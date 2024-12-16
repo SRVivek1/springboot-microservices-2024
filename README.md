@@ -124,4 +124,56 @@
 		@GetMapping(path = "/person/accept", produces = "application/vnd.company.app-v2+json")
 ```
 
-## 
+## a8-sboot-ms-hateoas
+- Maven dependency
+
+```
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+```
+
+- Spring resources
+
+```
+		import org.springframework.hateoas.EntityModel;
+		import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+```
+
+- API Refactoring
+
+```
+		/**
+		 * Retrieve the users.
+		 * 
+		 * @return
+		 */
+		@GetMapping(path = "/users/{id}", produces = {"application/json", "application/xml"})
+		public EntityModel<User> retrieveUser(@PathVariable Integer id) {
+			User user = userDaoService.findById(id);
+	
+			if (user == null) {
+				throw new UserNotFoundException(String.format("No user exists with id : %s", id));
+			}
+	
+			// Create link to method
+			var link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+	
+			// EntityModel object supports Model and allows to add links
+			final EntityModel<User> entityModel = EntityModel.of(user);
+			entityModel.add(link.withRel("all-users"));
+			
+			return entityModel;
+		}
+
+```
+
+
+## a9-sboot-ms-static-filtering
+
+
+
+
+## a10-
