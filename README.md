@@ -301,4 +301,20 @@
 ```
 
 
+## a11-sboot-ms-hal-explorer
+- Dependency
 
+```
+		<!-- Spring boot HAL explorer -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-rest-hal-explorer</artifactId>
+		</dependency>
+```
+
+- Default URL
+
+```
+		- http://localhost:8080/explorer
+		- http://localhost:8080/explorer/index.html#
+```
