@@ -26,4 +26,36 @@ org.springframework.web.servlet.support.ServletUriComponentsBuilder
 ```
 ---
 
-## a3-sboot-ms-social-
+
+## a3-sboot-ms-validation
+- TODO
+
+
+## a4-sboot-ms-springdoc-swagger-openapi
+- open API swagger documentation required below dependency in classpath.
+
+```
+	<dependency>
+		<groupId>org.springdoc</groupId>
+		<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		<version>2.7.0</version>
+	</dependency>
+
+```
+
+- Swagger API URL
+
+```
+http://localhost:8080/swagger-ui/index.html#/user-resource/retrieveAllUsers
+```
+
+- Reference
+
+```
+- https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml
+- https://springdoc.org/#getting-started
+```
+
+
+## a5-sboot-ms-content-negotiation
+- TODO
