@@ -57,4 +57,15 @@ public class UserDaoService {
 		return findById(user.getId());
 	}
 
+	/**
+	 * Delete user with given id.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean deleteById(Integer id) {
+
+		final Predicate<? super User> predicate = user -> user.getId().equals(id);
+		return users.removeIf(predicate);
+	}
 }

@@ -1,4 +1,4 @@
-package com.srvivek.sboot.mservices.controller;
+package com.srvivek.sboot.mservices.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
