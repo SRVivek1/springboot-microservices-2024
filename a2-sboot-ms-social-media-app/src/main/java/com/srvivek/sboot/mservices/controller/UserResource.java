@@ -44,7 +44,13 @@ public class UserResource {
 	 */
 	@GetMapping(path = "/users/{id}")
 	public User retrieveUser(@PathVariable Integer id) {
-		return userDaoService.findById(id);
+		User user = userDaoService.findById(id);
+		
+		if(user == null) {
+			throw new UserNotFoundException(String.format("No user exists with id : {}", id));
+		}
+		
+		return user;
 	}
 
 	/**
