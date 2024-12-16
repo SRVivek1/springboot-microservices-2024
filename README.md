@@ -173,7 +173,132 @@
 
 ## a9-sboot-ms-static-filtering
 
+### Static filtering
+
+- Resource
+
+```
+		import com.fasterxml.jackson.annotation.JsonIgnore;
+		import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+```
+
+- Static filtering code
+
+```
+		/**
+		 * Do not send field2, field4, field6
+		 */
+		@JsonIgnoreProperties(value = {"field2", "field4"})
+		public class SomeBean {
+		
+			private String field1;
+			private String field2;
+			private String field3;
+			private String field4;
+			private String field5;
+			
+			//Ignore in json response
+			@JsonIgnore
+			private String field6;
+			
+			// constructor
+			
+			// getters
+			
+			// toString()
+		}
+
+```
+
+
+### Dynamic filtering
+- Resource
+
+```
+		import com.fasterxml.jackson.databind.ser.FilterProvider;
+		import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+		import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+```
+
+
+- Dynamic Filtering code
+
+```
+		@RestController
+		public class DynamicFilteringController {
+		
+			@GetMapping("/dyna-filtering")
+			public SomeBeanDynamicFilter filtering() {
+				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3",
+						"Value-4", "Value-5", "Value-6");
+		
+				// Dynamic filtering
+				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field2",
+						"field4", "field6");
+		
+				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
+						simpleBeanPropertyFilter);
+		
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+		
+				return SomeBeanDynamicFilter;
+			}
+		
+			@GetMapping("/dyna-filtering-list")
+			public MappingJacksonValue filteringList() {
+				List<SomeBeanDynamicFilter> SomeBeanDynamicFilterList = Arrays.asList(
+						new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3", "Value-4", "Value-5", "Value-6"),
+						new SomeBeanDynamicFilter("Value-11", "Value-22", "Value-33", "Value-44", "Value-55", "Value-66"),
+						new SomeBeanDynamicFilter("Value-111", "Value-222", "Value-333", "Value-444", "Value-555",
+								"Value-666"));
+		
+				// Dynamic filtering
+				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field1",
+						"field3", "field5", "field6");
+				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
+						simpleBeanPropertyFilter);
+		
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+		
+				return mappingJacksonValue;
+			}
+
+```
+
+- Dynamic filterig bean
+
+-Resource
+
+```
+		import com.fasterxml.jackson.annotation.JsonFilter;
+```
+
+- Bean class
+
+```
+		/**
+		 * Dynamically exclude properties as per the specified filter.
+		 */
+		@JsonFilter("SomeBeanDynamicFilter")
+		public class SomeBeanDynamicFilter {
+		
+			private String field1;
+			private String field2;
+			private String field3;
+			private String field4;
+			private String field5;
+			private String field6;
+
+			// constructor
+			
+			// getters
+			
+			// toString()
+		}
+```
 
 
 
-## a10-
