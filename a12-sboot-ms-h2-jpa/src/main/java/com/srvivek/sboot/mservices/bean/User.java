@@ -21,7 +21,6 @@ public class User {
 
 	@Id
 	@GeneratedValue
-	@JsonProperty("user_id")
 	private Integer id;
 
 	@Column

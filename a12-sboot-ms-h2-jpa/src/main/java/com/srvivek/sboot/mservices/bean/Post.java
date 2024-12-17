@@ -1,7 +1,6 @@
 package com.srvivek.sboot.mservices.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +16,6 @@ public class Post {
 
 	@Id
 	@GeneratedValue
-	@JsonProperty("post_id")
 	private Integer id;
 
 	@Column
