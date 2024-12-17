@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import com.srvivek.sboot.mservices.bean.Post;
 import com.srvivek.sboot.mservices.bean.User;
 import com.srvivek.sboot.mservices.dao.PostRepository;
 import com.srvivek.sboot.mservices.dao.UserRepository;
+import com.srvivek.sboot.mservices.error.PostNotFoundException;
 import com.srvivek.sboot.mservices.error.UserNotFoundException;
 
 import jakarta.validation.Valid;
@@ -99,6 +101,41 @@ public class PostJpaResource {
 				.buildAndExpand(savedPost.getId()).toUri();
 
 		return ResponseEntity.created(resourceLocation).build();
-
 	}
+
+	/**
+	 * Retrieve post for the given user id and post id.
+	 * 
+	 * @param id
+	 * @param postId
+	 * @return
+	 */
+	@GetMapping(value = "/jpa/users/{id}/posts/{pid}")
+	public EntityModel<Post> retrievePostForPostId(@PathVariable Integer id,
+			@PathVariable(name = "pid") Integer postId) {
+
+		logger.info("PostJpaResource - retrievePostForPostId() API started.");
+
+		// user has to exists
+		Optional<User> user = userRepository.findById(id);
+
+		if (user.isEmpty()) {
+			throw new UserNotFoundException(String.format("No user exists with id %s", id));
+		}
+
+		logger.debug("User found with id {} : {}", id, user.get());
+
+		Optional<Post> post = postRepository.findByIdAndUser(postId, user.get());
+
+		if (post.isEmpty()) {
+			throw new PostNotFoundException(String.format("No post found with id: %s, pid: %s", id, postId));
+		}
+
+		logger.debug("Post for id {} : {}", postId, post);
+
+		final EntityModel<Post> resp = EntityModel.of(post.get());
+
+		return resp;
+	}
+
 }
