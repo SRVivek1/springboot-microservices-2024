@@ -19,6 +19,10 @@ import jakarta.validation.constraints.Size;
 @Entity(name = "user_details")
 public class User {
 
+	/**
+	 * Note: If using HATEOAS / EntitlyModel then the @Id field will not be returned
+	 * in response.
+	 */
 	@Id
 	@GeneratedValue
 	private Integer id;

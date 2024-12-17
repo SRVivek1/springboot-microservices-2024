@@ -20,6 +20,7 @@ import com.srvivek.sboot.mservices.bean.User;
 import com.srvivek.sboot.mservices.dao.UserRepository;
 import com.srvivek.sboot.mservices.error.UserNotFoundException;
 
+import jakarta.persistence.Id;
 import jakarta.validation.Valid;
 
 @RestController
@@ -47,6 +48,9 @@ public class UserJpaResource {
 	/**
 	 * Retrieve the users.
 	 * 
+	 * Note: HATEOAS / EntitlyModel for response, it filters out the {@link Id}
+	 * filed from bean.
+	 * 
 	 * @return
 	 */
 	@GetMapping(path = "/jpa/users/{id}")
@@ -55,7 +59,7 @@ public class UserJpaResource {
 		Optional<User> user = userRepository.findById(id);
 
 		logger.debug("User found in DB : {}", user.get());
-		
+
 		if (user.isEmpty()) {
 			throw new UserNotFoundException(String.format("No user exists with id : %s", id));
 		}
@@ -66,6 +70,28 @@ public class UserJpaResource {
 		entityModel.add(link.withRel("all-users"));
 
 		return entityModel;
+	}
+
+	/**
+	 * Retrieve the users, without HATEOAS
+	 * 
+	 * Note: HATEOAS / EntitlyModel for response, it filters out the {@link Id}
+	 * filed from bean.
+	 * 
+	 * @return
+	 */
+	@GetMapping(path = "/jpa/wh/users/{id}")
+	public User retrieveUserNoHateoas(@PathVariable Integer id) {
+		logger.info("Find user associated with id : {}", id);
+		Optional<User> user = userRepository.findById(id);
+
+		logger.debug("User found in DB : {}", user.get());
+
+		if (user.isEmpty()) {
+			throw new UserNotFoundException(String.format("No user exists with id : %s", id));
+		}
+
+		return user.get();
 	}
 
 	/**
