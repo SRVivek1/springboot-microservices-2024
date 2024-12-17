@@ -12,7 +12,7 @@
 	<groupId>com.srvivek.sboot.mservices</groupId>
 	<artifactId>a12-sboot-ms-h2-jpa</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>a12-sboot-ms-h2-jpa/</name>
+	<name>a12-sboot-ms-h2-jpa</name>
 	<description>Spring boot microservices learning POCs.</description>
 	<url />
 	<licenses>
