@@ -6,9 +6,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,7 +46,7 @@ public class PostJpaResource {
 	 * @return
 	 */
 	@GetMapping("/jpa/users/{id}/posts")
-	public CollectionModel<Post> retrieveAllPostsOfUser(@PathVariable(name = "id") Integer userId) {
+	public List<Post> retrieveAllPostsOfUser(@PathVariable(name = "id") Integer userId) {
 
 		logger.info("PostJpaResource - retrieveAllPostsOfUser() API started.");
 
@@ -63,13 +60,7 @@ public class PostJpaResource {
 
 		logger.debug("Posts for user {} : {}", userId, postList);
 
-		final WebMvcLinkBuilder link = WebMvcLinkBuilder
-				.linkTo(WebMvcLinkBuilder.methodOn(UserJpaResource.class).retrieveUser(userId));
-
-		final CollectionModel<Post> posts = CollectionModel.of(postList);
-		posts.add(link.withRel(String.format("user-%s", userId)));
-
-		return posts;
+		return postList;
 	}
 
 	/**
@@ -111,8 +102,7 @@ public class PostJpaResource {
 	 * @return
 	 */
 	@GetMapping(value = "/jpa/users/{id}/posts/{pid}")
-	public EntityModel<Post> retrievePostForPostId(@PathVariable Integer id,
-			@PathVariable(name = "pid") Integer postId) {
+	public Post retrievePostForPostId(@PathVariable Integer id, @PathVariable(name = "pid") Integer postId) {
 
 		logger.info("PostJpaResource - retrievePostForPostId() API started.");
 
@@ -133,9 +123,7 @@ public class PostJpaResource {
 
 		logger.debug("Post for id {} : {}", postId, post);
 
-		final EntityModel<Post> resp = EntityModel.of(post.get());
-
-		return resp;
+		return post.get();
 	}
 
 }
