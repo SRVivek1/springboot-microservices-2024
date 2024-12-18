@@ -12,14 +12,20 @@ public class SpringSecurityConfiguration {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-		// All requests must be authorized
-		// Else return HTTP 403
+		/* 
+		 * All requests must be authorized.
+		 * 
+		 * Else return HTTP 403, it doesn't prompt for user creds.
+		 */
 		httpSecurity.authorizeHttpRequests(
 				authorizationManagerRequestMatcherRegistryCustomizer -> authorizationManagerRequestMatcherRegistryCustomizer
 						.anyRequest().authenticated());
 
-		// Prompt for authentication if request is not authorized
-		// Using default customizer
+		/* 
+		 * Prompt for authentication if request is not authorized.
+		 * 
+		 * Using default customizer
+		 */
 		httpSecurity.httpBasic(Customizer.withDefaults());
 
 		/*
