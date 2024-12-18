@@ -3,9 +3,9 @@ package com.srvivek.sboot.msc.limitservice.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "limits-service")
+@ConfigurationProperties(prefix = "app-config")
 @Component
-public class LimitsServiceConfiguration {
+public class AppServiceConfiguration {
 
 	// it will match to property named - limits-service.minimum
 	private int minimum;
@@ -13,7 +13,7 @@ public class LimitsServiceConfiguration {
 	// it will match to property named - limits-service.maximum
 	private int maximum;
 
-	public LimitsServiceConfiguration() {
+	public AppServiceConfiguration() {
 	}
 
 	public int getMinimum() {

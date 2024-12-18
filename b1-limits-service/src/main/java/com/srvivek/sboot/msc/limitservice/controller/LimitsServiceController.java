@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srvivek.sboot.msc.limitservice.bean.Limits;
+import com.srvivek.sboot.msc.limitservice.config.LimitsServiceConfiguration;
 
 @RestController
 public class LimitsServiceController {
