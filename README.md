@@ -320,7 +320,7 @@
 ```
 
 
-## Docker installation
+##a13-sboot-ms-mysql-jpa
 - Launch MySQL as Docker container
 
 ```
@@ -370,3 +370,45 @@
 		spring.jpa.hibernate.ddl-auto=update
 		spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 ```
+
+
+##a14-sboot-sc-basic-authentication
+
+- Dependency
+
+```
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+```
+
+- Note: If facing any issue while starting the application, try following
+		- Stop the server.
+		- Update maven project (Alt + f5).
+		- Start the server.
+
+
+- Default user is 'user'.
+- Get auto generated password from log.
+	- Search in logs for "Using generated security password: " text to get the auto generated password.
+
+
+- Configuring user and password in application.properties
+
+```
+		spring.security.user.name=vivek
+		spring.security.user.password=welcome
+```	
+
+- Customizing default authentication
+	- Create a Configuration class to override default authetication
+
+```
+
+
+```	
+
+
