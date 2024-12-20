@@ -3,7 +3,7 @@
 ## Return response with link to newly created resource
 
 ### Project ref: a2-sboot-ms-social-media-app
-- Maven / External dependency
+- **<ins>Maven / External dependency</ins>**
 	- Below required resources are available in Spring web dependency.
  	- ```
     	<dependency>
@@ -12,14 +12,14 @@
 		</dependency>
     	```	 
 
-- Code changes
+- **<ins>Code changes</ins>**
 	- Build URL to new Resource using current request.
-		- `import org.springframework.web.servlet.support.ServletUriComponentsBuilder`
-		- `ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
-						.toUri();`
-	- Wrap new URL and response object in `ResponseEntity`.
-	- Return the `ResponseEntity` object.
-		- `return ResponseEntity.created(location).body(savedUser);`
+		- *`import org.springframework.web.servlet.support.ServletUriComponentsBuilder`*
+		- *`ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
+						.toUri();`*
+	- Wrap new URL and response object in *`ResponseEntity`*.
+	- Return the *`ResponseEntity`* object.
+		- *`return ResponseEntity.created(location).body(savedUser);`*
 
 		- ```
 			@PostMapping("/users")
@@ -37,6 +37,7 @@
 
 ```
 
+# Formatted till here
 ## a3-sboot-ms-validation
 - TODO
 
