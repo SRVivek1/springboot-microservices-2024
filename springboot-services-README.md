@@ -1,47 +1,96 @@
-# springboot-microservices-2024
-
-## Return response with link to newly created resource
-
+# springboot-microservices-2024 [v3.4.0]
+---
+## 1. Return response with link to newly created resource
 ### Project ref: a2-sboot-ms-social-media-app
 - **<ins>Maven / External dependency</ins>**
 	- Below required resources are available in Spring web dependency.
- 	- ```
+ 	```
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-    	```	 
-
+		</dependency> 
 - **<ins>Code changes</ins>**
+    - imports
+      - *`import org.springframework.web.servlet.support.ServletUriComponentsBuilder`*
 	- Build URL to new Resource using current request.
-		- *`import org.springframework.web.servlet.support.ServletUriComponentsBuilder`*
 		- *`ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
 						.toUri();`*
-	- Wrap new URL and response object in *`ResponseEntity`*.
-	- Return the *`ResponseEntity`* object.
+	- Wrap new URL and response object in *`ResponseEntity`* and return the *`ResponseEntity`* object.
 		- *`return ResponseEntity.created(location).body(savedUser);`*
+	- Controller method
+		```
+			@PostMapping("/users")
+			public ResponseEntity<User> createUser(@RequestBody User user) {
 
-		- ```
-				@PostMapping("/users")
-				public ResponseEntity<User> createUser(@RequestBody User user) {
+				logger.debug("User to save : {}", user);
+				User savedUser = userDaoService.save(user);
 	
-					logger.debug("User to save : {}", user);
-			
-					User savedUser = userDaoService.save(user);
-		
-					URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}")
-	    					.buildAndExpand(savedUser.getId()).toUri();
+				URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}")
+	    			.buildAndExpand(savedUser.getId()).toUri();
 	    
-					return ResponseEntity.created(location).body(savedUser);
-				}	
+				return ResponseEntity.created(location).body(savedUser);
+			}	
 ---
+## 2. Property, method param or Return type validation
 
-# Formatted till here
-## a3-sboot-ms-validation
-- TODO
+### Project ref:  a3-sboot-ms-validation
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - imports
+    - `import jakarta.validation.Valid;`
+  - Annotate the method parameter for validation.
+	```
+		@PostMapping("/users")
+		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
 
+			logger.debug("User to save : {}", user);
 
-## a4-sboot-ms-springdoc-swagger-openapi
+			var savedUser = userDaoService.save(user);
+
+			var location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
+					.toUri();
+			return ResponseEntity.created(location).body(savedUser);
+		}
+	```
+
+  - imports
+    - `import jakarta.validation.constraints.Past;`
+	- `import jakarta.validation.constraints.Size;`
+  - Add validation in the properties of the bean.
+	```
+		public class User {
+
+			private Integer id;
+
+			@Size(min = 3, max = 20, message = "Name must be more than 2 characters.")
+			private String name;
+
+			@Past(message = "Birth date should be in past.")
+			@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+			private LocalDate birthDate;
+
+			// constructors, setter-getters and other methods.
+		}
+	```
+  - **<ins>Notes:</ins>**
+    - Spring internally usages `jakarta-validation` API.
+    - Check `jakarta.validation.constraints.*` for more validation classes.
+      - `@Valid` annotation:
+        - Marks a property, method parameter or method return type for validation cascading.
+        - Constraints defined on the object and its properties are validated when the property, method parameter or method return type is validated.
+      - `@Size` annotation
+        - Validates property value to match defined size constraints.
+      - `@Past` annotation
+        - Validates date value for must be a past date.
+
+---
+## a4-sboot-ms-springdoc-swagger-openapi  -- Reformatting TODO
 - open API swagger documentation required below dependency in classpath.
 
 ```

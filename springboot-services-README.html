@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>springboot-microservices-2024 &lbrack;v3&period;4&period;0&rbrack;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024 [v3.4.0]</h1>
+<hr>
+<h2 id="1-return-response-with-link-to-newly-created-resource">1. Return response with link to newly created resource</h2>
+<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: a2-sboot-ms-social-media-app</h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Below required resources are available in Spring web dependency.</li>
+</ul>
+<pre><code>	&lt;dependency&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+	&lt;/dependency&gt; 
+</code></pre>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><em><code>import org.springframework.web.servlet.support.ServletUriComponentsBuilder</code></em></li>
+</ul>
+</li>
+<li>Build URL to new Resource using current request.
+<ul>
+<li><em><code>ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId())   			.toUri();</code></em></li>
+</ul>
+</li>
+<li>Wrap new URL and response object in <em><code>ResponseEntity</code></em> and return the <em><code>ResponseEntity</code></em> object.
+<ul>
+<li><em><code>return ResponseEntity.created(location).body(savedUser);</code></em></li>
+</ul>
+</li>
+<li>Controller method<pre><code>	@PostMapping(&quot;/users&quot;)
+	public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) {
+
+		logger.debug(&quot;User to save : {}&quot;, user);
+		User savedUser = userDaoService.save(user);
+
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;)
+			.buildAndExpand(savedUser.getId()).toUri();
+
+		return ResponseEntity.created(location).body(savedUser);
+	}	
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-property-method-param-or-return-type-validation">2. Property, method param or Return type validation</h2>
+<h3 id="project-ref--a3-sboot-ms-validation">Project ref:  a3-sboot-ms-validation</h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Add spring validation dependency.<pre><code>	&lt;dependency&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+	&lt;/dependency&gt;
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.Valid;</code></li>
+</ul>
+</li>
+<li>
+<p>Annotate the method parameter for validation.</p>
+<pre><code>	@PostMapping(&quot;/users&quot;)
+	public ResponseEntity&lt;User&gt; createUser(@Valid @RequestBody User user) {
+
+		logger.debug(&quot;User to save : {}&quot;, user);
+
+		var savedUser = userDaoService.save(user);
+
+		var location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId())
+				.toUri();
+		return ResponseEntity.created(location).body(savedUser);
+	}
+</code></pre>
+</li>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.constraints.Past;</code></li>
+<li><code>import jakarta.validation.constraints.Size;</code></li>
+</ul>
+</li>
+<li>
+<p>Add validation in the properties of the bean.</p>
+<pre><code>	public class User {
+
+		private Integer id;
+
+		@Size(min = 3, max = 20, message = &quot;Name must be more than 2 characters.&quot;)
+		private String name;
+
+		@Past(message = &quot;Birth date should be in past.&quot;)
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;)
+		private LocalDate birthDate;
+
+		// constructors, setter-getters and other methods.
+	}
+</code></pre>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Spring internally usages <code>jakarta-validation</code> API.</li>
+<li>Check <code>jakarta.validation.constraints.*</code> for more validation classes.
+<ul>
+<li><code>@Valid</code> annotation:
+<ul>
+<li>Marks a property, method parameter or method return type for validation cascading.</li>
+<li>Constraints defined on the object and its properties are validated when the property, method parameter or method return type is validated.</li>
+</ul>
+</li>
+<li><code>@Size</code> annotation
+<ul>
+<li>Validates property value to match defined size constraints.</li>
+</ul>
+</li>
+<li><code>@Past</code> annotation
+<ul>
+<li>Validates date value for must be a past date.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="a4-sboot-ms-springdoc-swagger-openapi">a4-sboot-ms-springdoc-swagger-openapi</h2>
+<ul>
+<li>open API swagger documentation required below dependency in classpath.</li>
+</ul>
+<pre><code>		&lt;dependency&gt;
+			&lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+			&lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+			&lt;version&gt;2.7.0&lt;/version&gt;
+		&lt;/dependency&gt;
+
+</code></pre>
+<ul>
+<li>Swagger API URL</li>
+</ul>
+<pre><code>		http://localhost:8080/swagger-ui/index.html#/user-resource/retrieveAllUsers
+</code></pre>
+<ul>
+<li>Reference</li>
+</ul>
+<pre><code>		- https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml
+		- https://springdoc.org/#getting-started
+</code></pre>
+<h2 id="a5-sboot-ms-content-negotiation">a5-sboot-ms-content-negotiation</h2>
+<ul>
+<li>TODO</li>
+</ul>
+<h2 id="a6-sboot-ms-content-i18n">a6-sboot-ms-content-i18n</h2>
+<ul>
+<li>TODO</li>
+</ul>
+<h2 id="a7-sboot-ms-api-versioning">a7-sboot-ms-api-versioning</h2>
+<ul>
+<li>URI Versioning</li>
+</ul>
+<pre><code>		V1: http://localhost:8080/v1/person
+		
+		@GetMapping(&quot;/v1/person&quot;)
+		
+		V2: http://localhost:8080/v2/person
+		
+		@GetMapping(&quot;/v2/person&quot;)
+
+</code></pre>
+<ul>
+<li>Request Param Versioning</li>
+</ul>
+<pre><code>		V1: http://localhost:8080/person?version=1
+		
+		@GetMapping(path = &quot;/person&quot;, params = &quot;version=1&quot;)
+		
+		V2: http://localhost:8080/person?version=2
+		
+		@GetMapping(path = &quot;/person&quot;, params = &quot;version=2&quot;)
+</code></pre>
+<ul>
+<li>Header Versioning</li>
+</ul>
+<pre><code>		V1: http://localhost:8080/person/header
+		
+		HEADER - X-API-VERSION:1
+		
+		@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=1&quot;)
+		
+		V2: http://localhost:8080/person/header
+		
+		HEADER - X-API-VERSION:2
+		
+		@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=2&quot;)
+</code></pre>
+<ul>
+<li>Content Negotiation Versioning</li>
+</ul>
+<pre><code>		V1: http://localhost:8080/person/accept
+		
+		HEADER - Accept:application/vnd.company.app-v1+json
+		
+		@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.company.app-v1+json&quot;)
+		
+		V2: http://localhost:8080/person/accept
+		
+		HEADER - Accept:application/vnd.company.app-v1+json
+		
+		@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.company.app-v2+json&quot;)
+</code></pre>
+<h2 id="a8-sboot-ms-hateoas">a8-sboot-ms-hateoas</h2>
+<ul>
+<li>Maven dependency</li>
+</ul>
+<pre><code>		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-hateoas&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>Spring resources</li>
+</ul>
+<pre><code>		import org.springframework.hateoas.EntityModel;
+		import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+</code></pre>
+<ul>
+<li>API Refactoring</li>
+</ul>
+<pre><code>		/**
+		 * Retrieve the users.
+		 * 
+		 * @return
+		 */
+		@GetMapping(path = &quot;/users/{id}&quot;, produces = {&quot;application/json&quot;, &quot;application/xml&quot;})
+		public EntityModel&lt;User&gt; retrieveUser(@PathVariable Integer id) {
+			User user = userDaoService.findById(id);
+	
+			if (user == null) {
+				throw new UserNotFoundException(String.format(&quot;No user exists with id : %s&quot;, id));
+			}
+	
+			// Create link to method
+			var link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+	
+			// EntityModel object supports Model and allows to add links
+			final EntityModel&lt;User&gt; entityModel = EntityModel.of(user);
+			entityModel.add(link.withRel(&quot;all-users&quot;));
+			
+			return entityModel;
+		}
+
+</code></pre>
+<h2 id="a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</h2>
+<h3 id="static-filtering">Static filtering</h3>
+<ul>
+<li>Resource</li>
+</ul>
+<pre><code>		import com.fasterxml.jackson.annotation.JsonIgnore;
+		import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+</code></pre>
+<ul>
+<li>Static filtering code</li>
+</ul>
+<pre><code>		/**
+		 * Do not send field2, field4, field6
+		 */
+		@JsonIgnoreProperties(value = {&quot;field2&quot;, &quot;field4&quot;})
+		public class SomeBean {
+		
+			private String field1;
+			private String field2;
+			private String field3;
+			private String field4;
+			private String field5;
+			
+			//Ignore in json response
+			@JsonIgnore
+			private String field6;
+			
+			// constructor
+			
+			// getters
+			
+			// toString()
+		}
+
+</code></pre>
+<h3 id="dynamic-filtering">Dynamic filtering</h3>
+<ul>
+<li>Resource</li>
+</ul>
+<pre><code>		import com.fasterxml.jackson.databind.ser.FilterProvider;
+		import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+		import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+</code></pre>
+<ul>
+<li>Dynamic Filtering code</li>
+</ul>
+<pre><code>		@RestController
+		public class DynamicFilteringController {
+		
+			@GetMapping(&quot;/dyna-filtering&quot;)
+			public SomeBeanDynamicFilter filtering() {
+				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter(&quot;Value-1&quot;, &quot;Value-2&quot;, &quot;Value-3&quot;,
+						&quot;Value-4&quot;, &quot;Value-5&quot;, &quot;Value-6&quot;);
+		
+				// Dynamic filtering
+				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept(&quot;field2&quot;,
+						&quot;field4&quot;, &quot;field6&quot;);
+		
+				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter(&quot;SomeBeanDynamicFilter&quot;,
+						simpleBeanPropertyFilter);
+		
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+		
+				return SomeBeanDynamicFilter;
+			}
+		
+			@GetMapping(&quot;/dyna-filtering-list&quot;)
+			public MappingJacksonValue filteringList() {
+				List&lt;SomeBeanDynamicFilter&gt; SomeBeanDynamicFilterList = Arrays.asList(
+						new SomeBeanDynamicFilter(&quot;Value-1&quot;, &quot;Value-2&quot;, &quot;Value-3&quot;, &quot;Value-4&quot;, &quot;Value-5&quot;, &quot;Value-6&quot;),
+						new SomeBeanDynamicFilter(&quot;Value-11&quot;, &quot;Value-22&quot;, &quot;Value-33&quot;, &quot;Value-44&quot;, &quot;Value-55&quot;, &quot;Value-66&quot;),
+						new SomeBeanDynamicFilter(&quot;Value-111&quot;, &quot;Value-222&quot;, &quot;Value-333&quot;, &quot;Value-444&quot;, &quot;Value-555&quot;,
+								&quot;Value-666&quot;));
+		
+				// Dynamic filtering
+				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept(&quot;field1&quot;,
+						&quot;field3&quot;, &quot;field5&quot;, &quot;field6&quot;);
+				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter(&quot;SomeBeanDynamicFilter&quot;,
+						simpleBeanPropertyFilter);
+		
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+		
+				return mappingJacksonValue;
+			}
+
+</code></pre>
+<ul>
+<li>Dynamic filterig bean</li>
+</ul>
+<p>-Resource</p>
+<pre><code>		import com.fasterxml.jackson.annotation.JsonFilter;
+</code></pre>
+<ul>
+<li>Bean class</li>
+</ul>
+<pre><code>		/**
+		 * Dynamically exclude properties as per the specified filter.
+		 */
+		@JsonFilter(&quot;SomeBeanDynamicFilter&quot;)
+		public class SomeBeanDynamicFilter {
+		
+			private String field1;
+			private String field2;
+			private String field3;
+			private String field4;
+			private String field5;
+			private String field6;
+
+			// constructor
+			
+			// getters
+			
+			// toString()
+		}
+</code></pre>
+<h2 id="a11-sboot-ms-hal-explorer">a11-sboot-ms-hal-explorer</h2>
+<ul>
+<li>Dependency</li>
+</ul>
+<pre><code>		&lt;!-- Spring boot HAL explorer --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.data&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-data-rest-hal-explorer&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>Default URL</li>
+</ul>
+<pre><code>		- http://localhost:8080/explorer
+		- http://localhost:8080/explorer/index.html#
+</code></pre>
+<p>##a13-sboot-ms-mysql-jpa</p>
+<ul>
+<li>Launch MySQL as Docker container</li>
+</ul>
+<pre><code>		docker run --detach --env MYSQL_ROOT_PASSWORD=dummypassword --env MYSQL_USER=social-media-user --env MYSQL_PASSWORD=dummypassword --env MYSQL_DATABASE=social-media-database --name mysql --publish 3306:3306 mysql:8-oracle
+
+</code></pre>
+<ul>
+<li>mysqlsh commands</li>
+</ul>
+<pre><code>		mysqlsh
+		\connect social-media-user@localhost:3306
+		\sql
+		use social-media-database
+		select * from user_details;
+		select * from post;
+		\quit
+</code></pre>
+<ul>
+<li>/pom.xml Modified</li>
+</ul>
+<pre><code>		&lt;!-- Use this for Spring Boot 3.1 and higher --&gt;
+		&lt;dependency&gt;
+		    &lt;groupId&gt;com.mysql&lt;/groupId&gt;
+		    &lt;artifactId&gt;mysql-connector-j&lt;/artifactId&gt;
+		&lt;/dependency&gt; 
+		 
+		&lt;!-- Use this if you are using Spring Boot 3.0 or lower
+		    &lt;dependency&gt;
+		        &lt;groupId&gt;mysql&lt;/groupId&gt;
+		        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+		    &lt;/dependency&gt; 
+		--&gt;
+</code></pre>
+<ul>
+<li>/src/main/resources/application.properties</li>
+</ul>
+<pre><code>		#spring.datasource.url=jdbc:h2:mem:testdb
+		spring.jpa.show-sql=true
+		spring.datasource.url=jdbc:mysql://localhost:3306/social-media-database
+		spring.datasource.username=social-media-user
+		spring.datasource.password=dummypassword
+		spring.jpa.hibernate.ddl-auto=update
+		spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+</code></pre>
+<p>##a14-sboot-sc-basic-authentication</p>
+<ul>
+<li>Dependency</li>
+</ul>
+<pre><code>		&lt;!-- Spring Security --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+</code></pre>
+<ul>
+<li>
+<p>Note: If facing any issue while starting the application, try following
+- Stop the server.
+- Update maven project (Alt + f5).
+- Start the server.</p>
+</li>
+<li>
+<p>Default user is 'user'.</p>
+</li>
+<li>
+<p>Get auto generated password from log.</p>
+<ul>
+<li>Search in logs for &quot;Using generated security password: &quot; text to get the auto generated password.</li>
+</ul>
+</li>
+<li>
+<p>Configuring user and password in application properties</p>
+</li>
+</ul>
+<pre><code>		spring.security.user.name=vivek
+		spring.security.user.password=welcome
+</code></pre>
+<ul>
+<li>Customizing default authentication
+<ul>
+<li>Create a Configuration class to override default authetication</li>
+</ul>
+</li>
+</ul>
+<pre><code>		import org.springframework.context.annotation.Bean;
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.security.config.Customizer;
+		import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+		import org.springframework.security.web.SecurityFilterChain;
+		
+		@Configuration
+		public class SpringSecurityConfiguration {
+		
+			@Bean
+			SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+		
+				/* 
+				 * All requests must be authorized.
+				 * 
+				 * Else return HTTP 403, it doesn't prompt for user creds.
+				 */
+				httpSecurity.authorizeHttpRequests(
+						authorizationManagerRequestMatcherRegistryCustomizer -&gt; authorizationManagerRequestMatcherRegistryCustomizer
+								.anyRequest().authenticated());
+		
+				/* 
+				 * Prompt for authentication if request is not authorized.
+				 * 
+				 * Using default customizer
+				 */
+				httpSecurity.httpBasic(Customizer.withDefaults());
+		
+				/*
+				 * Disabling CSRF as it may cause issue with HTTP methods - POST &amp; PUT.
+				 * 
+				 * if enabled, Keep prompting for user credentials for post request.
+				 */
+				httpSecurity.csrf(csrf -&gt; csrf.disable());
+		
+				return httpSecurity.build();
+			}
+		}
+
+</code></pre>
+<ul>
+<li>X</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
