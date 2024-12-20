@@ -1,6 +1,11 @@
-# springboot-microservices-2024
+### springboot-microservices-2024
 
-## a2-sboot-ms-social-media-app
+## Build ResponseEntity with created resource URL
+
+# Project ref: a2-sboot-ms-social-media-app
+- Build URL to new Resource using current request.
+	- `ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
+					.toUri();`
 - Return URL and create status in response.
 
 ```
