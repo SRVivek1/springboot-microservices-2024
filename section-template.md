@@ -37,5 +37,9 @@
       - `@Size` annotation
         - Validates property value to match defined size constraints.
 
+  - **<ins>References:</ins>**
+    - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml`
+    - `xyz`
+
 ---
 
