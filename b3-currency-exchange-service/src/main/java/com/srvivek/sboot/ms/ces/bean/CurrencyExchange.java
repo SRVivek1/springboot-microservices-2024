@@ -2,12 +2,28 @@ package com.srvivek.sboot.ms.ces.bean;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class CurrencyExchange {
 
+	@Id
 	private long id;
+	
+	@Column(name = "currency_from")
 	private String from;
+	
+	@Column(name = "currency_to")
 	private String to;
+	
 	private BigDecimal conversionMultiples;
+
+	/**
+	 * Returns server env. where the request was executed.
+	 */
+	private String environment;
 
 	public CurrencyExchange() {
 		super();
@@ -51,6 +67,14 @@ public class CurrencyExchange {
 
 	public void setConversionMultiples(BigDecimal conversionMultiples) {
 		this.conversionMultiples = conversionMultiples;
+	}
+
+	public String getEnvironment() {
+		return environment;
+	}
+
+	public void setEnvironment(String environment) {
+		this.environment = environment;
 	}
 
 	@Override
