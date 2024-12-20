@@ -5,6 +5,12 @@
 ### Project ref: a2-sboot-ms-social-media-app
 - Maven / External dependency
 	- Below required resources are available in Spring web dependency.
+ 	- ```
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+    	```	 
 
 - Code changes
 	- Build URL to new Resource using current request.
@@ -15,18 +21,19 @@
 	- Return the `ResponseEntity` object.
 		- `return ResponseEntity.created(location).body(savedUser);`
 
-```
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@RequestBody User user) {
+		- ```
+			@PostMapping("/users")
+			public ResponseEntity<User> createUser(@RequestBody User user) {
 	
-			logger.debug("User to save : {}", user);
+				logger.debug("User to save : {}", user);
+		
+				User savedUser = userDaoService.save(user);
 	
-			User savedUser = userDaoService.save(user);
-	
-			URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
-					.toUri();
-			return ResponseEntity.created(location).body(savedUser);
-		}
+				URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}")
+    					.buildAndExpand(savedUser.getId()).toUri();
+    
+				return ResponseEntity.created(location).body(savedUser);
+			}
 
 ```
 
