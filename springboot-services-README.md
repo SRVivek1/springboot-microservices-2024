@@ -22,19 +22,18 @@
 		- *`return ResponseEntity.created(location).body(savedUser);`*
 
 		- ```
-			@PostMapping("/users")
-			public ResponseEntity<User> createUser(@RequestBody User user) {
+				@PostMapping("/users")
+				public ResponseEntity<User> createUser(@RequestBody User user) {
 	
-				logger.debug("User to save : {}", user);
+					logger.debug("User to save : {}", user);
+			
+					User savedUser = userDaoService.save(user);
 		
-				User savedUser = userDaoService.save(user);
-	
-				URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}")
-    					.buildAndExpand(savedUser.getId()).toUri();
-    
-				return ResponseEntity.created(location).body(savedUser);
-			}
-	```
+					URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}")
+	    					.buildAndExpand(savedUser.getId()).toUri();
+	    
+					return ResponseEntity.created(location).body(savedUser);
+				}	```
 
 
 # Formatted till here
