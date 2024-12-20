@@ -1,12 +1,19 @@
-### springboot-microservices-2024
+# springboot-microservices-2024
 
-## Build ResponseEntity with created resource URL
+## Return response with link to newly created resource
 
-# Project ref: a2-sboot-ms-social-media-app
-- Build URL to new Resource using current request.
-	- `ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
-					.toUri();`
-- Return URL and create status in response.
+### Project ref: a2-sboot-ms-social-media-app
+- Maven / External dependency
+	- Below required resources are available in Spring web dependency.
+
+- Code changes
+	- Build URL to new Resource using current request.
+		- `import org.springframework.web.servlet.support.ServletUriComponentsBuilder`
+		- `ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
+						.toUri();`
+	- Wrap new URL and response object in `ResponseEntity`.
+	- Return the `ResponseEntity` object.
+		- `return ResponseEntity.created(location).body(savedUser);`
 
 ```
 		@PostMapping("/users")
@@ -22,15 +29,6 @@
 		}
 
 ```
-
-- API in use.
-	- Below resource is used to build the URI dynamically.
-
-```
-		org.springframework.web.servlet.support.ServletUriComponentsBuilder
-```
----
-
 
 ## a3-sboot-ms-validation
 - TODO
