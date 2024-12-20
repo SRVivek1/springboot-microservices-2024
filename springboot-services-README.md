@@ -33,9 +33,8 @@
     					.buildAndExpand(savedUser.getId()).toUri();
     
 				return ResponseEntity.created(location).body(savedUser);
-			}
+			}```
 
-		```
 
 # Formatted till here
 ## a3-sboot-ms-validation
