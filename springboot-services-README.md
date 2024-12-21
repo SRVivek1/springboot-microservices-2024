@@ -1,13 +1,13 @@
 # springboot-microservices-2024 [v3.4.0]
 ---
 ## 1. Return response with link to newly created resource
-### Project ref: a2-sboot-ms-social-media-app
+### Project ref: *a2-sboot-ms-social-media-app*
 - **<ins>Maven / External dependency</ins>**
 	- Below required resources are available in Spring web dependency.
- 	```
+ 	```xml
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-bo	ot-starter-web</artifactId>
 		</dependency> 
 - **<ins>Code changes</ins>**
     - imports
@@ -18,7 +18,7 @@
 	- Wrap new URL and response object in *`ResponseEntity`* and return the *`ResponseEntity`* object.
 		- *`return ResponseEntity.created(location).body(savedUser);`*
 	- Controller method
-		```
+		```java
 			@PostMapping("/users")
 			public ResponseEntity<User> createUser(@RequestBody User user) {
 
@@ -33,10 +33,10 @@
 ---
 ## 2. Property, method param or Return type validation
 
-### Project ref:  a3-sboot-ms-validation
+### Project ref: *a3-sboot-ms-validation*
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
- 	```
+ 	```xml
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -45,7 +45,7 @@
   - imports
     - `import jakarta.validation.Valid;`
   - Annotate the method parameter for validation.
-	```
+	```java
 		@PostMapping("/users")
 		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
 
@@ -63,7 +63,7 @@
     - `import jakarta.validation.constraints.Past;`
 	- `import jakarta.validation.constraints.Size;`
   - Add validation in the properties of the bean.
-	```
+	```java
 		public class User {
 
 			private Integer id;
@@ -90,98 +90,287 @@
         - Validates date value for must be a past date.
 
 ---
-## a4-sboot-ms-springdoc-swagger-openapi  -- Reformatting TODO
-- open API swagger documentation required below dependency in classpath.
+## 3. API documentation using openAPI, swagger-ui
 
-```
-		<dependency>
+### Project ref: *a4-sboot-ms-springdoc-swagger-openapi*
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```xml
+    	<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.7.0</version>
 		</dependency>
+- **<ins>Code changes</ins>**
+  - `None`.
+	
+- **<ins>Swagger URL:</ins>**
+  - http://localhost:8080/swagger-ui
+  - http://localhost:8080/swagger-ui/index.html
 
-```
+- **<ins>Notes:</ins>**
+  - `No code change required to enable swagger documentation`.
+  - It's enabled by default if the ependency is present in `POM.xml`
 
-- Swagger API URL
+- **<ins>References:</ins>**
+  - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui`
+  - `https://springdoc.org/#getting-started`
 
-```
-		http://localhost:8080/swagger-ui/index.html#/user-resource/retrieveAllUsers
-```
+---
 
-- Reference
+## 4. Content negotiation for Response parsing
 
-```
-		- https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml
-		- https://springdoc.org/#getting-started
-```
+### Project ref: *a5-sboot-ms-content-negotiation*
+- **<ins>Maven / External dependency</ins>**
+  - Add following dependency in POM.xml
+ 	```xml
+    	<!-- XML conversion -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - `None`
+- **<ins>Notes:</ins>**
+  - If client requests for `Accept: application/xml` header.
+  - Spring willl internally check `jackson-dataformat-xml` API dependency, if found bean will be transformed to xml.
+---
 
+## 5. Internationalization (i18n)
 
-## a5-sboot-ms-content-negotiation
-- TODO
+### Project ref: *a6-sboot-ms-content-i18n*
+- **<ins>Maven / External dependency</ins>**
+  - Required API is available as part of spring-context dependency.
+  - This is imported with spring web dependency internally.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - imports
+    - `import org.springframework.context.MessageSource;`
+  - Autowire the MessageSource in required class.
+	```java
+		@RestController
+		public class HelloWorldI18n {
 
+			private MessageSource messageSource;
 
+			// autowire (constructor injection) messageSource.
+			public HelloWorldI18n(MessageSource messageSource) {
+				super();
+				this.messageSource = messageSource;
+			}
 
-## a6-sboot-ms-content-i18n
-- TODO
+			@GetMapping("/say-hello-i18n")
+			public String sayHello() {
 
-## a7-sboot-ms-api-versioning
-- URI Versioning
+				var locale = LocaleContextHolder.getLocale();
 
-```
-		V1: http://localhost:8080/v1/person
-		
-		@GetMapping("/v1/person")
-		
-		V2: http://localhost:8080/v2/person
-		
-		@GetMapping("/v2/person")
+				return this.messageSource.getMessage("good.morning", null, "Default - Good Morning", locale);
+			}
+		}
+	```
+  - Create property files for different locale 
+    - File: `messages[-<locale>].properties`
+    - Here's some examples:
+      - Default: `messages.properties`
+      - Spanish: `messages_es.properties`
+      - German: `messages_ger.properties`
+- **<ins>Notes:</ins>**
+  - Default message files name prefix is `messages` & suffix is `.properties`.
+  - Spring reads the value of `Accept-Language` Header from `HTTP Request`and replaces it with `<locale>` when locating `messsages[-<locale>].properties` file.
 
-```
+---
+## 6. Microservice API Versioning
+### Project ref: *a7-sboot-ms-api-versioning*
+- **<ins>Maven / External dependency</ins>**
+  - No dependency required.
+  - API versioning is HTTP architectural style.
+	- `None`
+- **<ins>Common Code</ins>**
+  - Person bean v1
+	```java
+		public class PersonV1 {
 
+			private String name;
 
-- Request Param Versioning
+			public PersonV1(String name) {
+				super();
+				this.name = name;
+			}
+			// getter-setters
+		}
+	```
+  - Person bean v2
+	```java
+		public class PersonV2 {
 
-```
-		V1: http://localhost:8080/person?version=1
-		
-		@GetMapping(path = "/person", params = "version=1")
-		
-		V2: http://localhost:8080/person?version=2
-		
-		@GetMapping(path = "/person", params = "version=2")
-```
+			private Name name;
 
-- Header Versioning
+			public PersonV2(Name name) {
+				super();
+				this.name = name;
+			}
+			// getter-setters
+		}
+	```
+  - Name bean
+	```java
+		public class Name {
 
-```
-		V1: http://localhost:8080/person/header
-		
-		HEADER - X-API-VERSION:1
-		
-		@GetMapping(path = "/person/header", headers = "X-API-VERSION=1")
-		
-		V2: http://localhost:8080/person/header
-		
-		HEADER - X-API-VERSION:2
-		
-		@GetMapping(path = "/person/header", headers = "X-API-VERSION=2")
-```
+			private String firstName;
+			private String lastName;
 
-- Content Negotiation Versioning
+			public Name(String firstName, String lastName) {
+				super();
+				this.firstName = firstName;
+				this.lastName = lastName;
+			}
+			// getters-setters
+		}
+	```
+- **<ins>URI Versioning</ins>**
+  - In this versioning style, a version number is appended in URL to create new URL version.
+  - **Twitter** also follows same versoning strrateegy.
+    - **Ref:** https://developer.x.com/en/docs/x-ads-api/versioning
+  - **<ins>Drawback</ins>**
+    - Polluting URL
+  - **<ins>Controller Code changes</ins>**
+    - imports
+      - `import org.springframework.web.bind.annotation.GetMapping;`
+    - Here's two versions of API defined.
+		```java
+			@RestController
+			public class UriVersioningPersonController {
 
-```
-		V1: http://localhost:8080/person/accept
-		
-		HEADER - Accept:application/vnd.company.app-v1+json
-		
-		@GetMapping(path = "/person/accept", produces = "application/vnd.company.app-v1+json")
-		
-		V2: http://localhost:8080/person/accept
-		
-		HEADER - Accept:application/vnd.company.app-v1+json
-		
-		@GetMapping(path = "/person/accept", produces = "application/vnd.company.app-v2+json")
-```
+				/**
+				* Version 1
+				* @return
+				*/
+				@GetMapping("/v1/person")
+				public PersonV1 getPersonV1() {
+					return new PersonV1("URI Versioning v1");
+				}
+
+				/**
+				* Version 2
+				* @return
+				*/
+				@GetMapping("/v2/person")
+				public PersonV2 getPersonV2() {
+					return new PersonV2(new Name("URI", "Versioning V2"));
+				}
+			}
+		```
+- **<ins>Request Param Versioning</ins>**
+  - In this versioning style, a request param is sent with API version number.
+  - Base URL remains unchanged. 
+  - **Amazon** also follows same versoning strrateegy.
+    - **Ref:** https://
+  - **<ins>Drawback</ins>**
+    - Polluting URL
+  - **<ins>Controller Code changes</ins>**
+    - imports
+      - `import org.springframework.web.bind.annotation.GetMapping;`
+    - Here's two versions of API defined.
+		```java
+			@RestController
+			public class RequestParamVersioningController {
+
+				/**
+				* Version 1
+				* @return
+				*/
+				@GetMapping(path = "/person/param", params = "version=1")
+				public PersonV1 getPersonV1() {
+					return new PersonV1("Request Param versioning v1");
+				}
+
+				/**
+				* Version 2
+				* @return
+				*/
+				@GetMapping(path = "/person/param", params = "version=2")
+				public PersonV2 getPersonV2() {
+					return new PersonV2(new Name("Request Parama", "Versioning v2"));
+				}
+			}
+		```
+- **<ins>Custom Header Versioning</ins>**
+  - In this versioning style, a custom HTTP header is sent with API version number.
+  - Base URL remains unchanged. 
+  - **Microsoft** also follows same versoning strrateegy.
+    - **Ref:** https://
+  - **<ins>Drawback</ins>**
+    - Misuse of HTTP Headers
+  - **<ins>Controller Code changes</ins>**
+    - imports
+      - `import org.springframework.web.bind.annotation.GetMapping;`
+    - Here's two versions of API defined.
+		```java
+			@RestController
+			public class CustomHeaderVersioning {
+
+				/**
+				* Version 1
+				* @return
+				*/
+				@GetMapping(path = "/person/header", headers = "X-API-VERSION=1")
+				public PersonV1 getPersonV1() {
+					return new PersonV1("Custom Header Versioning v1");
+				}
+
+				/**
+				* Version 2
+				* @return
+				*/
+				@GetMapping(path = "/person/header", headers = "X-API-VERSION=2")
+				public PersonV2 getPersonV2() {
+					return new PersonV2(new Name("Custom Header", "Versioning v2"));
+				}
+			}
+		```
+- **<ins>Content Negotiation (Media type) Versioning</ins>**
+  - a.k.a `Content negotiation` or `Accept header` versioning.
+  - In this versioning style, a custome media type is sent in `Accept` HTTP header.
+  - Which API matches the header value request is forwarded to it.
+    - e.g. `Accept: application/vnd.comp.app-v2+json`
+  - Base URL remains unchanged. 
+  - **Github** also follows same versoning strrateegy.
+    - **Ref:** https://
+  - **<ins>Drawback</ins>**
+    - Misuse of HTTP Headers
+  - **<ins>Controller Code changes</ins>**
+    - imports
+      - `import org.springframework.web.bind.annotation.GetMapping;`
+    - Here's two versions of API defined.
+		```java
+			@RestController
+			public class MediaTypeVersioning {
+
+				/**
+				* Version 1
+				* @return
+				*/
+				@GetMapping(path = "/person/accept", produces = "application/vnd.comp.app-v1+json")
+				public PersonV1 getPersonV1() {
+					return new PersonV1("Mediatype Versioning v1.");
+				}
+
+				/**
+				* Version 2
+				* @return
+				*/
+				@GetMapping(path = "/person/accept", produces = "application/vnd.comp.app-v2+json")
+				public PersonV2 getPersonV2() {
+					return new PersonV2(new Name("Media type", "Versioning v2"));
+				}
+			}
+		```
+
+---
 
 ## a8-sboot-ms-hateoas
 - Maven dependency

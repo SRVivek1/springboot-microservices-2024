@@ -139,16 +139,16 @@
             <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024 [v3.4.0]</h1>
 <hr>
 <h2 id="1-return-response-with-link-to-newly-created-resource">1. Return response with link to newly created resource</h2>
-<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: a2-sboot-ms-social-media-app</h3>
+<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Below required resources are available in Spring web dependency.</li>
 </ul>
-<pre><code>	&lt;dependency&gt;
-		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-		&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-	&lt;/dependency&gt; 
+<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-bo	ot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span> 
 </code></pre>
 </li>
 <li><strong><ins>Code changes</ins></strong>
@@ -168,16 +168,16 @@
 <li><em><code>return ResponseEntity.created(location).body(savedUser);</code></em></li>
 </ul>
 </li>
-<li>Controller method<pre><code>	@PostMapping(&quot;/users&quot;)
-	public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) {
+<li>Controller method<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> User user)</span> {
 
-		logger.debug(&quot;User to save : {}&quot;, user);
-		User savedUser = userDaoService.save(user);
+		logger.debug(<span class="hljs-string">&quot;User to save : {}&quot;</span>, user);
+		<span class="hljs-type">User</span> <span class="hljs-variable">savedUser</span> <span class="hljs-operator">=</span> userDaoService.save(user);
 
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;)
+		<span class="hljs-type">URI</span> <span class="hljs-variable">location</span> <span class="hljs-operator">=</span> ServletUriComponentsBuilder.fromCurrentRequest().path(<span class="hljs-string">&quot;{id}&quot;</span>)
 			.buildAndExpand(savedUser.getId()).toUri();
 
-		return ResponseEntity.created(location).body(savedUser);
+		<span class="hljs-keyword">return</span> ResponseEntity.created(location).body(savedUser);
 	}	
 </code></pre>
 </li>
@@ -186,14 +186,14 @@
 </ul>
 <hr>
 <h2 id="2-property-method-param-or-return-type-validation">2. Property, method param or Return type validation</h2>
-<h3 id="project-ref--a3-sboot-ms-validation">Project ref:  a3-sboot-ms-validation</h3>
+<h3 id="project-ref-a3-sboot-ms-validation">Project ref: <em>a3-sboot-ms-validation</em></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
-<li>Add spring validation dependency.<pre><code>	&lt;dependency&gt;
-		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-		&lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
-	&lt;/dependency&gt;
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-validation<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
 </li>
 </ul>
@@ -208,16 +208,16 @@
 </li>
 <li>
 <p>Annotate the method parameter for validation.</p>
-<pre><code>	@PostMapping(&quot;/users&quot;)
-	public ResponseEntity&lt;User&gt; createUser(@Valid @RequestBody User user) {
+<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
 
-		logger.debug(&quot;User to save : {}&quot;, user);
+		logger.debug(<span class="hljs-string">&quot;User to save : {}&quot;</span>, user);
 
-		var savedUser = userDaoService.save(user);
+		<span class="hljs-type">var</span> <span class="hljs-variable">savedUser</span> <span class="hljs-operator">=</span> userDaoService.save(user);
 
-		var location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId())
+		<span class="hljs-type">var</span> <span class="hljs-variable">location</span> <span class="hljs-operator">=</span> ServletUriComponentsBuilder.fromCurrentRequest().path(<span class="hljs-string">&quot;{id}&quot;</span>).buildAndExpand(savedUser.getId())
 				.toUri();
-		return ResponseEntity.created(location).body(savedUser);
+		<span class="hljs-keyword">return</span> ResponseEntity.created(location).body(savedUser);
 	}
 </code></pre>
 </li>
@@ -230,18 +230,18 @@
 </li>
 <li>
 <p>Add validation in the properties of the bean.</p>
-<pre><code>	public class User {
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
 
-		private Integer id;
+		<span class="hljs-keyword">private</span> Integer id;
 
-		@Size(min = 3, max = 20, message = &quot;Name must be more than 2 characters.&quot;)
-		private String name;
+		<span class="hljs-meta">@Size(min = 3, max = 20, message = &quot;Name must be more than 2 characters.&quot;)</span>
+		<span class="hljs-keyword">private</span> String name;
 
-		@Past(message = &quot;Birth date should be in past.&quot;)
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;)
-		private LocalDate birthDate;
+		<span class="hljs-meta">@Past(message = &quot;Birth date should be in past.&quot;)</span>
+		<span class="hljs-meta">@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;)</span>
+		<span class="hljs-keyword">private</span> LocalDate birthDate;
 
-		// constructors, setter-getters and other methods.
+		<span class="hljs-comment">// constructors, setter-getters and other methods.</span>
 	}
 </code></pre>
 </li>
@@ -275,90 +275,395 @@
 </li>
 </ul>
 <hr>
-<h2 id="a4-sboot-ms-springdoc-swagger-openapi">a4-sboot-ms-springdoc-swagger-openapi</h2>
+<h2 id="3-api-documentation-using-openapi-swagger-ui">3. API documentation using openAPI, swagger-ui</h2>
+<h3 id="project-ref-a4-sboot-ms-springdoc-swagger-openapi">Project ref: <em>a4-sboot-ms-springdoc-swagger-openapi</em></h3>
 <ul>
-<li>open API swagger documentation required below dependency in classpath.</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springdoc<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>springdoc-openapi-starter-webmvc-ui<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.7.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
 </ul>
-<pre><code>		&lt;dependency&gt;
-			&lt;groupId&gt;org.springdoc&lt;/groupId&gt;
-			&lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
-			&lt;version&gt;2.7.0&lt;/version&gt;
-		&lt;/dependency&gt;
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li><code>None</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Swagger URL:</ins></strong></p>
+<ul>
+<li><a href="http://localhost:8080/swagger-ui">http://localhost:8080/swagger-ui</a></li>
+<li><a href="http://localhost:8080/swagger-ui/index.html">http://localhost:8080/swagger-ui/index.html</a></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>No code change required to enable swagger documentation</code>.</li>
+<li>It's enabled by default if the ependency is present in <code>POM.xml</code></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui</code></li>
+<li><code>https://springdoc.org/#getting-started</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-content-negotiation-for-response-parsing">4. Content negotiation for Response parsing</h2>
+<h3 id="project-ref-a5-sboot-ms-content-negotiation">Project ref: <em>a5-sboot-ms-content-negotiation</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Add following dependency in POM.xml<pre><code class="language-xml">	<span class="hljs-comment">&lt;!-- XML conversion --&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.fasterxml.jackson.dataformat<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jackson-dataformat-xml<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>If client requests for <code>Accept: application/xml</code> header.</li>
+<li>Spring willl internally check <code>jackson-dataformat-xml</code> API dependency, if found bean will be transformed to xml.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-internationalization-i18n">5. Internationalization (i18n)</h2>
+<h3 id="project-ref-a6-sboot-ms-content-i18n">Project ref: <em>a6-sboot-ms-content-i18n</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required API is available as part of spring-context dependency.</li>
+<li>This is imported with spring web dependency internally.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.context.MessageSource;</code></li>
+</ul>
+</li>
+<li>Autowire the MessageSource in required class.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldI18n</span> {
 
-</code></pre>
-<ul>
-<li>Swagger API URL</li>
-</ul>
-<pre><code>		http://localhost:8080/swagger-ui/index.html#/user-resource/retrieveAllUsers
-</code></pre>
-<ul>
-<li>Reference</li>
-</ul>
-<pre><code>		- https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml
-		- https://springdoc.org/#getting-started
-</code></pre>
-<h2 id="a5-sboot-ms-content-negotiation">a5-sboot-ms-content-negotiation</h2>
-<ul>
-<li>TODO</li>
-</ul>
-<h2 id="a6-sboot-ms-content-i18n">a6-sboot-ms-content-i18n</h2>
-<ul>
-<li>TODO</li>
-</ul>
-<h2 id="a7-sboot-ms-api-versioning">a7-sboot-ms-api-versioning</h2>
-<ul>
-<li>URI Versioning</li>
-</ul>
-<pre><code>		V1: http://localhost:8080/v1/person
-		
-		@GetMapping(&quot;/v1/person&quot;)
-		
-		V2: http://localhost:8080/v2/person
-		
-		@GetMapping(&quot;/v2/person&quot;)
+		<span class="hljs-keyword">private</span> MessageSource messageSource;
 
+		<span class="hljs-comment">// autowire (constructor injection) messageSource.</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">HelloWorldI18n</span><span class="hljs-params">(MessageSource messageSource)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.messageSource = messageSource;
+		}
+
+		<span class="hljs-meta">@GetMapping(&quot;/say-hello-i18n&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">sayHello</span><span class="hljs-params">()</span> {
+
+			<span class="hljs-type">var</span> <span class="hljs-variable">locale</span> <span class="hljs-operator">=</span> LocaleContextHolder.getLocale();
+
+			<span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.messageSource.getMessage(<span class="hljs-string">&quot;good.morning&quot;</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">&quot;Default - Good Morning&quot;</span>, locale);
+		}
+	}
 </code></pre>
+</li>
+<li>Create property files for different locale
 <ul>
-<li>Request Param Versioning</li>
-</ul>
-<pre><code>		V1: http://localhost:8080/person?version=1
-		
-		@GetMapping(path = &quot;/person&quot;, params = &quot;version=1&quot;)
-		
-		V2: http://localhost:8080/person?version=2
-		
-		@GetMapping(path = &quot;/person&quot;, params = &quot;version=2&quot;)
-</code></pre>
+<li>File: <code>messages[-&lt;locale&gt;].properties</code></li>
+<li>Here's some examples:
 <ul>
-<li>Header Versioning</li>
+<li>Default: <code>messages.properties</code></li>
+<li>Spanish: <code>messages_es.properties</code></li>
+<li>German: <code>messages_ger.properties</code></li>
 </ul>
-<pre><code>		V1: http://localhost:8080/person/header
-		
-		HEADER - X-API-VERSION:1
-		
-		@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=1&quot;)
-		
-		V2: http://localhost:8080/person/header
-		
-		HEADER - X-API-VERSION:2
-		
-		@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=2&quot;)
-</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Notes:</ins></strong>
 <ul>
-<li>Content Negotiation Versioning</li>
+<li>Default message files name prefix is <code>messages</code> &amp; suffix is <code>.properties</code>.</li>
+<li>Spring reads the value of <code>Accept-Language</code> Header from <code>HTTP Request</code>and replaces it with <code>&lt;locale&gt;</code> when locating <code>messsages[-&lt;locale&gt;].properties</code> file.</li>
 </ul>
-<pre><code>		V1: http://localhost:8080/person/accept
-		
-		HEADER - Accept:application/vnd.company.app-v1+json
-		
-		@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.company.app-v1+json&quot;)
-		
-		V2: http://localhost:8080/person/accept
-		
-		HEADER - Accept:application/vnd.company.app-v1+json
-		
-		@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.company.app-v2+json&quot;)
+</li>
+</ul>
+<hr>
+<h2 id="6-microservice-api-versioning">6. Microservice API Versioning</h2>
+<h3 id="project-ref-a7-sboot-ms-api-versioning">Project ref: <em>a7-sboot-ms-api-versioning</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>No dependency required.</li>
+<li>API versioning is HTTP architectural style.
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Common Code</ins></strong>
+<ul>
+<li>Person bean v1<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV1</span> {
+
+		<span class="hljs-keyword">private</span> String name;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">PersonV1</span><span class="hljs-params">(String name)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.name = name;
+		}
+		<span class="hljs-comment">// getter-setters</span>
+	}
 </code></pre>
+</li>
+<li>Person bean v2<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV2</span> {
+
+		<span class="hljs-keyword">private</span> Name name;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">PersonV2</span><span class="hljs-params">(Name name)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.name = name;
+		}
+		<span class="hljs-comment">// getter-setters</span>
+	}
+</code></pre>
+</li>
+<li>Name bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Name</span> {
+
+		<span class="hljs-keyword">private</span> String firstName;
+		<span class="hljs-keyword">private</span> String lastName;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">Name</span><span class="hljs-params">(String firstName, String lastName)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.firstName = firstName;
+			<span class="hljs-built_in">this</span>.lastName = lastName;
+		}
+		<span class="hljs-comment">// getters-setters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>URI Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a version number is appended in URL to create new URL version.</li>
+<li><strong>Twitter</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> <a href="https://developer.x.com/en/docs/x-ads-api/versioning">https://developer.x.com/en/docs/x-ads-api/versioning</a></li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Polluting URL</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UriVersioningPersonController</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/v1/person&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;URI Versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/v2/person&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;URI&quot;</span>, <span class="hljs-string">&quot;Versioning V2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Request Param Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a request param is sent with API version number.</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Amazon</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Polluting URL</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RequestParamVersioningController</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/param&quot;, params = &quot;version=1&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Request Param versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/param&quot;, params = &quot;version=2&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Request Parama&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Custom Header Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a custom HTTP header is sent with API version number.</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Microsoft</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Misuse of HTTP Headers</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomHeaderVersioning</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=1&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Custom Header Versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=2&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Custom Header&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Content Negotiation (Media type) Versioning</ins></strong>
+<ul>
+<li>a.k.a <code>Content negotiation</code> or <code>Accept header</code> versioning.</li>
+<li>In this versioning style, a custome media type is sent in <code>Accept</code> HTTP header.</li>
+<li>Which API matches the header value request is forwarded to it.
+<ul>
+<li>e.g. <code>Accept: application/vnd.comp.app-v2+json</code></li>
+</ul>
+</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Github</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Misuse of HTTP Headers</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MediaTypeVersioning</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.comp.app-v1+json&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Mediatype Versioning v1.&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.comp.app-v2+json&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Media type&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
 <h2 id="a8-sboot-ms-hateoas">a8-sboot-ms-hateoas</h2>
 <ul>
 <li>Maven dependency</li>

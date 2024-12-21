@@ -45,8 +45,7 @@ public class CurrencyExchangeController {
 
 		return currencyExchange;
 	}
-	
-	
+
 	/**
 	 * Return conversion rate for given currencies.
 	 * 
@@ -59,9 +58,13 @@ public class CurrencyExchangeController {
 
 		logger.info("Executing CurrencyExchangeController - retrieveExchangeRate()");
 
+		// Currency names are case sensitive
+		from = from.toUpperCase();
+		to = to.toUpperCase();
+
 		final String port = environment.getProperty("local.server.port");
 
-		final CurrencyExchange currencyExchange = currencyExchangeRepository.findByFromAndTo(from.toUpperCase(), to.toUpperCase());
+		final CurrencyExchange currencyExchange = currencyExchangeRepository.findByFromAndTo(from, to);
 		currencyExchange.setEnvironment(port);
 
 		logger.debug("Response {}", currencyExchange);

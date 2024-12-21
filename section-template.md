@@ -1,6 +1,6 @@
 ## 2. Property, method param or Return type validation
 
-### Project ref:  a3-sboot-ms-validation
+### Project ref: *a3-sboot-ms-validation*
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```
@@ -22,7 +22,6 @@
 
   - imports
     - `import jakarta.validation.constraints.Past;`
-	- `import jakarta.validation.constraints.Size;`
   - Add validation in the properties of the bean.
 	```
 		public class User {
@@ -30,16 +29,16 @@
 			// Impacted code goes here.
 		}
 	```
-  - **<ins>Notes:</ins>**
-    - Spring internally usages `jakarta-validation` API.
-      - `@Valid` annotation:
-        - Marks a property, method parameter or method return type for validation cascading.
-      - `@Size` annotation
-        - Validates property value to match defined size constraints.
+- **<ins>Notes:</ins>**
+  - Spring internally usages `jakarta-validation` API.
+  - `@Valid` annotation:
+    - Marks a property, method parameter or method return type for validation cascading.
+  - `@Size` annotation
+    - Validates property value to match defined size constraints.
 
-  - **<ins>References:</ins>**
-    - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml`
-    - `xyz`
+- **<ins>References:</ins>**
+  - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml`
+  - `xyz`
 
 ---
 
