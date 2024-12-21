@@ -2,7 +2,7 @@
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>springboot-microservices-2024 &lbrack;v3&period;4&period;0&rbrack;</title>
+            <title>springboot-microservices-2024-&lbrack;v3&period;4&period;0&rbrack;</title>
             <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@
         
         </head>
         <body class="vscode-body vscode-light">
-            <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024 [v3.4.0]</h1>
+            <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024-[v3.4.0]</h1>
 <hr>
 <h2 id="1-return-response-with-link-to-newly-created-resource">1. Return response with link to newly created resource</h2>
 <h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
@@ -423,9 +423,9 @@
 </li>
 </ul>
 </li>
-<li><strong><ins>Common Code</ins></strong>
+<li><strong><ins>Common Java Beans Code</ins></strong>
 <ul>
-<li>Person bean v1<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV1</span> {
+<li>Personv1.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV1</span> {
 
 		<span class="hljs-keyword">private</span> String name;
 
@@ -437,7 +437,7 @@
 	}
 </code></pre>
 </li>
-<li>Person bean v2<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV2</span> {
+<li>Personv2.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV2</span> {
 
 		<span class="hljs-keyword">private</span> Name name;
 
@@ -449,7 +449,7 @@
 	}
 </code></pre>
 </li>
-<li>Name bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Name</span> {
+<li>Name.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Name</span> {
 
 		<span class="hljs-keyword">private</span> String firstName;
 		<span class="hljs-keyword">private</span> String lastName;
@@ -664,84 +664,279 @@
 </li>
 </ul>
 <hr>
-<h2 id="a8-sboot-ms-hateoas">a8-sboot-ms-hateoas</h2>
+<h2 id="7-springboot-hateoas">7. SpringBoot HATEOAS</h2>
+<h3 id="project-ref-a8-sboot-ms-hateoas">Project ref: <em>a8-sboot-ms-hateoas</em></h3>
 <ul>
-<li>Maven dependency</li>
-</ul>
-<pre><code>		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-boot-starter-hateoas&lt;/artifactId&gt;
-		&lt;/dependency&gt;
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-hateoas<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
-<ul>
-<li>Spring resources</li>
+</li>
 </ul>
-<pre><code>		import org.springframework.hateoas.EntityModel;
-		import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.hateoas.EntityModel;</code></li>
+<li><code>import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.<pre><code class="language-java">	<span class="hljs-comment">/**
+	 * Retrieve the users.
+	 * <span class="hljs-doctag">@return</span>
+	 */</span>
+	<span class="hljs-meta">@GetMapping(path = &quot;/users/{id}&quot;, produces = {&quot;application/json&quot;, &quot;application/xml&quot;})</span>
+	<span class="hljs-keyword">public</span> EntityModel&lt;User&gt; <span class="hljs-title function_">retrieveUser</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Integer id)</span> {
+		<span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> userDaoService.findById(id);
 
-</code></pre>
-<ul>
-<li>API Refactoring</li>
-</ul>
-<pre><code>		/**
-		 * Retrieve the users.
-		 * 
-		 * @return
-		 */
-		@GetMapping(path = &quot;/users/{id}&quot;, produces = {&quot;application/json&quot;, &quot;application/xml&quot;})
-		public EntityModel&lt;User&gt; retrieveUser(@PathVariable Integer id) {
-			User user = userDaoService.findById(id);
-	
-			if (user == null) {
-				throw new UserNotFoundException(String.format(&quot;No user exists with id : %s&quot;, id));
-			}
-	
-			// Create link to method
-			var link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
-	
-			// EntityModel object supports Model and allows to add links
-			final EntityModel&lt;User&gt; entityModel = EntityModel.of(user);
-			entityModel.add(link.withRel(&quot;all-users&quot;));
-			
-			return entityModel;
+		<span class="hljs-keyword">if</span> (user == <span class="hljs-literal">null</span>) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserNotFoundException</span>(String.format(<span class="hljs-string">&quot;No user exists with id : %s&quot;</span>, id));
 		}
 
-</code></pre>
-<h2 id="a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</h2>
-<h3 id="static-filtering">Static filtering</h3>
-<ul>
-<li>Resource</li>
-</ul>
-<pre><code>		import com.fasterxml.jackson.annotation.JsonIgnore;
-		import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-</code></pre>
-<ul>
-<li>Static filtering code</li>
-</ul>
-<pre><code>		/**
-		 * Do not send field2, field4, field6
-		 */
-		@JsonIgnoreProperties(value = {&quot;field2&quot;, &quot;field4&quot;})
-		public class SomeBean {
+		<span class="hljs-comment">// Hateoas: Create link to method</span>
+		<span class="hljs-type">var</span> <span class="hljs-variable">link</span> <span class="hljs-operator">=</span> WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(<span class="hljs-built_in">this</span>.getClass()).retrieveAllUsers());
+
+		<span class="hljs-comment">// EntityModel object supports Model and allows to add links</span>
+		<span class="hljs-keyword">final</span> EntityModel&lt;User&gt; entityModel = EntityModel.of(user);
 		
-			private String field1;
-			private String field2;
-			private String field3;
-			private String field4;
-			private String field5;
-			
-			//Ignore in json response
-			@JsonIgnore
-			private String field6;
-			
-			// constructor
-			
-			// getters
-			
-			// toString()
+		<span class="hljs-comment">//Hateoas: Add link to Model response object.</span>
+		entityModel.add(link.withRel(<span class="hljs-string">&quot;all-users&quot;</span>));
+		
+		<span class="hljs-keyword">return</span> entityModel;
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>Spring HATEOAS</code> provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC.</li>
+<li>The <code>core problem it tries to address</code> is link creation and representation assembly.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>https://spring.io/projects/spring-hateoas</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-static-content-filtering">8. Static content filtering</h2>
+<h3 id="project-ref-a9-sboot-ms-static-filtering">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Content filtering refers to removing the properties from Response bean when sending back to requestor.</li>
+<li>This feature is available in <code>jackson-annotations-x.x.jar</code>, which is added as part of <code>spring-boot-starter-web</code> dependency.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>We only need to update the Java Bean properties. No change required in controller.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.annotation.JsonIgnore;</code></li>
+<li><code>import com.fasterxml.jackson.annotation.JsonIgnoreProperties;</code></li>
+</ul>
+</li>
+<li>Annotate java properties to ignore while building the response.<pre><code class="language-java">	<span class="hljs-comment">/** Ignore all specified properties from the class.  */</span>
+	<span class="hljs-meta">@JsonIgnoreProperties(value = {&quot;property4&quot;, &quot;property6&quot;})</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SomeBean</span> {
+
+		<span class="hljs-keyword">private</span> String property1;
+		
+		<span class="hljs-comment">// Ignore this property</span>
+		<span class="hljs-meta">@JsonIgnore</span>
+		<span class="hljs-keyword">private</span> String property2;
+		<span class="hljs-keyword">private</span> String property3;
+		
+		<span class="hljs-comment">// @JsonIgnoreProperties - Ignore this</span>
+		<span class="hljs-keyword">private</span> String property4;
+		<span class="hljs-keyword">private</span> String property5;
+		
+		<span class="hljs-comment">// @JsonIgnoreProperties - Ignore this</span>
+		<span class="hljs-keyword">private</span> String property6;
+
+		<span class="hljs-comment">// constructors, setter-getters and utility methods</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>In this approach we're hardcoding that which properties should not be returned in response when the given bean is returned in response, irrespective of which API is using this.</li>
+<li>Hence, this is called <code>Static Filtering</code>.</li>
+<li><code>@JsonIgnore</code> annotation:
+<ul>
+<li>Marks the property, to be removed when building response from this bean.</li>
+</ul>
+</li>
+<li><code>@JsonIgnoreProperties</code> annotation
+<ul>
+<li>Marks a list of properties inside this class, to be removed when building response from this bean.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="9-dynamic-content-filtering-in-progress">9. Dynamic content filtering [<em><strong>in progress</strong></em>]</h2>
+<h3 id="project-ref-a9-sboot-ms-static-filtering-1">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Content filtering refers to removing the properties from Response bean when sending back to requestor.</li>
+<li>This feature is available in <code>jackson-annotations-x.x.jar</code>, which is added as part of <code>spring-boot-starter-web</code> dependency.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>Bean
+<ul>
+<li>Next, need to update the Java Bean class with the <code>filter name</code>.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.annotation.JsonFilter;</code></li>
+</ul>
+</li>
+<li>Annotate java properties to ignore while building the response.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">/** Dynamically exclude properties as per the specified filter set by the API. */</span>
+	<span class="hljs-meta">@JsonFilter(value = &quot;someBeanDynamicFilter&quot;)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span> {
+
+		<span class="hljs-keyword">private</span> String field1;
+		<span class="hljs-keyword">private</span> String field2;
+		<span class="hljs-keyword">private</span> String field3;
+		<span class="hljs-keyword">private</span> String field4;
+		<span class="hljs-keyword">private</span> String field5;
+		<span class="hljs-keyword">private</span> String field6;
+
+		<span class="hljs-comment">// constructors, setter-getters and utility methods</span>
+	}
+</code></pre>
+</li>
+<li>Contrller
+<ul>
+<li>Create instace of `` and mention the properties to be excluded and add it with a unique name in filter provider.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.databind.ser.FilterProvider;</code></li>
+<li><code>import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;</code></li>
+<li><code>import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;</code></li>
+<li><code>import com.srvivek.sboot.mservices.bean.SomeBeanDynamicFilter;</code></li>
+</ul>
+</li>
+<li>Create filter.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DynamicFilteringController</span> {
+
+		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering&quot;)</span>
+		<span class="hljs-keyword">public</span> SomeBeanDynamicFilter <span class="hljs-title function_">filtering</span><span class="hljs-params">()</span> {
+			<span class="hljs-type">SomeBeanDynamicFilter</span> <span class="hljs-variable">SomeBeanDynamicFilter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>,
+					<span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>);
+
+			<span class="hljs-comment">// Dynamic filtering</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field2&quot;</span>,
+					<span class="hljs-string">&quot;field4&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleFilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;someBeanDynamicFilter&quot;</span>,
+					simpleBeanPropertyFilter);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilter);
+			mappingJacksonValue.setFilters(simpleFilterProvider);
+
+			<span class="hljs-keyword">return</span> SomeBeanDynamicFilter;
 		}
 
+		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering-list&quot;)</span>
+		<span class="hljs-keyword">public</span> MappingJacksonValue <span class="hljs-title function_">filteringList</span><span class="hljs-params">()</span> {
+			List&lt;SomeBeanDynamicFilter&gt; SomeBeanDynamicFilterList = Arrays.asList(
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>, <span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>),
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-11&quot;</span>, <span class="hljs-string">&quot;Value-22&quot;</span>, <span class="hljs-string">&quot;Value-33&quot;</span>, <span class="hljs-string">&quot;Value-44&quot;</span>, <span class="hljs-string">&quot;Value-55&quot;</span>, <span class="hljs-string">&quot;Value-66&quot;</span>),
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-111&quot;</span>, <span class="hljs-string">&quot;Value-222&quot;</span>, <span class="hljs-string">&quot;Value-333&quot;</span>, <span class="hljs-string">&quot;Value-444&quot;</span>, <span class="hljs-string">&quot;Value-555&quot;</span>,
+							<span class="hljs-string">&quot;Value-666&quot;</span>));
+
+			<span class="hljs-comment">// Dynamic filtering</span>
+			<span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field1&quot;</span>,
+					<span class="hljs-string">&quot;field3&quot;</span>, <span class="hljs-string">&quot;field5&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
+			<span class="hljs-type">FilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;SomeBeanDynamicFilter&quot;</span>,
+					simpleBeanPropertyFilter);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilterList);
+			mappingJacksonValue.setFilters(simpleFilterProvider);
+
+			<span class="hljs-keyword">return</span> mappingJacksonValue;
+		}
+	}
 </code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>In this approach we're dynamically marking the properties which should not be returned in response when the given bean is returned in response, for the API which is returring this bean.</li>
+<li>Hence, this is called <code>Dynamic Filtering</code>.</li>
+<li><code>@JsonFilter</code> annotation:
+<ul>
+<li>Defines a filter name, which should be evaluated and applied every time when object of this bean is returned in response.</li>
+<li>The given filter name <code>SomeBeanDynamicFilter</code> is created and update in API method of controller class.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</h2>
 <h3 id="dynamic-filtering">Dynamic filtering</h3>
 <ul>
 <li>Resource</li>

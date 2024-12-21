@@ -1,9 +1,10 @@
 ## 2. Property, method param or Return type validation
-
 ### Project ref: *a3-sboot-ms-validation*
+- **<ins>Purpose / Feature</ins>**
+  - This is xyz feature.
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
- 	```
+ 	```xml
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -12,7 +13,7 @@
   - imports
     - `import jakarta.validation.Valid;`
   - Annotate the method parameter for validation.
-	```
+	```java
 		@PostMapping("/users")
 		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
 
@@ -23,7 +24,7 @@
   - imports
     - `import jakarta.validation.constraints.Past;`
   - Add validation in the properties of the bean.
-	```
+	```java
 		public class User {
 
 			// Impacted code goes here.

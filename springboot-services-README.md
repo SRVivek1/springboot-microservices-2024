@@ -1,4 +1,4 @@
-# springboot-microservices-2024 [v3.4.0]
+# springboot-microservices-2024-[v3.4.0]
 ---
 ## 1. Return response with link to newly created resource
 ### Project ref: *a2-sboot-ms-social-media-app*
@@ -137,7 +137,6 @@
 ---
 
 ## 5. Internationalization (i18n)
-
 ### Project ref: *a6-sboot-ms-content-i18n*
 - **<ins>Maven / External dependency</ins>**
   - Required API is available as part of spring-context dependency.
@@ -183,14 +182,15 @@
   - Spring reads the value of `Accept-Language` Header from `HTTP Request`and replaces it with `<locale>` when locating `messsages[-<locale>].properties` file.
 
 ---
+
 ## 6. Microservice API Versioning
 ### Project ref: *a7-sboot-ms-api-versioning*
 - **<ins>Maven / External dependency</ins>**
   - No dependency required.
   - API versioning is HTTP architectural style.
 	- `None`
-- **<ins>Common Code</ins>**
-  - Person bean v1
+- **<ins>Common Java Beans Code</ins>**
+  - Personv1.java bean
 	```java
 		public class PersonV1 {
 
@@ -203,7 +203,7 @@
 			// getter-setters
 		}
 	```
-  - Person bean v2
+  - Personv2.java bean 
 	```java
 		public class PersonV2 {
 
@@ -216,7 +216,7 @@
 			// getter-setters
 		}
 	```
-  - Name bean
+  - Name.java bean
 	```java
 		public class Name {
 
@@ -369,33 +369,25 @@
 				}
 			}
 		```
-
 ---
 
-## a8-sboot-ms-hateoas
-- Maven dependency
-
-```
-		<dependency>
+## 7. SpringBoot HATEOAS
+### Project ref: *a8-sboot-ms-hateoas*
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```xml
+    	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
-```
-
-- Spring resources
-
-```
-		import org.springframework.hateoas.EntityModel;
-		import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
-```
-
-- API Refactoring
-
-```
+- **<ins>Code changes</ins>**
+  - imports
+    - `import org.springframework.hateoas.EntityModel;`
+    - `import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;`
+  - Add validation in the properties of the bean.
+	```java
 		/**
 		 * Retrieve the users.
-		 * 
 		 * @return
 		 */
 		@GetMapping(path = "/users/{id}", produces = {"application/json", "application/xml"})
@@ -406,58 +398,177 @@
 				throw new UserNotFoundException(String.format("No user exists with id : %s", id));
 			}
 	
-			// Create link to method
+			// Hateoas: Create link to method
 			var link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
 	
 			// EntityModel object supports Model and allows to add links
 			final EntityModel<User> entityModel = EntityModel.of(user);
+			
+			//Hateoas: Add link to Model response object.
 			entityModel.add(link.withRel("all-users"));
 			
 			return entityModel;
 		}
+	```
+- **<ins>Notes:</ins>**
+  - `Spring HATEOAS` provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC. 
+  - The `core problem it tries to address` is link creation and representation assembly.
 
-```
+- **<ins>References:</ins>**
+  - `https://spring.io/projects/spring-hateoas`
+---
+
+## 8. Static content filtering
+### Project ref: *a9-sboot-ms-static-filtering*
+- **<ins>Purpose / Feature</ins>**
+  - Content filtering refers to removing the properties from Response bean when sending back to requestor.
+  - This feature is available in `jackson-annotations-x.x.jar`, which is added as part of `spring-boot-starter-web` dependency.
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - We only need to update the Java Bean properties. No change required in controller.
+  - imports
+    - `import com.fasterxml.jackson.annotation.JsonIgnore;`
+    - `import com.fasterxml.jackson.annotation.JsonIgnoreProperties;`
+  - Annotate java properties to ignore while building the response.
+	```java
+		/** Ignore all specified properties from the class.  */
+		@JsonIgnoreProperties(value = {"property4", "property6"})
+		public class SomeBean {
+
+			private String property1;
+			
+			// Ignore this property
+			@JsonIgnore
+			private String property2;
+			private String property3;
+			
+			// @JsonIgnoreProperties - Ignore this
+			private String property4;
+			private String property5;
+			
+			// @JsonIgnoreProperties - Ignore this
+			private String property6;
+
+			// constructors, setter-getters and utility methods
+		}
+	```
+- **<ins>Notes:</ins>**
+  - In this approach we're hardcoding that which properties should not be returned in response when the given bean is returned in response, irrespective of which API is using this.
+  - Hence, this is called `Static Filtering`.
+  - `@JsonIgnore` annotation:
+    - Marks the property, to be removed when building response from this bean.
+  - `@JsonIgnoreProperties` annotation
+    - Marks a list of properties inside this class, to be removed when building response from this bean.
+
+- **<ins>References:</ins>**
+  - `TBU`
+
+---
+
+## 9. Dynamic content filtering [***in progress***]
+### Project ref: *a9-sboot-ms-static-filtering*
+- **<ins>Purpose / Feature</ins>**
+  - Content filtering refers to removing the properties from Response bean when sending back to requestor.
+  - This feature is available in `jackson-annotations-x.x.jar`, which is added as part of `spring-boot-starter-web` dependency.
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - Bean
+    - Update the Java Bean class with the `filter name` create inside controller.
+    - All controller APIs should update the filter with same `filter name`.
+    - imports
+      - `import com.fasterxml.jackson.annotation.JsonFilter;`
+    - Annotate java properties to ignore while building the response.
+  	```java
+  		/** Dynamically exclude properties as per the specified filter set by the API. */
+  		@JsonFilter(value = "someBeanDynamicFilter")
+  		public class SomeBeanDynamicFilter {
+
+  			private String field1;
+  			private String field2;
+  			private String field3;
+  			private String field4;
+  			private String field5;
+  			private String field6;
+
+  			// constructors, setter-getters and utility methods
+  		}
+  	```
+  - Controller
+    - Create instace of `` and mention the properties to be excluded and add it with a unique name in filter provider.
+	- imports
+      - `import com.fasterxml.jackson.databind.ser.FilterProvider;`
+      - `import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;`
+      - `import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;`
+      - `import com.srvivek.sboot.mservices.bean.SomeBeanDynamicFilter;`
+    - Create filter.
+  	```java
+  		@RestController
+		public class DynamicFilteringController {
+
+			@GetMapping("/dyna-filtering")
+			public SomeBeanDynamicFilter filtering() {
+				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3",
+						"Value-4", "Value-5", "Value-6");
+
+				// Dynamic filtering
+				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field2",
+						"field4", "field6");
+
+				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("someBeanDynamicFilter",
+						simpleBeanPropertyFilter);
+
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+
+				return SomeBeanDynamicFilter;
+			}
+
+			@GetMapping("/dyna-filtering-list")
+			public MappingJacksonValue filteringList() {
+				List<SomeBeanDynamicFilter> SomeBeanDynamicFilterList = Arrays.asList(
+						new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3", "Value-4", "Value-5", "Value-6"),
+						new SomeBeanDynamicFilter("Value-11", "Value-22", "Value-33", "Value-44", "Value-55", "Value-66"),
+						new SomeBeanDynamicFilter("Value-111", "Value-222", "Value-333", "Value-444", "Value-555",
+								"Value-666"));
+
+				// Dynamic filtering
+				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field1",
+						"field3", "field5", "field6");
+				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
+						simpleBeanPropertyFilter);
+
+				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
+				mappingJacksonValue.setFilters(simpleFilterProvider);
+
+				return mappingJacksonValue;
+			}
+		}
+  	```
+- **<ins>Notes:</ins>**
+  - In this approach we're dynamically marking the properties which should not be returned in response when the given bean is returned in response, for the API which is returring this bean.
+  - Hence, this is called `Dynamic Filtering`.
+  - `@JsonFilter` annotation:
+    - Defines a filter name, which should be evaluated and applied every time when object of this bean is returned in response.
+    - The given filter name `SomeBeanDynamicFilter` is created and update in API method of controller class.
+
+- **<ins>References:</ins>**
+  - `TBU`
+
 
 
 ## a9-sboot-ms-static-filtering
-
-### Static filtering
-
-- Resource
-
-```
-		import com.fasterxml.jackson.annotation.JsonIgnore;
-		import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-```
-
-- Static filtering code
-
-```
-		/**
-		 * Do not send field2, field4, field6
-		 */
-		@JsonIgnoreProperties(value = {"field2", "field4"})
-		public class SomeBean {
-		
-			private String field1;
-			private String field2;
-			private String field3;
-			private String field4;
-			private String field5;
-			
-			//Ignore in json response
-			@JsonIgnore
-			private String field6;
-			
-			// constructor
-			
-			// getters
-			
-			// toString()
-		}
-
-```
-
 
 ### Dynamic filtering
 - Resource
