@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srvivek.sboot.ms.ces.bean.CurrencyExchange;
+import com.srvivek.sboot.ms.ces.execption.CurrencyNotFoundException;
 import com.srvivek.sboot.ms.ces.repository.CurrencyExchangeRepository;
 
 @RestController
@@ -65,6 +66,12 @@ public class CurrencyExchangeController {
 		final String port = environment.getProperty("local.server.port");
 
 		final CurrencyExchange currencyExchange = currencyExchangeRepository.findByFromAndTo(from, to);
+
+		if (currencyExchange == null) {
+			throw new CurrencyNotFoundException(
+					String.format("Currency exchange not available - from %s to %s", from, to));
+		}
+
 		currencyExchange.setEnvironment(port);
 
 		logger.debug("Response {}", currencyExchange);
