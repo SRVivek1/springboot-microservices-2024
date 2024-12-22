@@ -3,15 +3,15 @@
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
 - **<ins>Maven / External dependency</ins>**
-  - Add spring validation dependency.
+  - Required dependency.
  	```xml
     	<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
+			<artifactId>spring-boot-starter-xxxxx</artifactId>
 		</dependency>
 - **<ins>Code changes</ins>**
   - imports
-    - `import jakarta.validation.Valid;`
+    - `import some.dependent.resource`
   - Annotate the method parameter for validation.
 	```java
 		@PostMapping("/users")
@@ -22,7 +22,7 @@
 	```
 
   - imports
-    - `import jakarta.validation.constraints.Past;`
+    - `import some.dependent.resource`
   - Add validation in the properties of the bean.
 	```java
 		public class User {
@@ -30,16 +30,24 @@
 			// Impacted code goes here.
 		}
 	```
+
+> Note: This is an ***important*** note.
+
 - **<ins>Notes:</ins>**
-  - Spring internally usages `jakarta-validation` API.
-  - `@Valid` annotation:
-    - Marks a property, method parameter or method return type for validation cascading.
-  - `@Size` annotation
-    - Validates property value to match defined size constraints.
+  - Some important key point / takeaway note.
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
 
 - **<ins>References:</ins>**
-  - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml`
-  - `xyz`
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [xyz service](http://website.com/some-resource-path)
 
 ---
 

@@ -298,6 +298,7 @@
 <ul>
 <li>A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer).</li>
 <li>It also picks up some additional useful features related to Environment change events.</li>
+<li>**Config client is enabled by default.</li>
 </ul>
 </li>
 <li>
@@ -314,32 +315,67 @@
 <li>
 <p><strong><ins>Code changes</ins></strong></p>
 <ul>
-<li>
-<p>imports</p>
+<li>Create a <code>configurationProperties</code> class.
 <ul>
-<li><code>import jakarta.validation.Valid;</code></li>
+<li>imports
+<ul>
+<li><code>import org.springframework.boot.context.properties.ConfigurationProperties;</code></li>
 </ul>
 </li>
-<li>
-<p>Annotate the method parameter for validation.</p>
-<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
-	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
+<li>Annotate the class for injecting properties.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@ConfigurationProperties(prefix = &quot;limits-service&quot;)</span>
+	<span class="hljs-meta">@Component</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LimitsServiceConfiguration</span> {
 
-		<span class="hljs-comment">// Impacted code goes here.</span>
+		<span class="hljs-comment">// it will match to property named - limits-service.minimum</span>
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> minimum;
+
+		<span class="hljs-comment">// it will match to property named - limits-service.maximum</span>
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> maximum;
+
+		<span class="hljs-comment">// constructors, getter-setters.</span>
 	}
 </code></pre>
 </li>
-<li>
-<p>imports</p>
+<li>Controller / Service class
 <ul>
-<li><code>import jakarta.validation.constraints.Past;</code></li>
+<li>imports
+<ul>
+<li><code>None specific to config client.</code></li>
 </ul>
 </li>
-<li>
-<p>Add validation in the properties of the bean.</p>
-<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LimitsServiceController</span> {
 
-		<span class="hljs-comment">// Impacted code goes here.</span>
+		<span class="hljs-meta">@Autowired</span>
+		LimitsServiceConfiguration limitsServiceConfiguration;
+
+		<span class="hljs-comment">/**
+		* Read property value from application.properties.
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/limits&quot;)</span>
+		<span class="hljs-keyword">public</span> Limits <span class="hljs-title function_">retrieveLimits</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Limits</span>(limitsServiceConfiguration.getMinimum(), limitsServiceConfiguration.getMaximum());
+		}
+	}
+</code></pre>
+</li>
+<li>Limits Java bean to represent the data in one unit<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Limits</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> minimum;
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> maximum;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">Limits</span><span class="hljs-params">(<span class="hljs-type">int</span> minimum, <span class="hljs-type">int</span> maximum)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.minimum = minimum;
+			<span class="hljs-built_in">this</span>.maximum = maximum;
+		}
+
+		<span class="hljs-comment">//getter-setters &amp; other methods</span>
 	}
 </code></pre>
 </li>
@@ -350,7 +386,21 @@
 <ul>
 <li>Spring Boot 2.4 introduced a new way to import configuration data via the <code>spring.config.import</code> property.</li>
 <li>This is now the default way to bind to Config Server.</li>
-<li>To optionally connect to config server set the following in <code>application.properties</code>:</li>
+<li>To optionally connect to config server set the following in <code>application.properties</code>:<pre><code class="language-properties">	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:</span>
+</code></pre>
+</li>
+<li>This will connect to the Config Server at the default location of <a href="http://localhost:8888">http://localhost:8888</a>.</li>
+<li>Removing the optional: prefix will cause the Config Client to fail if it is unable to connect to Config Server.</li>
+<li>To change the location of Config Server either set <code>spring.cloud.config.uri</code> or add the url to the <code>spring.config.import</code> statement such as, <code>spring.config.import=optional:configserver:http://myhost:8888</code>.</li>
+<li>The location in the import property has precedence over the uri property.</li>
+<li>Spring Boot Config Data resolves configuration in a two step process.
+<ul>
+<li>First it loads all configuration using the default profile. This allows Spring Boot to gather all configuration which may activate any additional profiles.</li>
+<li>After it has gathered all activated profiles it will load any additional configuration for the active profiles.</li>
+<li>Due to this you may see multiple requests being made to the Spring Cloud Config Server to fetch configuration.</li>
+<li>This is normal and is a side effect of how Spring Boot loads configuration when using <code>spring.config.import</code>.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -362,81 +412,6 @@
 </li>
 </ul>
 <hr>
-<h2 id="b1-limits-service-enable-config-client">b1-limits-service [Enable config client]</h2>
-<ul>
-<li>Add cloud client dependency in pom.xml</li>
-</ul>
-<pre><code>		&lt;dependency&gt;
-			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
-			&lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
-		&lt;/dependency&gt;
-
-</code></pre>
-<ul>
-<li>Enable config. client and connect to config server</li>
-<li>Add/update properties in application.properties</li>
-</ul>
-<pre><code>		# Config client will use below app. name to determine the properties from config server
-			spring.application.name=limits-service
-
-
-		# Start: Cloud config client
-		
-			# mention profile
-			# for default config.
-			# spring.cloud.config.profile=default
-			spring.cloud.config.profile=dev
-		
-			# this part is mandatory if config client dependency is added in POM to start the app.
-			#spring.config.import=optional:configserver:
-			
-			spring.config.import=optional:configserver:http://localhost:8888/
-			
-			# To disable this check, set 
-			#spring.cloud.config.enabled=false 
-			#spring.cloud.config.import-check.enabled=false.
-		
-		# End: Cloud config client
-
-		# Start: Limits service local configuration
-		
-			limits-service.minimum=20
-			limits-service.maximum=21
-			
-			# ... other properties if any
-		# End: Limits service local configuration
-
-</code></pre>
-<ul>
-<li>Create configuration properties class</li>
-</ul>
-<pre><code>		import org.springframework.boot.context.properties.ConfigurationProperties;
-		import org.springframework.stereotype.Component;
-		
-	   /**
-		* Define prefix for properties to search in config properties.
-		*
-		*/
-		@ConfigurationProperties(prefix = &quot;limits-service&quot;)
-		@Component
-		public class LimitsServiceConfiguration {
-			
-			// it will match to property named - limits-service.minimum
-			private int minimum;
-
-			// it will match to property named - limits-service.maximum
-			private int maximum;
-		
-			// Default constructor.
-		
-			// Setter &amp; getters
-		
-			// toString()
-		
-		}
-
-</code></pre>
-<h2 id=""></h2>
 
             
             

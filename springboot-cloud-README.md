@@ -103,7 +103,7 @@
 - **<ins>Purpose / Feature</ins>**
   - A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer). 
   - It also picks up some additional useful features related to Environment change events.
-
+  - **Config client is enabled by default.  
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -112,30 +112,77 @@
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
 - **<ins>Code changes</ins>**
-  - imports
-    - `import jakarta.validation.Valid;`
-  - Annotate the method parameter for validation.
-	```java
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+  - Create a `configurationProperties` class.
+    - imports
+      - `import org.springframework.boot.context.properties.ConfigurationProperties;`
+    - Annotate the class for injecting properties.
+  	```java
+  		@ConfigurationProperties(prefix = "limits-service")
+		@Component
+		public class LimitsServiceConfiguration {
 
-			// Impacted code goes here.
+			// it will match to property named - limits-service.minimum
+			private int minimum;
+
+			// it will match to property named - limits-service.maximum
+			private int maximum;
+
+			// constructors, getter-setters.
 		}
-	```
+  	```
+  - Controller / Service class
+    - imports
+      - `None specific to config client.`
+    - Add validation in the properties of the bean.
+  	```java
+  		@RestController
+		public class LimitsServiceController {
 
-  - imports
-    - `import jakarta.validation.constraints.Past;`
-  - Add validation in the properties of the bean.
+			@Autowired
+			LimitsServiceConfiguration limitsServiceConfiguration;
+
+			/**
+			* Read property value from application.properties.
+			* @return
+			*/
+			@GetMapping("/limits")
+			public Limits retrieveLimits() {
+				return new Limits(limitsServiceConfiguration.getMinimum(), limitsServiceConfiguration.getMaximum());
+			}
+		}
+  	```
+  - Limits Java bean to represent the data in one unit
 	```java
-		public class User {
+		public class Limits {
 
-			// Impacted code goes here.
+			private int minimum;
+			private int maximum;
+
+			public Limits(int minimum, int maximum) {
+				super();
+				this.minimum = minimum;
+				this.maximum = maximum;
+			}
+
+			//getter-setters & other methods
 		}
 	```
 - **<ins>Notes:</ins>**
   - Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. 
   - This is now the default way to bind to Config Server.
   - To optionally connect to config server set the following in `application.properties`:
+	```properties
+		spring.config.import=optional:configserver:
+	```
+  - This will connect to the Config Server at the default location of [http://localhost:8888](http://localhost:8888).
+  - Removing the optional: prefix will cause the Config Client to fail if it is unable to connect to Config Server. 
+  - To change the location of Config Server either set `spring.cloud.config.uri` or add the url to the `spring.config.import` statement such as, `spring.config.import=optional:configserver:http://myhost:8888`. 
+  - The location in the import property has precedence over the uri property.
+  - Spring Boot Config Data resolves configuration in a two step process. 
+    - First it loads all configuration using the default profile. This allows Spring Boot to gather all configuration which may activate any additional profiles. 
+    - After it has gathered all activated profiles it will load any additional configuration for the active profiles. 
+    - Due to this you may see multiple requests being made to the Spring Cloud Config Server to fetch configuration. 
+    - This is normal and is a side effect of how Spring Boot loads configuration when using `spring.config.import`.
 
 
 - **<ins>References:</ins>**
@@ -143,92 +190,4 @@
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client)
 
 ---
-
-
-
-
-
-## b1-limits-service [Enable config client]
-
-- Add cloud client dependency in pom.xml
-
-```
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-
-```
-
-
-- Enable config. client and connect to config server
-- Add/update properties in application.properties
-
-```
-		# Config client will use below app. name to determine the properties from config server
-			spring.application.name=limits-service
-
-
-		# Start: Cloud config client
-		
-			# mention profile
-			# for default config.
-			# spring.cloud.config.profile=default
-			spring.cloud.config.profile=dev
-		
-			# this part is mandatory if config client dependency is added in POM to start the app.
-			#spring.config.import=optional:configserver:
-			
-			spring.config.import=optional:configserver:http://localhost:8888/
-			
-			# To disable this check, set 
-			#spring.cloud.config.enabled=false 
-			#spring.cloud.config.import-check.enabled=false.
-		
-		# End: Cloud config client
-
-		# Start: Limits service local configuration
-		
-			limits-service.minimum=20
-			limits-service.maximum=21
-			
-			# ... other properties if any
-		# End: Limits service local configuration
-
-```
-
-
-- Create configuration properties class 
-
-```
-		import org.springframework.boot.context.properties.ConfigurationProperties;
-		import org.springframework.stereotype.Component;
-		
-	   /**
-		* Define prefix for properties to search in config properties.
-		*
-		*/
-		@ConfigurationProperties(prefix = "limits-service")
-		@Component
-		public class LimitsServiceConfiguration {
-			
-			// it will match to property named - limits-service.minimum
-			private int minimum;
-
-			// it will match to property named - limits-service.maximum
-			private int maximum;
-		
-			// Default constructor.
-		
-			// Setter & getters
-		
-			// toString()
-		
-		}
-
-```
-
-
-## 
-
 
