@@ -3,6 +3,8 @@ package com.srvivek.sboot.mservices.error;
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -17,6 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	/**
 	 * Generic exception handling.
 	 * 
@@ -28,6 +32,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	@ExceptionHandler(exception = Exception.class)
 	public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) throws Exception {
 
+		logger.error("Error:  {}", ex);
 		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
 				request.getDescription(false));
 
@@ -46,6 +51,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request)
 			throws Exception {
 
+		logger.error("Error:  {}", ex);
+		
 		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
 				request.getDescription(false));
 
@@ -59,6 +66,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
+		logger.error("Error:  {}", ex);
+		
 		final StringBuilder fieldErros = new StringBuilder();
 
 		Consumer<? super FieldError> consumer = fe -> fieldErros.append(fe.getDefaultMessage()).append(" | ");

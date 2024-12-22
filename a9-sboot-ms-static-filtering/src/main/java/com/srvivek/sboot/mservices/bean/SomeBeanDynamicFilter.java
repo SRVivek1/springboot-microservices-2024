@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 /**
  * Dynamically exclude properties as per the specified filter.
  */
-@JsonFilter("SomeBeanDynamicFilter")
+@JsonFilter("dyna-filter-for-somebean")
 public class SomeBeanDynamicFilter {
 
 	private String field1;
