@@ -167,6 +167,42 @@
 			//getter-setters & other methods
 		}
 	```
+  - application.properties
+	```properties
+		#spring.profiles.active=dev,qa
+
+		# Start: Cloud config client
+
+		# Mention profile for default use.
+		# spring.cloud.config.profile=default
+		spring.cloud.config.profile=dev
+		#spring.cloud.config.profile=qa
+
+		# Provide name for this services, used to match for available properties file.
+		# for dev profile it will check the file name - limits-service-dev.properties in config. server.
+		spring.cloud.config.name=limits-service
+
+		# this part is mandatory if config client dependency is added in POM to start the app.
+		#spring.config.import=optional:configserver:
+
+		# 8888 - it's default port for config server
+		spring.config.import=optional:configserver:http://localhost:8888/
+
+		# To enable/disable remote configuration, by default is enabled 
+		#spring.cloud.config.enabled=false 
+
+		# End: Cloud config client
+
+
+		# Start: local service configuration
+		limits-service.minimum=20
+		limits-service.maximum=21
+
+		app-config.minimum=10
+		app-config.maximum=11
+		# End: local service configuration
+	
+	```
 - **<ins>Notes:</ins>**
   - Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. 
   - This is now the default way to bind to Config Server.
@@ -188,6 +224,138 @@
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client)
+
+---
+
+## 3. RestTemplate: Connect to other mircoservice
+### Project ref: *b4-currency-conversion-service*
+- **<ins>Purpose / Feature</ins>**
+  - A synchronous client to perform HTTP requests, exposing a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others. 
+  - RestTemplate offers templates for common scenarios by HTTP method, in addition to the generalized exchange and execute methods that support less frequent cases.
+  - RestTemplate is typically used as a shared component. 
+    - However, its configuration does not support concurrent modification, and as such its configuration is typically prepared on startup. 
+  - If necessary, you can create multiple, differently configured RestTemplate instances on startup.
+    - Such instances may use the same underlying ClientHttpRequestFactory if they need to share HTTP client resources.
+  - RestTemplate and RestClient share the same infrastructure (i.e. request factories, request interceptors and initializers, message converters, etc.), so any improvements made therein are shared as well. 
+    - However, RestClient is the focus for new higher-level features.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - imports
+    - `import org.springframework.web.client.RestTemplate;`
+  - Annotate the method parameter for validation.
+	```java
+				@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
+				public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
+						@PathVariable BigDecimal quantity) {
+
+					logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
+
+					// Standardize
+					from = from.toUpperCase();
+					to = to.toUpperCase();
+
+					final Map<String, String> uriVariables = new HashMap<>();
+					uriVariables.put("from", from);
+					uriVariables.put("to", to);
+					
+					// Send request to Currency exchange micro-service
+					final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+							"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
+							uriVariables);
+					final CurrencyConversion currencyConversionExchange = response.getBody();
+
+					logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
+
+					final CurrencyConversion currencyConversion = new CurrencyConversion(currencyConversionExchange.getId(), from, to, quantity,
+							currencyConversionExchange.getConversionMultiples(),
+							quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
+					
+					logger.debug("Response returned : {}", currencyConversionExchange);
+					
+					return currencyConversion;
+				}
+	```
+  - imports
+    - `import java.math.BigDecimal;`
+  - Annotate the method parameter for validation.
+	```java
+		public class CurrencyConversion {
+
+			private Long id;
+			private String from;
+			private String to;
+			private BigDecimal conversionMultiples;
+			private BigDecimal quantity;
+			private BigDecimal totalCalculatedAmount;
+			private String environment;
+
+			// contructors, setter-getters
+		}
+	```
+> Note: When using `RestTemplate` we have to write boiler plate code to call rest service. To overcome this, we can use another spring dependency `spring-cloud-openfeign`.
+
+
+- **<ins>References:</ins>**
+  - [https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html)
+
+---
+
+## 4. Using openfeign for calling rest services [***in progress***]
+### Project ref: *bx-xxx*
+- **<ins>Purpose / Feature</ins>**
+  - This is xyz feature.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-xxxxx</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - imports
+    - `import some.dependent.resource`
+  - Annotate the method parameter for validation.
+	```java
+		@PostMapping("/users")
+		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
+			// Impacted code goes here.
+		}
+	```
+
+  - imports
+    - `import some.dependent.resource`
+  - Add validation in the properties of the bean.
+	```java
+		public class User {
+
+			// Impacted code goes here.
+		}
+	```
+
+> Note: This is an ***important*** note.
+
+- **<ins>Notes:</ins>**
+  - Some important key point / takeaway note.
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
+- **<ins>References:</ins>**
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [xyz service](http://website.com/some-resource-path)
 
 ---
 

@@ -379,6 +379,41 @@
 	}
 </code></pre>
 </li>
+<li>application.properties<pre><code class="language-properties"><span class="hljs-comment">	#spring.profiles.active=dev,qa</span>
+<span class="hljs-comment">
+	# Start: Cloud config client</span>
+<span class="hljs-comment">
+	# Mention profile for default use.</span>
+<span class="hljs-comment">	# spring.cloud.config.profile=default</span>
+	<span class="hljs-attr">spring.cloud.config.profile</span>=<span class="hljs-string">dev</span>
+<span class="hljs-comment">	#spring.cloud.config.profile=qa</span>
+<span class="hljs-comment">
+	# Provide name for this services, used to match for available properties file.</span>
+<span class="hljs-comment">	# for dev profile it will check the file name - limits-service-dev.properties in config. server.</span>
+	<span class="hljs-attr">spring.cloud.config.name</span>=<span class="hljs-string">limits-service</span>
+<span class="hljs-comment">
+	# this part is mandatory if config client dependency is added in POM to start the app.</span>
+<span class="hljs-comment">	#spring.config.import=optional:configserver:</span>
+<span class="hljs-comment">
+	# 8888 - it&#x27;s default port for config server</span>
+	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:http://localhost:8888/</span>
+<span class="hljs-comment">
+	# To enable/disable remote configuration, by default is enabled </span>
+<span class="hljs-comment">	#spring.cloud.config.enabled=false </span>
+<span class="hljs-comment">
+	# End: Cloud config client</span>
+<span class="hljs-comment">
+
+	# Start: local service configuration</span>
+	<span class="hljs-attr">limits-service.minimum</span>=<span class="hljs-string">20</span>
+	<span class="hljs-attr">limits-service.maximum</span>=<span class="hljs-string">21</span>
+
+	<span class="hljs-attr">app-config.minimum</span>=<span class="hljs-string">10</span>
+	<span class="hljs-attr">app-config.maximum</span>=<span class="hljs-string">11</span>
+<span class="hljs-comment">	# End: local service configuration</span>
+
+</code></pre>
+</li>
 </ul>
 </li>
 <li>
@@ -408,6 +443,112 @@
 <ul>
 <li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/</a></li>
 <li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-resttemplate-connect-to-other-mircoservice-in-progress">3. RestTemplate: Connect to other mircoservice [<em><strong>in progress</strong></em>]</h2>
+<h3 id="project-ref-b4-currency-conversion-service">Project ref: <em>b4-currency-conversion-service</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>A synchronous client to perform HTTP requests, exposing a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others.</li>
+<li>RestTemplate offers templates for common scenarios by HTTP method, in addition to the generalized exchange and execute methods that support less frequent cases.</li>
+<li>RestTemplate is typically used as a shared component.
+<ul>
+<li>However, its configuration does not support concurrent modification, and as such its configuration is typically prepared on startup.</li>
+</ul>
+</li>
+<li>If necessary, you can create multiple, differently configured RestTemplate instances on startup.
+<ul>
+<li>Such instances may use the same underlying ClientHttpRequestFactory if they need to share HTTP client resources.</li>
+</ul>
+</li>
+<li>RestTemplate and RestClient share the same infrastructure (i.e. request factories, request interceptors and initializers, message converters, etc.), so any improvements made therein are shared as well.
+<ul>
+<li>However, RestClient is the focus for new higher-level features.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.client.RestTemplate;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.<pre><code class="language-java">			<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+			<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+					<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+
+				logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+
+				<span class="hljs-comment">// Standardize</span>
+				from = from.toUpperCase();
+				to = to.toUpperCase();
+
+				<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+				uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+				uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+				
+				<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+				<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>().getForEntity(
+						<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+						uriVariables);
+				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+
+				logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+
+				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from, to, quantity,
+						currencyConversionExchange.getConversionMultiples(),
+						quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
+				
+				logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+				
+				<span class="hljs-keyword">return</span> currencyConversion;
+			}
+</code></pre>
+</li>
+<li>imports
+<ul>
+<li><code>import java.math.BigDecimal;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+
+		<span class="hljs-keyword">private</span> Long id;
+		<span class="hljs-keyword">private</span> String from;
+		<span class="hljs-keyword">private</span> String to;
+		<span class="hljs-keyword">private</span> BigDecimal conversionMultiples;
+		<span class="hljs-keyword">private</span> BigDecimal quantity;
+		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
+		<span class="hljs-keyword">private</span> String environment;
+
+		<span class="hljs-comment">// contructors, setter-getters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: When using <code>RestTemplate</code> we have to write boiler plate code to call rest service. To overcome this, we can use another spring dependency <code>spring-cloud-openfeign</code>.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html">https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html</a></li>
 </ul>
 </li>
 </ul>
