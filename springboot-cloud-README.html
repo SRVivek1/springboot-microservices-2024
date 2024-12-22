@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Spring Cloud Reference Doc&lbrack;3&period;4&period;0&rbrack;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="spring-cloud-reference-doc340">Spring Cloud Reference Doc[3.4.0]</h1>
+<pre><code>- This documentation is created for reference from the Spring cloud POC we have developed in this turotial
+</code></pre>
+<hr>
+<h2 id="00-port-standardization">00. Port standardization</h2>
+<ul>
+<li>Below are be the port specific to each service we'l be developing in this tutorial.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Application</strong></th>
+<th><strong>Port</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Limits Microservice</td>
+<td><em>8080, 8081, etc.</em></td>
+</tr>
+<tr>
+<td>Spring Cloud Config Server</td>
+<td><em>8888</em></td>
+</tr>
+<tr>
+<td>Currency Exchange Microservice</td>
+<td><em>8000, 8001, 8002, etc.</em></td>
+</tr>
+<tr>
+<td>Currency Conversion Microservice</td>
+<td><em>8100, 8101, 8102, etc.</em></td>
+</tr>
+<tr>
+<td>Netflix Eureka Naming Server</td>
+<td><em>8761</em></td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td><em>8765</em></td>
+</tr>
+<tr>
+<td>Zipkin Distributed Tracing Server</td>
+<td><em>9411</em></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="01-develop-cloud-config-server">01. Develop cloud config server</h2>
+<h3 id="project-ref-b2-sboot-cloud-config-server">Project ref: <em>b2-sboot-cloud-config-server</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system.</li>
+<li>With the Config Server, you have a central place to manage external properties for applications across all environments.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-config-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>B2SbootCloudConfigServerApplication.java main app.
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.config.server.EnableConfigServer;</code></li>
+<li>Config server is enabled by adding annotation on main app.<pre><code class="language-java">	<span class="hljs-comment">/* Enable config server. */</span>
+	<span class="hljs-meta">@EnableConfigServer</span> 
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B2SbootCloudConfigServerApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B2SbootCloudConfigServerApplication.class, args);
+		}
+
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>application.properties</strong><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b2-sboot-cloud-config-server</span>
+<span class="hljs-comment">
+	# Server port for config server</span>
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8888</span>
+<span class="hljs-comment">
+	# Start: Git repo config</span>
+<span class="hljs-comment">
+	# Github.com</span>
+	<span class="hljs-attr">spring.cloud.config.server.git.uri</span>=<span class="hljs-string">https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</span>
+<span class="hljs-comment">
+	# local git</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///home/srvivek/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">
+	# windows</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///c:/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">
+	# End: Git repo config</span>
+</code></pre>
+</li>
+<li><strong>Git repo</strong>
+<ul>
+<li>In git repo, create propertie file using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code> in the base directory.<pre><code class="language-properties">	<span class="hljs-attr">./limits-service-prod.properties</span>
+	<span class="hljs-attr">./limits-service-dev.properties</span>
+	<span class="hljs-attr">./limits-service.properties</span>
+	<span class="hljs-attr">./limits-service-qa.properties</span>
+	<span class="hljs-attr">./currency-exchange-service.properties</span>
+
+</code></pre>
+</li>
+<li>Content<pre><code class="language-properties">	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.minimum=8</span>
+	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.maximum=888</span>
+	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.minimum=1</span>
+	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.maximum=111</span>
+	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.minimum=3</span>
+	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.maximum=333</span>
+	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.minimum=6</span>
+	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.maximum=666</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>@EnableConfigServer</code> annotation:
+<ul>
+<li>Help enable and configure Config. Server artifacts.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="02-developenable-cloud-config-client">02. Develop/Enable cloud config client</h2>
+<h3 id="project-ref-b1-limits-service">Project ref: <em>b1-limits-service</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer).</li>
+<li>It also picks up some additional useful features related to Environment change events.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-config<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.Valid;</code></li>
+</ul>
+</li>
+<li>
+<p>Annotate the method parameter for validation.</p>
+<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
+
+		<span class="hljs-comment">// Impacted code goes here.</span>
+	}
+</code></pre>
+</li>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.constraints.Past;</code></li>
+</ul>
+</li>
+<li>
+<p>Add validation in the properties of the bean.</p>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+
+		<span class="hljs-comment">// Impacted code goes here.</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Spring Boot 2.4 introduced a new way to import configuration data via the <code>spring.config.import</code> property.</li>
+<li>This is now the default way to bind to Config Server.</li>
+<li>To optionally connect to config server set the following in <code>application.properties</code>:</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="b1-limits-service-enable-config-client">b1-limits-service [Enable config client]</h2>
+<ul>
+<li>Add cloud client dependency in pom.xml</li>
+</ul>
+<pre><code>		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+</code></pre>
+<ul>
+<li>Enable config. client and connect to config server</li>
+<li>Add/update properties in application.properties</li>
+</ul>
+<pre><code>		# Config client will use below app. name to determine the properties from config server
+			spring.application.name=limits-service
+
+
+		# Start: Cloud config client
+		
+			# mention profile
+			# for default config.
+			# spring.cloud.config.profile=default
+			spring.cloud.config.profile=dev
+		
+			# this part is mandatory if config client dependency is added in POM to start the app.
+			#spring.config.import=optional:configserver:
+			
+			spring.config.import=optional:configserver:http://localhost:8888/
+			
+			# To disable this check, set 
+			#spring.cloud.config.enabled=false 
+			#spring.cloud.config.import-check.enabled=false.
+		
+		# End: Cloud config client
+
+		# Start: Limits service local configuration
+		
+			limits-service.minimum=20
+			limits-service.maximum=21
+			
+			# ... other properties if any
+		# End: Limits service local configuration
+
+</code></pre>
+<ul>
+<li>Create configuration properties class</li>
+</ul>
+<pre><code>		import org.springframework.boot.context.properties.ConfigurationProperties;
+		import org.springframework.stereotype.Component;
+		
+	   /**
+		* Define prefix for properties to search in config properties.
+		*
+		*/
+		@ConfigurationProperties(prefix = &quot;limits-service&quot;)
+		@Component
+		public class LimitsServiceConfiguration {
+			
+			// it will match to property named - limits-service.minimum
+			private int minimum;
+
+			// it will match to property named - limits-service.maximum
+			private int maximum;
+		
+			// Default constructor.
+		
+			// Setter &amp; getters
+		
+			// toString()
+		
+		}
+
+</code></pre>
+<h2 id=""></h2>
+
+            
+            
+        </body>
+        </html>
