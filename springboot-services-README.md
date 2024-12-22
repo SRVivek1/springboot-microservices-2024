@@ -688,7 +688,7 @@
 ---
 
 
-## a11-sboot-ms-hal-explorer
+## a11-sboot-ms-hal-explorer [***TODO***]
 - Dependency
 
 ```
@@ -708,7 +708,9 @@
 
 ---
 
-##a13-sboot-ms-mysql-jpa
+##a13-sboot-ms-h2-jpa [***TODO***]
+
+##a13-sboot-ms-mysql-jpa [***TODO***]
 - Launch MySQL as Docker container
 
 ```
@@ -759,8 +761,9 @@
 		spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 ```
 
+##a13-sboot-ms-mysql-jpa-JDBC-template [***TODO***]
 
-##a14-sboot-sc-basic-authentication
+##a14-sboot-sc-basic-authentication [***TODO***]
 
 - Dependency
 
@@ -839,4 +842,3 @@
 ```
 
 
-- X
