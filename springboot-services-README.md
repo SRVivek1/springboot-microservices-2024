@@ -471,7 +471,7 @@
 
 ---
 
-## 9. Dynamic content filtering [***in progress***]
+## 9. Dynamic content filtering
 ### Project ref: *a9-sboot-ms-static-filtering*
 - **<ins>Purpose / Feature</ins>**
   - Content filtering refers to removing the properties from Response bean when sending back to requestor.
@@ -492,15 +492,15 @@
     - Annotate java properties to ignore while building the response.
   	```java
   		/** Dynamically exclude properties as per the specified filter set by the API. */
-  		@JsonFilter(value = "someBeanDynamicFilter")
-  		public class SomeBeanDynamicFilter {
+  		@JsonFilter("dyna-filter-for-somebean")
+		public class SomeBeanDynamicFilter {
 
-  			private String field1;
-  			private String field2;
-  			private String field3;
-  			private String field4;
-  			private String field5;
-  			private String field6;
+			private String field1;
+			private String field2;
+			private String field3;
+			private String field4;
+			private String field5;
+			private String field6;
 
   			// constructors, setter-getters and utility methods
   		}
@@ -518,36 +518,39 @@
 		public class DynamicFilteringController {
 
 			@GetMapping("/dyna-filtering")
-			public SomeBeanDynamicFilter filtering() {
-				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3",
-						"Value-4", "Value-5", "Value-6");
+			public MappingJacksonValue filtering() {
 
 				// Dynamic filtering
 				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field2",
 						"field4", "field6");
 
-				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("someBeanDynamicFilter",
-						simpleBeanPropertyFilter);
+				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider()
+						.addFilter("dyna-filter-for-somebean", simpleBeanPropertyFilter);
 
+				// Construct resposnse bean
+				final SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3",
+						"Value-4", "Value-5", "Value-6");
 				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
 				mappingJacksonValue.setFilters(simpleFilterProvider);
 
-				return SomeBeanDynamicFilter;
+				return mappingJacksonValue;
 			}
 
 			@GetMapping("/dyna-filtering-list")
 			public MappingJacksonValue filteringList() {
+
+				// Dynamic filtering
+				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field1",
+						"field3", "field5", "field6");
+				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("dyna-filter-for-somebean",
+						simpleBeanPropertyFilter);
+
+				// Construct list of resposnse beans
 				List<SomeBeanDynamicFilter> SomeBeanDynamicFilterList = Arrays.asList(
 						new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3", "Value-4", "Value-5", "Value-6"),
 						new SomeBeanDynamicFilter("Value-11", "Value-22", "Value-33", "Value-44", "Value-55", "Value-66"),
 						new SomeBeanDynamicFilter("Value-111", "Value-222", "Value-333", "Value-444", "Value-555",
 								"Value-666"));
-
-				// Dynamic filtering
-				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field1",
-						"field3", "field5", "field6");
-				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
-						simpleBeanPropertyFilter);
 
 				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
 				mappingJacksonValue.setFilters(simpleFilterProvider);
@@ -561,103 +564,128 @@
   - Hence, this is called `Dynamic Filtering`.
   - `@JsonFilter` annotation:
     - Defines a filter name, which should be evaluated and applied every time when object of this bean is returned in response.
-    - The given filter name `SomeBeanDynamicFilter` is created and update in API method of controller class.
+    - The given filter name `dyna-filter-for-somebean` is created and update in API method of controller class.
+
+- **<ins>References:</ins>**
+  - `TBU`
+---
+
+## 10. Exception Handling
+### Project ref: *a2-sboot-ms-social-media-app*
+- **<ins>Purpose / Feature</ins>**
+  - Spring boot provides mechanism to handle and customize the exceptions thrown by the applications.
+- **<ins>Maven / External dependency</ins>**
+  - Add spring validation dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+- **<ins>Code changes</ins>**
+  - Java Bean
+    - Java Bean to standarized the error message returned to requestor/cient.
+    - ErrorDetails.java
+      - imports
+        - `None`
+      - Class with required properties
+    	```java
+    		public class ErrorDetails {
+
+				private LocalDateTime timestamp;
+				private String message;
+				private String details;
+
+				// Constructor, setter-getters
+			}
+    	```
+  - Custom Exception class
+    - Create a custom exception class to determine the type of error that has occured.
+	- UserNotFoundException.java
+      - imports
+        - `import org.springframework.http.HttpStatus;`
+		- `import org.springframework.web.bind.annotation.ResponseStatus;`
+      - Override required constructors and can have fields if any info need to be stored.
+    	```java
+    		@ResponseStatus(code = HttpStatus.NOT_FOUND)
+			public class UserNotFoundException extends RuntimeException {
+
+				private static final long serialVersionUID = 4882099180124262207L;
+
+				public UserNotFoundException(String message) {
+					super(message);
+				}
+			}
+    	```
+  - Controller Advice class
+    - Create a custom Controller advice class to determine the type of error that has occured.
+	- UserNotFoundException.java
+      - imports
+        - `import org.springframework.core.annotation.Order;`
+		- `import org.springframework.http.HttpStatus;`
+        - `import org.springframework.http.ResponseEntity;`
+        - `import org.springframework.web.bind.annotation.ControllerAdvice;`
+        - `import org.springframework.web.bind.annotation.ExceptionHandler;`
+        - `import org.springframework.web.bind.annotation.RestControllerAdvice;`
+        - `import org.springframework.web.context.request.WebRequest;`
+        - `import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;`
+        - `import jakarta.annotation.Priority;`
+      - Override required required method and process the exception.
+    	```java
+    		@ControllerAdvice
+			//@ControllerAdvice(basePackages = "com.srvivek.x.y.z") //for specific package
+			//@Order(value = 1) // for defining ordering
+			//@Priority(value = 1) // for defining ordering
+			//@RestControllerAdvice(basePackages = "com.srvivek.x.y.z") // @ControllerAdvice + @ResponseBody
+			public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+				private static final Logger logger = LoggerFactory.getLogger(CustomizedResponseEntityExceptionHandler.class);
+
+				/**
+				* Generic exception handling.
+				* @param ex
+				* @param request
+				* @return
+				* @throws Exception
+				*/
+				@ExceptionHandler(exception = Exception.class)
+				public final ResponseEntity<ErrorDetails> handleAllException(Exception ex, WebRequest request) throws Exception {
+
+					logger.error("Error stacktrace: {}", ex);
+
+					ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+							request.getDescription(false));
+
+					return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+
+				/**
+				* Return HTTP 404 for UserNotFoundException.
+				* @param ex
+				* @param request
+				* @return
+				* @throws Exception
+				*/
+				@ExceptionHandler(exception = UserNotFoundException.class)
+				public final ResponseEntity<ErrorDetails> handleUserNotFoundException(Exception ex, WebRequest request)
+						throws Exception {
+
+					logger.error("Error stacktrace: {}", ex);
+
+					ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+							request.getDescription(false));
+
+					return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
+				}
+			}
+    	```	
+- **<ins>Notes:</ins>**
+  - We can define controller advice for specific package.
+  - While handling exceptions, also log the error explicitly or else it will not be logged in log files.
 
 - **<ins>References:</ins>**
   - `TBU`
 
-
-
-## a9-sboot-ms-static-filtering
-
-### Dynamic filtering
-- Resource
-
-```
-		import com.fasterxml.jackson.databind.ser.FilterProvider;
-		import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-		import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
-```
-
-
-- Dynamic Filtering code
-
-```
-		@RestController
-		public class DynamicFilteringController {
-		
-			@GetMapping("/dyna-filtering")
-			public SomeBeanDynamicFilter filtering() {
-				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3",
-						"Value-4", "Value-5", "Value-6");
-		
-				// Dynamic filtering
-				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field2",
-						"field4", "field6");
-		
-				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
-						simpleBeanPropertyFilter);
-		
-				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
-				mappingJacksonValue.setFilters(simpleFilterProvider);
-		
-				return SomeBeanDynamicFilter;
-			}
-		
-			@GetMapping("/dyna-filtering-list")
-			public MappingJacksonValue filteringList() {
-				List<SomeBeanDynamicFilter> SomeBeanDynamicFilterList = Arrays.asList(
-						new SomeBeanDynamicFilter("Value-1", "Value-2", "Value-3", "Value-4", "Value-5", "Value-6"),
-						new SomeBeanDynamicFilter("Value-11", "Value-22", "Value-33", "Value-44", "Value-55", "Value-66"),
-						new SomeBeanDynamicFilter("Value-111", "Value-222", "Value-333", "Value-444", "Value-555",
-								"Value-666"));
-		
-				// Dynamic filtering
-				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept("field1",
-						"field3", "field5", "field6");
-				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter("SomeBeanDynamicFilter",
-						simpleBeanPropertyFilter);
-		
-				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
-				mappingJacksonValue.setFilters(simpleFilterProvider);
-		
-				return mappingJacksonValue;
-			}
-
-```
-
-- Dynamic filterig bean
-
--Resource
-
-```
-		import com.fasterxml.jackson.annotation.JsonFilter;
-```
-
-- Bean class
-
-```
-		/**
-		 * Dynamically exclude properties as per the specified filter.
-		 */
-		@JsonFilter("SomeBeanDynamicFilter")
-		public class SomeBeanDynamicFilter {
-		
-			private String field1;
-			private String field2;
-			private String field3;
-			private String field4;
-			private String field5;
-			private String field6;
-
-			// constructor
-			
-			// getters
-			
-			// toString()
-		}
-```
+---
 
 
 ## a11-sboot-ms-hal-explorer
@@ -678,6 +706,7 @@
 		- http://localhost:8080/explorer/index.html#
 ```
 
+---
 
 ##a13-sboot-ms-mysql-jpa
 - Launch MySQL as Docker container

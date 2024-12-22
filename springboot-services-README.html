@@ -809,7 +809,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="9-dynamic-content-filtering-in-progress">9. Dynamic content filtering [<em><strong>in progress</strong></em>]</h2>
+<h2 id="9-dynamic-content-filtering">9. Dynamic content filtering</h2>
 <h3 id="project-ref-a9-sboot-ms-static-filtering-1">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
 <ul>
 <li>
@@ -835,7 +835,8 @@
 <ul>
 <li>Bean
 <ul>
-<li>Next, need to update the Java Bean class with the <code>filter name</code>.</li>
+<li>Update the Java Bean class with the <code>filter name</code> create inside controller.</li>
+<li>All controller APIs should update the filter with same <code>filter name</code>.</li>
 <li>imports
 <ul>
 <li><code>import com.fasterxml.jackson.annotation.JsonFilter;</code></li>
@@ -844,7 +845,7 @@
 <li>Annotate java properties to ignore while building the response.</li>
 </ul>
 <pre><code class="language-java">	<span class="hljs-comment">/** Dynamically exclude properties as per the specified filter set by the API. */</span>
-	<span class="hljs-meta">@JsonFilter(value = &quot;someBeanDynamicFilter&quot;)</span>
+	<span class="hljs-meta">@JsonFilter(&quot;dyna-filter-for-somebean&quot;)</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span> {
 
 		<span class="hljs-keyword">private</span> String field1;
@@ -858,7 +859,7 @@
 	}
 </code></pre>
 </li>
-<li>Contrller
+<li>Controller
 <ul>
 <li>Create instace of `` and mention the properties to be excluded and add it with a unique name in filter provider.</li>
 <li>imports
@@ -875,36 +876,39 @@
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DynamicFilteringController</span> {
 
 		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering&quot;)</span>
-		<span class="hljs-keyword">public</span> SomeBeanDynamicFilter <span class="hljs-title function_">filtering</span><span class="hljs-params">()</span> {
-			<span class="hljs-type">SomeBeanDynamicFilter</span> <span class="hljs-variable">SomeBeanDynamicFilter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>,
-					<span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>);
+		<span class="hljs-keyword">public</span> MappingJacksonValue <span class="hljs-title function_">filtering</span><span class="hljs-params">()</span> {
 
 			<span class="hljs-comment">// Dynamic filtering</span>
 			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field2&quot;</span>,
 					<span class="hljs-string">&quot;field4&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
 
-			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleFilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;someBeanDynamicFilter&quot;</span>,
-					simpleBeanPropertyFilter);
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleFilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>()
+					.addFilter(<span class="hljs-string">&quot;dyna-filter-for-somebean&quot;</span>, simpleBeanPropertyFilter);
 
+			<span class="hljs-comment">// Construct resposnse bean</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SomeBeanDynamicFilter</span> <span class="hljs-variable">SomeBeanDynamicFilter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>,
+					<span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>);
 			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilter);
 			mappingJacksonValue.setFilters(simpleFilterProvider);
 
-			<span class="hljs-keyword">return</span> SomeBeanDynamicFilter;
+			<span class="hljs-keyword">return</span> mappingJacksonValue;
 		}
 
 		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering-list&quot;)</span>
 		<span class="hljs-keyword">public</span> MappingJacksonValue <span class="hljs-title function_">filteringList</span><span class="hljs-params">()</span> {
+
+			<span class="hljs-comment">// Dynamic filtering</span>
+			<span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field1&quot;</span>,
+					<span class="hljs-string">&quot;field3&quot;</span>, <span class="hljs-string">&quot;field5&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
+			<span class="hljs-type">FilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;dyna-filter-for-somebean&quot;</span>,
+					simpleBeanPropertyFilter);
+
+			<span class="hljs-comment">// Construct list of resposnse beans</span>
 			List&lt;SomeBeanDynamicFilter&gt; SomeBeanDynamicFilterList = Arrays.asList(
 					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>, <span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>),
 					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-11&quot;</span>, <span class="hljs-string">&quot;Value-22&quot;</span>, <span class="hljs-string">&quot;Value-33&quot;</span>, <span class="hljs-string">&quot;Value-44&quot;</span>, <span class="hljs-string">&quot;Value-55&quot;</span>, <span class="hljs-string">&quot;Value-66&quot;</span>),
 					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-111&quot;</span>, <span class="hljs-string">&quot;Value-222&quot;</span>, <span class="hljs-string">&quot;Value-333&quot;</span>, <span class="hljs-string">&quot;Value-444&quot;</span>, <span class="hljs-string">&quot;Value-555&quot;</span>,
 							<span class="hljs-string">&quot;Value-666&quot;</span>));
-
-			<span class="hljs-comment">// Dynamic filtering</span>
-			<span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field1&quot;</span>,
-					<span class="hljs-string">&quot;field3&quot;</span>, <span class="hljs-string">&quot;field5&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
-			<span class="hljs-type">FilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;SomeBeanDynamicFilter&quot;</span>,
-					simpleBeanPropertyFilter);
 
 			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilterList);
 			mappingJacksonValue.setFilters(simpleFilterProvider);
@@ -924,7 +928,7 @@
 <li><code>@JsonFilter</code> annotation:
 <ul>
 <li>Defines a filter name, which should be evaluated and applied every time when object of this bean is returned in response.</li>
-<li>The given filter name <code>SomeBeanDynamicFilter</code> is created and update in API method of controller class.</li>
+<li>The given filter name <code>dyna-filter-for-somebean</code> is created and update in API method of controller class.</li>
 </ul>
 </li>
 </ul>
@@ -936,90 +940,167 @@
 </ul>
 </li>
 </ul>
-<h2 id="a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</h2>
-<h3 id="dynamic-filtering">Dynamic filtering</h3>
+<hr>
+<h2 id="10-exception-handling">10. Exception Handling</h2>
+<h3 id="project-ref-a2-sboot-ms-social-media-app-1">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
 <ul>
-<li>Resource</li>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Spring boot provides mechanism to handle and customize the exceptions thrown by the applications.</li>
 </ul>
-<pre><code>		import com.fasterxml.jackson.databind.ser.FilterProvider;
-		import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-		import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
-<ul>
-<li>Dynamic Filtering code</li>
+</li>
 </ul>
-<pre><code>		@RestController
-		public class DynamicFilteringController {
-		
-			@GetMapping(&quot;/dyna-filtering&quot;)
-			public SomeBeanDynamicFilter filtering() {
-				SomeBeanDynamicFilter SomeBeanDynamicFilter = new SomeBeanDynamicFilter(&quot;Value-1&quot;, &quot;Value-2&quot;, &quot;Value-3&quot;,
-						&quot;Value-4&quot;, &quot;Value-5&quot;, &quot;Value-6&quot;);
-		
-				// Dynamic filtering
-				final SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept(&quot;field2&quot;,
-						&quot;field4&quot;, &quot;field6&quot;);
-		
-				final SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter(&quot;SomeBeanDynamicFilter&quot;,
-						simpleBeanPropertyFilter);
-		
-				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilter);
-				mappingJacksonValue.setFilters(simpleFilterProvider);
-		
-				return SomeBeanDynamicFilter;
-			}
-		
-			@GetMapping(&quot;/dyna-filtering-list&quot;)
-			public MappingJacksonValue filteringList() {
-				List&lt;SomeBeanDynamicFilter&gt; SomeBeanDynamicFilterList = Arrays.asList(
-						new SomeBeanDynamicFilter(&quot;Value-1&quot;, &quot;Value-2&quot;, &quot;Value-3&quot;, &quot;Value-4&quot;, &quot;Value-5&quot;, &quot;Value-6&quot;),
-						new SomeBeanDynamicFilter(&quot;Value-11&quot;, &quot;Value-22&quot;, &quot;Value-33&quot;, &quot;Value-44&quot;, &quot;Value-55&quot;, &quot;Value-66&quot;),
-						new SomeBeanDynamicFilter(&quot;Value-111&quot;, &quot;Value-222&quot;, &quot;Value-333&quot;, &quot;Value-444&quot;, &quot;Value-555&quot;,
-								&quot;Value-666&quot;));
-		
-				// Dynamic filtering
-				SimpleBeanPropertyFilter simpleBeanPropertyFilter = SimpleBeanPropertyFilter.filterOutAllExcept(&quot;field1&quot;,
-						&quot;field3&quot;, &quot;field5&quot;, &quot;field6&quot;);
-				FilterProvider simpleFilterProvider = new SimpleFilterProvider().addFilter(&quot;SomeBeanDynamicFilter&quot;,
-						simpleBeanPropertyFilter);
-		
-				final MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(SomeBeanDynamicFilterList);
-				mappingJacksonValue.setFilters(simpleFilterProvider);
-		
-				return mappingJacksonValue;
-			}
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>Java Bean
+<ul>
+<li>Java Bean to standarized the error message returned to requestor/cient.</li>
+<li>ErrorDetails.java
+<ul>
+<li>imports
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+<li>Class with required properties<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ErrorDetails</span> {
 
-</code></pre>
-<ul>
-<li>Dynamic filterig bean</li>
-</ul>
-<p>-Resource</p>
-<pre><code>		import com.fasterxml.jackson.annotation.JsonFilter;
-</code></pre>
-<ul>
-<li>Bean class</li>
-</ul>
-<pre><code>		/**
-		 * Dynamically exclude properties as per the specified filter.
-		 */
-		@JsonFilter(&quot;SomeBeanDynamicFilter&quot;)
-		public class SomeBeanDynamicFilter {
-		
-			private String field1;
-			private String field2;
-			private String field3;
-			private String field4;
-			private String field5;
-			private String field6;
+		<span class="hljs-keyword">private</span> LocalDateTime timestamp;
+		<span class="hljs-keyword">private</span> String message;
+		<span class="hljs-keyword">private</span> String details;
 
-			// constructor
-			
-			// getters
-			
-			// toString()
+		<span class="hljs-comment">// Constructor, setter-getters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Custom Exception class
+<ul>
+<li>Create a custom exception class to determine the type of error that has occured.</li>
+<li>UserNotFoundException.java
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.http.HttpStatus;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ResponseStatus;</code></li>
+</ul>
+</li>
+<li>Override required constructors and can have fields if any info need to be stored.<pre><code class="language-java">	<span class="hljs-meta">@ResponseStatus(code = HttpStatus.NOT_FOUND)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserNotFoundException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">RuntimeException</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> <span class="hljs-number">4882099180124262207L</span>;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">UserNotFoundException</span><span class="hljs-params">(String message)</span> {
+			<span class="hljs-built_in">super</span>(message);
 		}
+	}
 </code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Controller Advice class
+<ul>
+<li>Create a custom Controller advice class to determine the type of error that has occured.</li>
+<li>UserNotFoundException.java
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.core.annotation.Order;</code></li>
+<li><code>import org.springframework.http.HttpStatus;</code></li>
+<li><code>import org.springframework.http.ResponseEntity;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ControllerAdvice;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ExceptionHandler;</code></li>
+<li><code>import org.springframework.web.bind.annotation.RestControllerAdvice;</code></li>
+<li><code>import org.springframework.web.context.request.WebRequest;</code></li>
+<li><code>import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;</code></li>
+<li><code>import jakarta.annotation.Priority;</code></li>
+</ul>
+</li>
+<li>Override required required method and process the exception.<pre><code class="language-java">	<span class="hljs-meta">@ControllerAdvice</span>
+	<span class="hljs-comment">//@ControllerAdvice(basePackages = &quot;com.srvivek.x.y.z&quot;) //for specific package</span>
+	<span class="hljs-comment">//@Order(value = 1) // for defining ordering</span>
+	<span class="hljs-comment">//@Priority(value = 1) // for defining ordering</span>
+	<span class="hljs-comment">//@RestControllerAdvice(basePackages = &quot;com.srvivek.x.y.z&quot;) // @ControllerAdvice + @ResponseBody</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomizedResponseEntityExceptionHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ResponseEntityExceptionHandler</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CustomizedResponseEntityExceptionHandler.class);
+
+		<span class="hljs-comment">/**
+		* Generic exception handling.
+		* <span class="hljs-doctag">@param</span> ex
+		* <span class="hljs-doctag">@param</span> request
+		* <span class="hljs-doctag">@return</span>
+		* <span class="hljs-doctag">@throws</span> Exception
+		*/</span>
+		<span class="hljs-meta">@ExceptionHandler(exception = Exception.class)</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> ResponseEntity&lt;ErrorDetails&gt; <span class="hljs-title function_">handleAllException</span><span class="hljs-params">(Exception ex, WebRequest request)</span> <span class="hljs-keyword">throws</span> Exception {
+
+			logger.error(<span class="hljs-string">&quot;Error stacktrace: {}&quot;</span>, ex);
+
+			<span class="hljs-type">ErrorDetails</span> <span class="hljs-variable">errorDetails</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ErrorDetails</span>(LocalDateTime.now(), ex.getMessage(),
+					request.getDescription(<span class="hljs-literal">false</span>));
+
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;ErrorDetails&gt;(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		<span class="hljs-comment">/**
+		* Return HTTP 404 for UserNotFoundException.
+		* <span class="hljs-doctag">@param</span> ex
+		* <span class="hljs-doctag">@param</span> request
+		* <span class="hljs-doctag">@return</span>
+		* <span class="hljs-doctag">@throws</span> Exception
+		*/</span>
+		<span class="hljs-meta">@ExceptionHandler(exception = UserNotFoundException.class)</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> ResponseEntity&lt;ErrorDetails&gt; <span class="hljs-title function_">handleUserNotFoundException</span><span class="hljs-params">(Exception ex, WebRequest request)</span>
+				<span class="hljs-keyword">throws</span> Exception {
+
+			logger.error(<span class="hljs-string">&quot;Error stacktrace: {}&quot;</span>, ex);
+
+			<span class="hljs-type">ErrorDetails</span> <span class="hljs-variable">errorDetails</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ErrorDetails</span>(LocalDateTime.now(), ex.getMessage(),
+					request.getDescription(<span class="hljs-literal">false</span>));
+
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;ErrorDetails&gt;(errorDetails, HttpStatus.NOT_FOUND);
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>We can define controller advice for specific package.</li>
+<li>While handling exceptions, also log the error explicitly or else it will not be logged in log files.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<hr>
 <h2 id="a11-sboot-ms-hal-explorer">a11-sboot-ms-hal-explorer</h2>
 <ul>
 <li>Dependency</li>
@@ -1036,6 +1117,7 @@
 <pre><code>		- http://localhost:8080/explorer
 		- http://localhost:8080/explorer/index.html#
 </code></pre>
+<hr>
 <p>##a13-sboot-ms-mysql-jpa</p>
 <ul>
 <li>Launch MySQL as Docker container</li>
