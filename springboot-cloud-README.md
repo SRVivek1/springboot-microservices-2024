@@ -435,6 +435,7 @@
 - **<ins>Purpose / Feature</ins>**
   - It's an application that contains information about all micro services including the name of the service, port, and IP address. 
   - Each microservice has to register itself with the Eureka Server.
+  - Service is available at `/` context. [http://localhost:8761/](http://localhost:8761/) 
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -481,6 +482,101 @@
 		# Eureka : end
 	```
 ---
+
+## 6. Eureka Naming server client configuration
+### Project ref: *b3-currency-exchange-service* & *b4-currency-conversion-service*
+- **<ins>Purpose / Feature</ins>**
+  - Register's the micro-service to Name server.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Add Eureka client in POM.ml
+  - ***Step-2:*** Configure eureka server URI in application.properties
+   
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-eureka-client</artifactId>
+		</dependency>
+- **<ins>Config changes</ins>**
+  - **Application Config:** *application.properties*
+	```properties
+		# Start: Eureka client config
+
+		# Map of availability zone to list of fully qualified URLs to communicate with eureka server. 
+		# Each value can be a single URL or a comma separated list of alternative locations. 
+		# Typically the eureka server URLs carry protocol,host,port,context and version information if any. 
+		# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ 
+		eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+		# End: Eureka client config
+	```
+
+> Note: If `Eureka client` dependency is present in `POM.xml`, spring will automatically try to register this service to Naming server by looking for `Eureka Server` on it's default `Eureka port - 8761`.
+
+---
+
+## 7. Load Balancing microservices
+### Project ref: *b3-currency-exchange-service* & *b4-currency-conversion-service*
+- **<ins>Purpose / Feature</ins>**
+  - Balance the traffic to the services dynamically by checking the current running instances.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Some change/step
+  - ***Step-2:*** Some change/step
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>xxx.xxxx.xxxx</groupId>
+			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
+		</dependency>
+- **<ins>Code / Config changes</ins>**
+  - **Controller:** *AbcController.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
+	```java
+		@PostMapping("/users")
+		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
+			// Impacted code goes here.
+		}
+	```
+  - **Service:** *AbcResource.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
+	```java
+		public Object createUser(@Valid @RequestBody User user) {
+
+			// Impacted code goes here.
+		}
+	```
+  - **Application Config:** *application.properties*
+	```properties
+		spring.abc.xyz=false
+	```
+
+> Note: This is an ***important*** note.
+
+- **<ins>Notes:</ins>**
+  - Some important key point / takeaway note.
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
+- **<ins>References:</ins>**
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [xyz service](http://website.com/some-resource-path)
+
+---
+
 
 
 

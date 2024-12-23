@@ -730,6 +730,7 @@
 <ul>
 <li>It's an application that contains information about all micro services including the name of the service, port, and IP address.</li>
 <li>Each microservice has to register itself with the Eureka Server.</li>
+<li>Service is available at <code>/</code> context. <a href="http://localhost:8761/">http://localhost:8761/</a></li>
 </ul>
 </li>
 <li><strong><ins>Maven / External dependency</ins></strong>
@@ -791,6 +792,54 @@
 </ul>
 </li>
 </ul>
+<hr>
+<h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
+<h3 id="project-ref-b3-currency-exchange-service--b4-currency-conversion-service">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b4-currency-conversion-service</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Register's the micro-service to Name server.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Add Eureka client in <a href="http://POM.ml">POM.ml</a></li>
+<li><em><strong>Step-2:</strong></em> Configure eureka server URI in application.properties</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Config changes</ins></strong></p>
+<ul>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment">	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: If <code>Eureka client</code> dependency is present in <code>POM.xml</code>, spring will automatically try to register this service to Naming server by looking for <code>Eureka Server</code> on it's default <code>Eureka port - 8761</code>.</p>
+</blockquote>
 <hr>
 
             

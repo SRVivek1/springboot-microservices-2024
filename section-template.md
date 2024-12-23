@@ -2,14 +2,17 @@
 ### Project ref: *xx-xxxx-xx-xxxx*
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Some change/step
+  - ***Step-2:*** Some change/step
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
     	<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-xxxxx</artifactId>
+			<groupId>xxx.xxxx.xxxx</groupId>
+			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
 		</dependency>
-- **<ins>Code changes</ins>**
+- **<ins>Code / Config changes</ins>**
   - **Controller:** *AbcController.java*
     - imports
       - `import some.dependent.resource`
@@ -30,6 +33,10 @@
 
 			// Impacted code goes here.
 		}
+	```
+  - **Application Config:** *application.properties*
+	```properties
+		spring.abc.xyz=false
 	```
 
 > Note: This is an ***important*** note.
