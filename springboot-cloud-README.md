@@ -484,11 +484,11 @@
 ---
 
 ## 6. Eureka Naming server client configuration
-### Project ref: *b3-currency-exchange-service* & *b4-currency-conversion-service*
+### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Register's the micro-service to Name server.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Add Eureka client in POM.ml
+  - ***Step-1:*** Add Eureka client in POM.xml
   - ***Step-2:*** Configure eureka server URI in application.properties
    
 - **<ins>Maven / External dependency</ins>**
@@ -517,63 +517,35 @@
 ---
 
 ## 7. Load Balancing microservices
-### Project ref: *b3-currency-exchange-service* & *b4-currency-conversion-service*
+### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Some change/step
-  - ***Step-2:*** Some change/step
-- **<ins>Maven / External dependency</ins>**
-  - Required dependency.
- 	```xml
-    	<dependency>
-			<groupId>xxx.xxxx.xxxx</groupId>
-			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
-		</dependency>
+  - ***Step-1:*** Update the feign client ***@FeignClient*** `annotation`
+  - ***Step-2:*** Note: Expections is that eureka client is already configed if not configure it first.
+  - ***Step-2:*** Also verify in eureka server that your micro-service is getting regitered.
 - **<ins>Code / Config changes</ins>**
-  - **Controller:** *AbcController.java*
+  - **Feign Client:** *AbcController.java*
     - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
+      - `import org.springframework.cloud.openfeign.FeignClient;`
+    - Annotate `@FeignClient` with only service name.
 	```java
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+		//@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")
+		/* Find service details from name server using service name. */
+		@FeignClient(name = "b3-currency-exchange-service") 
+		public interface CurrencyExchangeProxy {
 
-			// Impacted code goes here.
+			/**
+			* Method as defined in the host service.
+			* 
+			* @param from
+			* @param to
+			* @return
+			*/
+			@GetMapping("/jpa/currency-exchange/from/{from}/to/{to}")
+			public CurrencyConversion retrieveExchangeRateFromDatabase(@PathVariable String from, @PathVariable String to);
 		}
-	```
-  - **Service:** *AbcResource.java*
-    - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
-	```java
-		public Object createUser(@Valid @RequestBody User user) {
-
-			// Impacted code goes here.
-		}
-	```
-  - **Application Config:** *application.properties*
-	```properties
-		spring.abc.xyz=false
-	```
-
-> Note: This is an ***important*** note.
-
-- **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
-
-- **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
+> Note: With service name it finds the server details from `Eureka Server`.
 
 ---
 

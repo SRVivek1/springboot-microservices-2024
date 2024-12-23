@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @SpringBootApplication
-public class B4CurrencyConversionServiceApplication {
+public class B5CurrencyConversionServiceOpenFeignApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+		SpringApplication.run(B5CurrencyConversionServiceOpenFeignApplication.class, args);
 	}
 
 }

@@ -794,7 +794,7 @@
 </ul>
 <hr>
 <h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
-<h3 id="project-ref-b3-currency-exchange-service--b4-currency-conversion-service">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b4-currency-conversion-service</em></h3>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
@@ -805,7 +805,7 @@
 <li>
 <p><strong><ins>Steps</ins></strong></p>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add Eureka client in <a href="http://POM.ml">POM.ml</a></li>
+<li><em><strong>Step-1:</strong></em> Add Eureka client in POM.xml</li>
 <li><em><strong>Step-2:</strong></em> Configure eureka server URI in application.properties</li>
 </ul>
 </li>
@@ -839,6 +839,56 @@
 </ul>
 <blockquote>
 <p>Note: If <code>Eureka client</code> dependency is present in <code>POM.xml</code>, spring will automatically try to register this service to Naming server by looking for <code>Eureka Server</code> on it's default <code>Eureka port - 8761</code>.</p>
+</blockquote>
+<hr>
+<h2 id="7-load-balancing-microservices">7. Load Balancing microservices</h2>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Balance the traffic to the services dynamically by checking the current running instances.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code></li>
+<li><em><strong>Step-2:</strong></em> Note: Expections is that eureka client is already configed if not configure it first.</li>
+<li><em><strong>Step-2:</strong></em> Also verify in eureka server that your micro-service is getting regitered.</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Feign Client:</strong> <em>AbcController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Annotate <code>@FeignClient</code> with only service name.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">//@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</span>
+	<span class="hljs-comment">/* Find service details from name server using service name. */</span>
+	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</span> 
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
+
+		<span class="hljs-comment">/**
+		* Method as defined in the host service.
+		* 
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: With service name it finds the server details from <code>Eureka Server</code>.</p>
 </blockquote>
 <hr>
 
