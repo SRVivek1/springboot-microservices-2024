@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.srvivek.sboot.mservices.ccs.bean.CurrencyConversion;
 
-@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")
+//@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")
+@FeignClient(name = "b3-currency-exchange-service")
 public interface CurrencyExchangeProxy {
 
 	/**

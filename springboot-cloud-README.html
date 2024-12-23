@@ -841,7 +841,7 @@
 <p>Note: If <code>Eureka client</code> dependency is present in <code>POM.xml</code>, spring will automatically try to register this service to Naming server by looking for <code>Eureka Server</code> on it's default <code>Eureka port - 8761</code>.</p>
 </blockquote>
 <hr>
-<h2 id="7-load-balancing-microservices">7. Load Balancing microservices</h2>
+<h2 id="7-load-balancing-microservices-in-progress">7. Load Balancing microservices [<em><strong>in progress</strong></em>]</h2>
 <h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
@@ -851,9 +851,19 @@
 </li>
 <li><strong><ins>Steps</ins></strong>
 <ul>
-<li><em><strong>Step-1:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code></li>
-<li><em><strong>Step-2:</strong></em> Note: Expections is that eureka client is already configed if not configure it first.</li>
-<li><em><strong>Step-2:</strong></em> Also verify in eureka server that your micro-service is getting regitered.</li>
+<li><em><strong>Step-1:</strong></em> Add `` dependency in POM.xml.</li>
+<li><em><strong>Step-2:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property</li>
+<li><em><strong>Step-2:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-loadbalancer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
 </ul>
 </li>
 <li><strong><ins>Code / Config changes</ins></strong>
@@ -874,7 +884,6 @@
 
 		<span class="hljs-comment">/**
 		* Method as defined in the host service.
-		* 
 		* <span class="hljs-doctag">@param</span> from
 		* <span class="hljs-doctag">@param</span> to
 		* <span class="hljs-doctag">@return</span>

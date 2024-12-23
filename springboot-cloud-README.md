@@ -516,14 +516,21 @@
 
 ---
 
-## 7. Load Balancing microservices
+## 7. Load Balancing microservices [***in progress***]
 ### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Update the feign client ***@FeignClient*** `annotation`
-  - ***Step-2:*** Note: Expections is that eureka client is already configed if not configure it first.
-  - ***Step-2:*** Also verify in eureka server that your micro-service is getting regitered.
+  - ***Step-1:*** Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
+  - ***Step-2:*** Update the feign client ***@FeignClient*** `annotation` and remove `url` property
+  - ***Step-2:*** Restart your service and verify in eureka server that your micro-service is regitered.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+		</dependency>
 - **<ins>Code / Config changes</ins>**
   - **Feign Client:** *AbcController.java*
     - imports
@@ -537,7 +544,6 @@
 
 			/**
 			* Method as defined in the host service.
-			* 
 			* @param from
 			* @param to
 			* @return
