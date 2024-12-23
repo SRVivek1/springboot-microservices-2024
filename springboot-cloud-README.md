@@ -6,15 +6,15 @@
 
 - Below are be the port specific to each service we'l be developing in this tutorial.
 
-| **Application** | **Port** |
-| --------------- | -------- |
-| Limits Microservice | *8080, 8081, etc.* |
-| Spring Cloud Config Server | *8888* |
-| Currency Exchange Microservice | *8000, 8001, 8002, etc.* |
-| Currency Conversion Microservice | *8100, 8101, 8102, etc.* |
-| Netflix Eureka Naming Server | *8761* |
-| API Gateway | *8765* |
-| Zipkin Distributed Tracing Server | *9411* |
+| **Application** | **Port** | **Info** |
+| --------------- | -------- | -------- |
+| Limits Microservice | *8080, 8081, etc.* | ~ |
+| Spring Cloud Config Server | *8888* | Port 8888 is default port for config srver as per spring docs. |
+| Currency Exchange Microservice | *8000, 8001, 8002, etc.* | ~ |
+| Currency Conversion Microservice | *8100, 8101, 8102, etc.* | ~ |
+| Netflix Eureka Naming Server | *8761* | ~ |
+| API Gateway | *8765* | ~ |
+| Zipkin Distributed Tracing Server | *9411* | ~ |
 
 ---
 
@@ -306,8 +306,132 @@
 
 ---
 
-## 4. Using openfeign for calling rest services [***in progress***]
-### Project ref: *bx-xxx*
+## 4. OpenFeign client: Connect to other mircoservice
+### Project ref: *b5-currency-conversion-service-openfeign*
+- **<ins>Purpose / Feature</ins>**
+  - Easy way to make rest service calls. 
+  - Removes bioler plate code need to be written while using `RestTemplate` to invoke a rest service.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+- **<ins>Code changes</ins>**
+  - Application: Enable feign clients using ***@EnableFeignClients***.
+    - Scans for interfaces that declare they are feign clients `(via org.springframework.cloud.openfeign.FeignClient @FeignClient)`. 
+    - Configures component scanning directives for use with `org.springframework.context.annotation.Configuration @Configuration` classes.
+    -  imports
+       - `import org.springframework.cloud.openfeign.EnableFeignClients;`
+    - Annotate the SpringBoot application to enable feign clients.
+	```java
+		@EnableFeignClients  // Enables feign clients in application
+		@SpringBootApplication
+		public class B4CurrencyConversionServiceApplication {
+
+			public static void main(String[] args) {
+				SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+			}
+		}
+	```
+  - Response java bean ***CurrencyConversion.java***.
+    - This class must have all the properties expecting from `currency-exchange` service, to support auto population of response data. 
+    -  imports
+       - `import java.math.BigDecimal;`
+    - Annotate the SpringBoot application to enable feign clients.
+	```java
+		public class CurrencyConversion {
+
+			private Long id;
+			private String from;
+			private String to;
+			private BigDecimal conversionMultiples;
+			private BigDecimal quantity;
+			private BigDecimal totalCalculatedAmount;
+			private String environment;
+
+			// constructors, setter-getters.
+		}
+	```
+
+  - Create an feign client interface ***CurrencyExchangeProxy.java***
+    -  imports
+       - `import org.springframework.cloud.openfeign.FeignClient;`
+    - Add validation in the properties of the bean.
+	```java
+		@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")
+		public interface CurrencyExchangeProxy {
+
+			/**
+			* Method as defined in the host service.
+			* @param from
+			* @param to
+			* @return
+			*/
+			@GetMapping("/jpa/currency-exchange/from/{from}/to/{to}")
+			public CurrencyConversion retrieveExchangeRateFromDatabase(@PathVariable String from, @PathVariable String to);
+		}
+	```
+	- Controller/Service to use feign client interface.
+    -  imports
+       - `import org.springframework.cloud.openfeign.FeignClient;`
+    - Add validation in the properties of the bean.
+	```java
+		@RestController
+		public class CurrencyConversionController {
+
+			private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionController.class);
+
+			@Autowired
+			private CurrencyExchangeProxy currencyExchangeProxy;
+
+			/**
+			* Currency conversion using feign client.
+			* @param from
+			* @param to
+			* @param quantity
+			* @return
+			*/
+			@GetMapping("/currency-conversion-feign/from/{from}/to/{to}/quantity/{quantity}")
+			public CurrencyConversion calculateCurrencyConversionFeign(@PathVariable String from, @PathVariable String to,
+					@PathVariable BigDecimal quantity) {
+
+				logger.info("Executing CurrencyConversionController.calculateCurrencyConversionFeign(..) API.");
+
+				// Standardize
+				from = from.toUpperCase();
+				to = to.toUpperCase();
+
+				// Send request to Currency exchange micro-service
+				final CurrencyConversion currencyConversionExchange = currencyExchangeProxy
+						.retrieveExchangeRateFromDatabase(from, to);
+
+				logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
+
+				final CurrencyConversion currencyConversion = new CurrencyConversion(currencyConversionExchange.getId(), from,
+						to, quantity, currencyConversionExchange.getConversionMultiples(),
+						quantity.multiply(currencyConversionExchange.getConversionMultiples()),
+						currencyConversionExchange.getEnvironment());
+
+				logger.debug("Response returned : {}", currencyConversionExchange);
+
+				return currencyConversion;
+			}
+		}
+	```
+
+> Note: The `CurrencyConversion.java` bean has all the properties which will be returned from `currency-exchange' service.
+
+- **<ins>References:</ins>**
+  - [https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html](https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html)
+  - [https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
+
+---
+
+## 5. Service Registry / Naming server : Eureka naming server
+### Project ref: *a3-sboot-ms-validation*
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
 - **<ins>Maven / External dependency</ins>**
@@ -358,4 +482,5 @@
   - [xyz service](http://website.com/some-resource-path)
 
 ---
+
 

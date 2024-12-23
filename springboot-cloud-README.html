@@ -149,36 +149,44 @@
 <tr>
 <th><strong>Application</strong></th>
 <th><strong>Port</strong></th>
+<th><strong>Info</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Limits Microservice</td>
 <td><em>8080, 8081, etc.</em></td>
+<td>~</td>
 </tr>
 <tr>
 <td>Spring Cloud Config Server</td>
 <td><em>8888</em></td>
+<td>Port 8888 is default port for config srver as per spring docs.</td>
 </tr>
 <tr>
 <td>Currency Exchange Microservice</td>
 <td><em>8000, 8001, 8002, etc.</em></td>
+<td>~</td>
 </tr>
 <tr>
 <td>Currency Conversion Microservice</td>
 <td><em>8100, 8101, 8102, etc.</em></td>
+<td>~</td>
 </tr>
 <tr>
 <td>Netflix Eureka Naming Server</td>
 <td><em>8761</em></td>
+<td>~</td>
 </tr>
 <tr>
 <td>API Gateway</td>
 <td><em>8765</em></td>
+<td>~</td>
 </tr>
 <tr>
 <td>Zipkin Distributed Tracing Server</td>
 <td><em>9411</em></td>
+<td>~</td>
 </tr>
 </tbody>
 </table>
@@ -447,7 +455,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="3-resttemplate-connect-to-other-mircoservice-in-progress">3. RestTemplate: Connect to other mircoservice [<em><strong>in progress</strong></em>]</h2>
+<h2 id="3-resttemplate-connect-to-other-mircoservice">3. RestTemplate: Connect to other mircoservice</h2>
 <h3 id="project-ref-b4-currency-conversion-service">Project ref: <em>b4-currency-conversion-service</em></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
@@ -549,6 +557,168 @@
 <li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html">https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-openfeign-client-connect-to-other-mircoservice">4. OpenFeign client: Connect to other mircoservice</h2>
+<h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <em>b5-currency-conversion-service-openfeign</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Easy way to make rest service calls.</li>
+<li>Removes bioler plate code need to be written while using <code>RestTemplate</code> to invoke a rest service.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>
+<p>Application: Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.</p>
+<ul>
+<li>Scans for interfaces that declare they are feign clients <code>(via org.springframework.cloud.openfeign.FeignClient @FeignClient)</code>.</li>
+<li>Configures component scanning directives for use with <code>org.springframework.context.annotation.Configuration @Configuration</code> classes.</li>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.EnableFeignClients;</code></li>
+</ul>
+</li>
+<li>Annotate the SpringBoot application to enable feign clients.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B4CurrencyConversionServiceApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+		}
+	}
+</code></pre>
+</li>
+<li>
+<p>Response java bean <em><strong>CurrencyConversion.java</strong></em>.</p>
+<ul>
+<li>This class must have all the properties expecting from <code>currency-exchange</code> service, to support auto population of response data.</li>
+<li>imports
+<ul>
+<li><code>import java.math.BigDecimal;</code></li>
+</ul>
+</li>
+<li>Annotate the SpringBoot application to enable feign clients.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+
+		<span class="hljs-keyword">private</span> Long id;
+		<span class="hljs-keyword">private</span> String from;
+		<span class="hljs-keyword">private</span> String to;
+		<span class="hljs-keyword">private</span> BigDecimal conversionMultiples;
+		<span class="hljs-keyword">private</span> BigDecimal quantity;
+		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
+		<span class="hljs-keyword">private</span> String environment;
+
+		<span class="hljs-comment">// constructors, setter-getters.</span>
+	}
+</code></pre>
+</li>
+<li>
+<p>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em></p>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
+
+		<span class="hljs-comment">/**
+		* Method as defined in the host service.
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
+	}
+</code></pre>
+<ul>
+<li>Controller/Service to use feign client interface.</li>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CurrencyConversionController.class);
+
+		<span class="hljs-meta">@Autowired</span>
+		<span class="hljs-keyword">private</span> CurrencyExchangeProxy currencyExchangeProxy;
+
+		<span class="hljs-comment">/**
+		* Currency conversion using feign client.
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@param</span> quantity
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/currency-conversion-feign/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversionFeign</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+				<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+
+			logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversionFeign(..) API.&quot;</span>);
+
+			<span class="hljs-comment">// Standardize</span>
+			from = from.toUpperCase();
+			to = to.toUpperCase();
+
+			<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> currencyExchangeProxy
+					.retrieveExchangeRateFromDatabase(from, to);
+
+			logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from,
+					to, quantity, currencyConversionExchange.getConversionMultiples(),
+					quantity.multiply(currencyConversionExchange.getConversionMultiples()),
+					currencyConversionExchange.getEnvironment());
+
+			logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+
+			<span class="hljs-keyword">return</span> currencyConversion;
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: The <code>CurrencyConversion.java</code> bean has all the properties which will be returned from `currency-exchange' service.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html">https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/">https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/</a></li>
 </ul>
 </li>
 </ul>
