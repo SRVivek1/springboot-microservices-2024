@@ -966,6 +966,230 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </li>
 </ul>
 <hr>
+<h2 id="8-api-gateway">8. API Gateway</h2>
+<h3 id="project-ref-b7-api-gateway">Project ref: <em>b7-api-gateway</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>All requests will be routed via API Gateway.</li>
+<li>This gives us flexibility to implement all common features at one place.</li>
+<li>Build on top of Spring WebFlux (Reactive Approach).</li>
+<li>Provide cross cutting concerns
+<ul>
+<li>Security</li>
+<li>Monitoring / Metrics</li>
+</ul>
+</li>
+<li>Features:
+<ul>
+<li>Match routes to any request attribute to route to right service.</li>
+<li>Allows to define Predicates (Matcher) &amp; Filters (eg. Authentication, Authorization, Logging etc.).</li>
+<li>Integrates with Spring Cloud Discovery client to load balancing to the service for which the request is received.</li>
+<li>Path rewriting.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Ensure following dependencies are added.
+<ul>
+<li>Eureka Discovery Client</li>
+<li>Reactive API Gateay</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Enable API gateway client discovery in <code>application.properties</code></li>
+<li><em><strong>Step-3:</strong></em> Now, we can access services with the Service name registered in Eureka server and path to controller API.
+<ul>
+<li><a href="http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Add property to accept service name in lower case
+<ul>
+<li><a href="http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b7-api-gateway</span>
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8765</span>
+<span class="hljs-comment">
+	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# Enables the Eureka health check handler.</span>
+	<span class="hljs-attr">eureka.client.healthcheck.enabled</span>=<span class="hljs-string">true</span>
+
+	<span class="hljs-attr">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">60</span>
+	<span class="hljs-attr">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">60</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+<span class="hljs-comment">
+	# Start: Api Gateway</span>
+<span class="hljs-comment">
+	# Flag that enables Discovery Client gateway integration.</span>
+<span class="hljs-comment">	# This allows us to invoke service using service-name registered in Eureka</span>
+<span class="hljs-comment">	# http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Option to lower case serviceId in predicates and filters, defaults to false. </span>
+<span class="hljs-comment">	# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.lower-case-service-id</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Api Gateway</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Service client discovery is by defaut <code>disabled</code>. It need to be enabed explicitly in <code>application.properties</code>. Check above config for details.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/">https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="9-routes-with-spring-cloud-gateway-in-progress">9. Routes with spring cloud gateway [<em><strong>in progress</strong></em>]</h2>
+<h3 id="project-ref-xx-xxxx-xx-xxxx">Project ref: <em>xx-xxxx-xx-xxxx</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>This is xyz feature.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Some change/step</li>
+<li><em><strong>Step-2:</strong></em> Some change/step</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>xxx.xxxx.xxxx<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>xxx-xxxx-xxx-xxxxx<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>AbcController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import some.dependent.resource</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
+
+		<span class="hljs-comment">// Impacted code goes here.</span>
+	}
+</code></pre>
+</li>
+<li><strong>Service:</strong> <em>AbcResource.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import some.dependent.resource</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> Object <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
+
+		<span class="hljs-comment">// Impacted code goes here.</span>
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.abc.xyz</span>=<span class="hljs-string">false</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Some important key point / takeaway note.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Pros &amp; Cons</ins></strong></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pros 1</td>
+<td>Cons 1</td>
+</tr>
+<tr>
+<td>Pros 2</td>
+<td>Cons 2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
+<li><a href="http://website.com/some-resource-path">xyz service</a></li>
+</ul>
+</li>
+</ul>
+<hr>
 
             
             

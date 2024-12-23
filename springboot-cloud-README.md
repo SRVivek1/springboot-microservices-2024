@@ -614,6 +614,146 @@
 
 ---
 
+## 8. API Gateway
+### Project ref: *b7-api-gateway*
+- **<ins>Purpose / Feature</ins>**
+  - All requests will be routed via API Gateway.
+  - This gives us flexibility to implement all common features at one place.
+  - Build on top of Spring WebFlux (Reactive Approach).
+  - Provide cross cutting concerns
+    - Security
+    - Monitoring / Metrics
+  - Features:
+    - Match routes to any request attribute to route to right service.
+    - Allows to define Predicates (Matcher) & Filters (eg. Authentication, Authorization, Logging etc.).
+    - Integrates with Spring Cloud Discovery client to load balancing to the service for which the request is received.
+    - Path rewriting.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Ensure following dependencies are added.
+    - Eureka Discovery Client
+    - Reactive API Gateay
+  - ***Step-2:*** Enable API gateway client discovery in `application.properties`
+  - ***Step-3:*** Now, we can access services with the Service name registered in Eureka server and path to controller API.
+    - http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+  - ***Step-4:*** Add property to accept service name in lower case
+    - http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+- **<ins>Code / Config changes</ins>**
+  - **Application Config:** *application.properties*
+	```properties
+		spring.application.name=b7-api-gateway
+		server.port=8765
+
+		# Start: Eureka client config
+
+		# Map of availability zone to list of fully qualified URLs to communicate with eureka server. 
+		# Each value can be a single URL or a comma separated list of alternative locations. 
+		# Typically the eureka server URLs carry protocol,host,port,context and version information if any. 
+		# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ 
+		eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+		# Enables the Eureka health check handler.
+		eureka.client.healthcheck.enabled=true
+
+		eureka.instance.lease-renewal-interval-in-seconds=60
+		eureka.instance.lease-expiration-duration-in-seconds=60
+
+		# End: Eureka client config
+
+		# Start: Api Gateway
+
+		# Flag that enables Discovery Client gateway integration.
+		# This allows us to invoke service using service-name registered in Eureka
+		# http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr
+		spring.cloud.gateway.discovery.locator.enabled=true
+
+		# Option to lower case serviceId in predicates and filters, defaults to false. 
+		# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**
+		spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+
+		# End: Api Gateway
+	```
+
+> Note: This is an ***important*** note.
+
+- **<ins>Notes:</ins>**
+  - Service client discovery is by defaut `disabled`. It need to be enabed explicitly in `application.properties`. Check above config for details.
+
+- **<ins>References:</ins>**
+  - [https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/](https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/)
+
+---
+
+## 9. Routes with spring cloud gateway [***in progress***]
+### Project ref: *xx-xxxx-xx-xxxx*
+- **<ins>Purpose / Feature</ins>**
+  - This is xyz feature.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Some change/step
+  - ***Step-2:*** Some change/step
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>xxx.xxxx.xxxx</groupId>
+			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
+		</dependency>
+- **<ins>Code / Config changes</ins>**
+  - **Controller:** *AbcController.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
+	```java
+		@PostMapping("/users")
+		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
+			// Impacted code goes here.
+		}
+	```
+  - **Service:** *AbcResource.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
+	```java
+		public Object createUser(@Valid @RequestBody User user) {
+
+			// Impacted code goes here.
+		}
+	```
+  - **Application Config:** *application.properties*
+	```properties
+		spring.abc.xyz=false
+	```
+
+> Note: This is an ***important*** note.
+
+- **<ins>Notes:</ins>**
+  - Some important key point / takeaway note.
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
+- **<ins>References:</ins>**
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [xyz service](http://website.com/some-resource-path)
+
+---
 
 
 
