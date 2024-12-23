@@ -1,4 +1,4 @@
-package com.srvivek.sboot.mservices.ccs;
+package com.srvivek.sboot.mservices.ccs.controller;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
