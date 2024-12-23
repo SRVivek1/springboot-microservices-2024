@@ -516,14 +516,15 @@
 
 ---
 
-## 7. Load Balancing microservices [***in progress***]
+## 7. Client side Load Balancing microservices
 ### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
   - ***Step-1:*** Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
-  - ***Step-2:*** Update the feign client ***@FeignClient*** `annotation` and remove `url` property
-  - ***Step-2:*** Restart your service and verify in eureka server that your micro-service is regitered.
+  - ***Step-2:*** Add eureka properties in `application.propeties`.
+  - ***Step-3:*** Update the feign client ***@FeignClient*** `annotation` and remove `url` property.
+  - ***Step-4:*** Restart your service and verify in eureka server that your micro-service is regitered.
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -551,7 +552,65 @@
 			@GetMapping("/jpa/currency-exchange/from/{from}/to/{to}")
 			public CurrencyConversion retrieveExchangeRateFromDatabase(@PathVariable String from, @PathVariable String to);
 		}
-> Note: With service name it finds the server details from `Eureka Server`.
+ 
+ - **Application Config:** *application.properties*
+	```properties
+
+		# load balancer
+		logging.level.com.netflix.discovery=debug
+
+		# Start: Eureka client config
+
+		# Map of availability zone to list of fully qualified URLs to communicate with eureka server. 
+		# Each value can be a single URL or a comma separated list of alternative locations. 
+		# Typically the eureka server URLs carry protocol,host,port,context and version information if any. 
+		# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ 
+		eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+		# Enables the Eureka health check handler.
+		eureka.client.healthcheck.enabled=true
+
+		eureka.instance.lease-renewal-interval-in-seconds=60
+		eureka.instance.lease-expiration-duration-in-seconds=60
+
+		# End: Eureka client config
+
+
+		# Start: Spring Load Balancer
+
+		# Enable load balancer.
+		spring.cloud.loadbalancer.enabled=true
+
+		# Enables LoadBalancer retries.
+		spring.cloud.loadbalancer.retry.enabled=true
+
+		# End: Spring Load Balancer
+
+
+		# Start: Cloud config client
+
+		# by default it's enabled
+		spring.cloud.config.enabled=true
+
+		# Name of the service to be shared wit config server
+		spring.cloud.config.name=currency-conversion-service
+
+		# default active profile
+		spring.cloud.config.profile=dev
+
+		# 8888 - it's default port for config server
+		spring.config.import=optional:configserver:http://localhost:8888
+
+		# End: Cloud config client
+	```
+	
+> Note: 
+> With service name it finds the server details from `Eureka Server`.
+> `spring-load-balancer` is mandatory dependency with feign client.
+
+- **<ins>References:</ins>**
+  - [https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html](https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html)
+
 
 ---
 

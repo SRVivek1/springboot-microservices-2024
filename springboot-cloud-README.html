@@ -841,22 +841,26 @@
 <p>Note: If <code>Eureka client</code> dependency is present in <code>POM.xml</code>, spring will automatically try to register this service to Naming server by looking for <code>Eureka Server</code> on it's default <code>Eureka port - 8761</code>.</p>
 </blockquote>
 <hr>
-<h2 id="7-load-balancing-microservices-in-progress">7. Load Balancing microservices [<em><strong>in progress</strong></em>]</h2>
+<h2 id="7-client-side-load-balancing-microservices">7. Client side Load Balancing microservices</h2>
 <h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
-<li><strong><ins>Purpose / Feature</ins></strong>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
 <ul>
 <li>Balance the traffic to the services dynamically by checking the current running instances.</li>
 </ul>
 </li>
-<li><strong><ins>Steps</ins></strong>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add `` dependency in POM.xml.</li>
-<li><em><strong>Step-2:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property</li>
-<li><em><strong>Step-2:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
+<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
+<li><em><strong>Step-2:</strong></em> Add eureka properties in <code>application.propeties</code>.</li>
+<li><em><strong>Step-3:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
+<li><em><strong>Step-4:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
 </ul>
 </li>
-<li><strong><ins>Maven / External dependency</ins></strong>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
@@ -866,7 +870,8 @@
 </li>
 </ul>
 </li>
-<li><strong><ins>Code / Config changes</ins></strong>
+<li>
+<p><strong><ins>Code / Config changes</ins></strong></p>
 <ul>
 <li><strong>Feign Client:</strong> <em>AbcController.java</em>
 <ul>
@@ -891,14 +896,75 @@
 		<span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
 		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
 	}
+
 </code></pre>
 </li>
 </ul>
 </li>
+<li>
+<p><strong>Application Config:</strong> <em>application.properties</em></p>
+<pre><code class="language-properties"><span class="hljs-comment">
+	# load balancer</span>
+	<span class="hljs-attr">logging.level.com.netflix.discovery</span>=<span class="hljs-string">debug</span>
+<span class="hljs-comment">
+	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# Enables the Eureka health check handler.</span>
+	<span class="hljs-attr">eureka.client.healthcheck.enabled</span>=<span class="hljs-string">true</span>
+
+	<span class="hljs-attr">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">60</span>
+	<span class="hljs-attr">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">60</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+<span class="hljs-comment">
+
+	# Start: Spring Load Balancer</span>
+<span class="hljs-comment">
+	# Enable load balancer.</span>
+	<span class="hljs-attr">spring.cloud.loadbalancer.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Enables LoadBalancer retries.</span>
+	<span class="hljs-attr">spring.cloud.loadbalancer.retry.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Spring Load Balancer</span>
+<span class="hljs-comment">
+
+	# Start: Cloud config client</span>
+<span class="hljs-comment">
+	# by default it&#x27;s enabled</span>
+	<span class="hljs-attr">spring.cloud.config.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Name of the service to be shared wit config server</span>
+	<span class="hljs-attr">spring.cloud.config.name</span>=<span class="hljs-string">currency-conversion-service</span>
+<span class="hljs-comment">
+	# default active profile</span>
+	<span class="hljs-attr">spring.cloud.config.profile</span>=<span class="hljs-string">dev</span>
+<span class="hljs-comment">
+	# 8888 - it&#x27;s default port for config server</span>
+	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:http://localhost:8888</span>
+<span class="hljs-comment">
+	# End: Cloud config client</span>
+</code></pre>
+</li>
 </ul>
 <blockquote>
-<p>Note: With service name it finds the server details from <code>Eureka Server</code>.</p>
+<p>Note:
+With service name it finds the server details from <code>Eureka Server</code>.
+<code>spring-load-balancer</code> is mandatory dependency with feign client.</p>
 </blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html">https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html</a></li>
+</ul>
+</li>
+</ul>
 <hr>
 
             
