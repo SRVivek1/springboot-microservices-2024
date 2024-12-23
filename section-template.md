@@ -1,5 +1,5 @@
 ## XX. Property, method param or Return type validation
-### Project ref: *a3-sboot-ms-validation*
+### Project ref: *xx-xxxx-xx-xxxx*
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
 - **<ins>Maven / External dependency</ins>**
@@ -10,9 +10,10 @@
 			<artifactId>spring-boot-starter-xxxxx</artifactId>
 		</dependency>
 - **<ins>Code changes</ins>**
-  - imports
-    - `import some.dependent.resource`
-  - Annotate the method parameter for validation.
+  - **Controller:** *AbcController.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
 	```java
 		@PostMapping("/users")
 		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
@@ -20,12 +21,12 @@
 			// Impacted code goes here.
 		}
 	```
-
-  - imports
-    - `import some.dependent.resource`
-  - Add validation in the properties of the bean.
+  - **Service:** *AbcResource.java*
+    - imports
+      - `import some.dependent.resource`
+    - Annotate the method parameter for validation.
 	```java
-		public class User {
+		public Object createUser(@Valid @RequestBody User user) {
 
 			// Impacted code goes here.
 		}

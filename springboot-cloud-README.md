@@ -431,56 +431,57 @@
 ---
 
 ## 5. Service Registry / Naming server : Eureka naming server
-### Project ref: *a3-sboot-ms-validation*
+### Project ref: *b6-naming-service*
 - **<ins>Purpose / Feature</ins>**
-  - This is xyz feature.
+  - It's an application that contains information about all micro services including the name of the service, port, and IP address. 
+  - Each microservice has to register itself with the Eureka Server.
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
     	<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-xxxxx</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 - **<ins>Code changes</ins>**
-  - imports
-    - `import some.dependent.resource`
-  - Annotate the method parameter for validation.
+  - **Controller:** *AbcController.java*
+    - imports
+      - `import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;`
+    - Annotate the method parameter for validation.
 	```java
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+		@EnableEurekaServer
+		@SpringBootApplication
+		public class B6NamingServiceApplication {
 
-			// Impacted code goes here.
+			public static void main(String[] args) {
+				SpringApplication.run(B6NamingServiceApplication.class, args);
+			}	
 		}
 	```
+  - **Applcation Config:** *application.properties*
+    - Configure Eureka server mandatory properties.
+	```properties
+		spring.application.name=b6-naming-service
 
-  - imports
-    - `import some.dependent.resource`
-  - Add validation in the properties of the bean.
-	```java
-		public class User {
+		server.port=8761
 
-			// Impacted code goes here.
-		}
+		# Eureka : start
+
+		# Indicates whether or not this instance should register its information with eureka server for discovery by others.
+		eureka.client.register-with-eureka=false
+
+		# Indicates whether this client should fetch eureka registry information from eureka server.
+		eureka.client.fetch-registry=false
+
+		# when guessing a hostname, the IP address of the server should be used in preference to the hostname reported by the OS
+		# eureka.instance.prefer-ip-address=true
+
+		# The hostname if it can be determined at configuration time (otherwise it will be guessed from OS primitives).
+		# eureka.instance.hostname=localhost
+
+		# Eureka : end
 	```
-
-> Note: This is an ***important*** note.
-
-- **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
-
-- **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
-
 ---
+
+
 
 

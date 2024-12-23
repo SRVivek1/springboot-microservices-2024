@@ -723,6 +723,75 @@
 </li>
 </ul>
 <hr>
+<h2 id="5-service-registry--naming-server--eureka-naming-server">5. Service Registry / Naming server : Eureka naming server</h2>
+<h3 id="project-ref-b6-naming-service">Project ref: <em>b6-naming-service</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>It's an application that contains information about all micro services including the name of the service, port, and IP address.</li>
+<li>Each microservice has to register itself with the Eureka Server.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>AbcController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@EnableEurekaServer</span>
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B6NamingServiceApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B6NamingServiceApplication.class, args);
+		}	
+	}
+</code></pre>
+</li>
+<li><strong>Applcation Config:</strong> <em>application.properties</em>
+<ul>
+<li>Configure Eureka server mandatory properties.</li>
+</ul>
+<pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b6-naming-service</span>
+
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8761</span>
+<span class="hljs-comment">
+	# Eureka : start</span>
+<span class="hljs-comment">
+	# Indicates whether or not this instance should register its information with eureka server for discovery by others.</span>
+	<span class="hljs-attr">eureka.client.register-with-eureka</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# Indicates whether this client should fetch eureka registry information from eureka server.</span>
+	<span class="hljs-attr">eureka.client.fetch-registry</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# when guessing a hostname, the IP address of the server should be used in preference to the hostname reported by the OS</span>
+<span class="hljs-comment">	# eureka.instance.prefer-ip-address=true</span>
+<span class="hljs-comment">
+	# The hostname if it can be determined at configuration time (otherwise it will be guessed from OS primitives).</span>
+<span class="hljs-comment">	# eureka.instance.hostname=localhost</span>
+<span class="hljs-comment">
+	# Eureka : end</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
 
             
             
