@@ -1251,6 +1251,76 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </li>
 </ul>
 <hr>
+<h2 id="10-api-gateway--global-filter">10. API Gateway : Global filter</h2>
+<h3 id="project-ref-b8-api-gateway-routes-1">Project ref: <em>b8-api-gateway-routes</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Contract for interception-style, chained processing of gateway requests that may be used to implement cross-cutting, application-agnostic requirements such as security, timeouts, and others</li>
+<li>Only applies to matched gateway routes. Copied from framework WebFilter.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Considering tht API Gateway is already implemented with working routes config
+<ul>
+<li>If not, refer <code>section 8</code> &amp; <code>section 9</code> above for API Gateway coniguration.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create a class implementing <code>o.s.c.g.filter.GlobalFilter class</code>.</li>
+<li><em><strong>Step-3:</strong></em> Override <code>filter(....) method</code> and add the business logic.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Configuration:</strong> <em>LoggingGlobalFilter.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import some.dependent.resource</code></li>
+<li><code>import org.springframework.cloud.gateway.filter.GatewayFilterChain;</code></li>
+<li><code>import org.springframework.cloud.gateway.filter.GlobalFilter;</code></li>
+<li><code>import org.springframework.web.server.ServerWebExchange;</code></li>
+<li><code>import reactor.core.publisher.Mono;</code></li>
+</ul>
+</li>
+<li>Implement <code>o.s.c.g.filter.GlobalFilter class</code> and <code>filter(...) method</code>.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@Component</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LoggingGlobalFilter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">GlobalFilter</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(LoggingGlobalFilter.class);
+
+		<span class="hljs-meta">@Override</span>
+		<span class="hljs-keyword">public</span> Mono&lt;Void&gt; <span class="hljs-title function_">filter</span><span class="hljs-params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> {
+
+			<span class="hljs-comment">// log the request</span>
+			logger.info(<span class="hljs-string">&quot;Request -&gt; Method: {}, Path: {}&quot;</span>, exchange.getRequest().getMethod(),
+					exchange.getRequest().getPath());
+
+			<span class="hljs-keyword">return</span> chain.filter(exchange);
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             

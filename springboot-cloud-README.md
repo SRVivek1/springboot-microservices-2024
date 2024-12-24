@@ -827,6 +827,56 @@
 
 ---
 
+## 10. API Gateway : Global filter
+### Project ref: *b8-api-gateway-routes*
+- **<ins>Purpose / Feature</ins>**
+  - Contract for interception-style, chained processing of gateway requests that may be used to implement cross-cutting, application-agnostic requirements such as security, timeouts, and others
+  - Only applies to matched gateway routes. Copied from framework WebFilter.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Considering tht API Gateway is already implemented with working routes config
+    - If not, refer `section 8` & `section 9` above for API Gateway coniguration.
+  - ***Step-2:*** Create a class implementing `o.s.c.g.filter.GlobalFilter class`.
+  - ***Step-3:*** Override `filter(....) method` and add the business logic.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+- **<ins>Code / Config changes</ins>**
+  - **Configuration:** *LoggingGlobalFilter.java*
+    - imports
+      - `import some.dependent.resource`
+      - `import org.springframework.cloud.gateway.filter.GatewayFilterChain;`
+      - `import org.springframework.cloud.gateway.filter.GlobalFilter;`
+      - `import org.springframework.web.server.ServerWebExchange;`
+      - `import reactor.core.publisher.Mono;`
+    - Implement `o.s.c.g.filter.GlobalFilter class` and `filter(...) method`.
+	```java
+		@Component
+		public class LoggingGlobalFilter implements GlobalFilter {
+
+			private static Logger logger = LoggerFactory.getLogger(LoggingGlobalFilter.class);
+
+			@Override
+			public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+				// log the request
+				logger.info("Request -> Method: {}, Path: {}", exchange.getRequest().getMethod(),
+						exchange.getRequest().getPath());
+
+				return chain.filter(exchange);
+			}
+		}
+	```
+---
+
+
 
 
 
