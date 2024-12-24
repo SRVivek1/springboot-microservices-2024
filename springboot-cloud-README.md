@@ -698,6 +698,7 @@
 ### Project ref: *b8-api-gateway-routes*
 - **<ins>Purpose / Feature</ins>**
   - API Gateway `Routers` and `Filters` provides the option to intercept and process the requests.
+  - It provides methods/APIs to match request on any attribute - `method, header, cookie, path, host etc.`.
   - It allow to route specific URLs to desired service.
   - We can add HTTP headers & params in the request.
   - We can also rewrite the URL.
