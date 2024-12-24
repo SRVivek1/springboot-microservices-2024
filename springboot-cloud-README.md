@@ -694,64 +694,136 @@
 
 ---
 
-## 9. Routes with spring cloud gateway [***in progress***]
-### Project ref: *xx-xxxx-xx-xxxx*
+## 9. Routes with spring cloud gateway
+### Project ref: *b8-api-gateway-routes*
 - **<ins>Purpose / Feature</ins>**
-  - This is xyz feature.
+  - API Gateway `Routers` and `Filters` provides the option to intercept and process the requests.
+  - It allow to route specific URLs to desired service.
+  - We can add HTTP headers & params in the request.
+  - We can also rewrite the URL.
+  - We can also implement common checks such as authentication, authorization, logging etc. 
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Some change/step
-  - ***Step-2:*** Some change/step
+  - ***Step-1:*** Considering tht API Gateway is already implemented.
+    - If not, refer `section 8` above for API Gateway coniguration.
+  - ***Step-2:*** Update application configuration in `application.properties`.
+    - Disable `gateway discovery locator` configuration in `application.properties` to auto discover clients from Eureka server.
+  - ***Step-3:*** Create a Configuration class.
+    - Create a Bean of `o.s.c.gateway.route.RouteLocator` class with method accepting `RouteLocatorBuilder` class as argument.
+    - Now using `RouteLocatorBuilder` instance, we can customize routes, e.g. 
+      - Route any URL to `lb://<service-name-in-eureka>` to redirect and do load-balancing.
+      - Route to any external service [http://httpbin.org/](http://httpbin.org/).
+        - Request failing for `HTTPS` requests, requires SSL confguration.
+      - Rewrite the requested URL to corresponfing inernal service URL using filters.
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
     	<dependency>
-			<groupId>xxx.xxxx.xxxx</groupId>
-			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 - **<ins>Code / Config changes</ins>**
-  - **Controller:** *AbcController.java*
+  - **Configuratio:** *ApiGatewayConfiguration.java*
     - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
+      - `import org.springframework.cloud.gateway.route.RouteLocator;`
+      - `import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;`
+      - `import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder.Builder;`
+    - Create a `Bean` of `RouteLocator` class.
 	```java
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+		/**
+		* Configuration class to build custom routes and request customization.
+		*/
+		@Configuration
+		public class ApiGatewayConfiguration {
 
-			// Impacted code goes here.
-		}
-	```
-  - **Service:** *AbcResource.java*
-    - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
-	```java
-		public Object createUser(@Valid @RequestBody User user) {
+			/**
+			* Define routes.
+			* @param routeLocatorBuilder
+			* @return
+			*/
+			@Bean
+			RouteLocator getwayRoute(RouteLocatorBuilder routeLocatorBuilder) {
+				/*
+				* Redirect request to external service. Also, optionally we can add http
+				* headers and request params in the request.
+				*/
+				Builder routeLocator = routeLocatorBuilder.routes()
+						.route((p) -> p.path("/get")
+								.filters(f -> f.addRequestHeader("MY-HEADER", "MY-CUSTOM-HEADER")
+										.addRequestParameter("MY-REQUEST-PARAM", "MY-CUSTOM-REQUEST-PARAM"))
+								.uri("http://httpbin.org:80/"));
 
-			// Impacted code goes here.
+				/**
+				* Route URLs to load balancer and eureka service name
+				*/
+				routeLocator = routeLocator.route(p -> p.path("/currency-exchange/**").uri("lb://b3-currency-exchange-service"))
+						.route(p -> p.path("/currency-conversion-feign/**")
+								.uri("lb://b5-currency-conversion-service-openfeign"));
+
+				/**
+				* Rewrite URL and copy the path
+				*/
+				routeLocator.route(p -> p.path("/ccfs/**")
+						.filters(f -> f.rewritePath("/ccfs/(?<segment>.*)", "/currency-conversion-feign/${segment}"))
+						.uri("lb://b5-currency-conversion-service-openfeign"));
+
+				return routeLocator.build();
+			}
 		}
 	```
   - **Application Config:** *application.properties*
 	```properties
-		spring.abc.xyz=false
+		spring.application.name=b8-api-gateway-routes
+
+		server.port=8765
+
+		# Start: Eureka client config
+
+		# Map of availability zone to list of fully qualified URLs to communicate with eureka server. 
+		# Each value can be a single URL or a comma separated list of alternative locations. 
+		# Typically the eureka server URLs carry protocol,host,port,context and version information if any. 
+		# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ 
+		eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+		# Enables the Eureka health check handler.
+		eureka.client.healthcheck.enabled=true
+
+		eureka.instance.lease-renewal-interval-in-seconds=60
+		eureka.instance.lease-expiration-duration-in-seconds=60
+
+		# End: Eureka client config
+
+
+		# Start: Api Gateway
+
+		# Flag that enables Discovery Client gateway integration.
+		# This allows us to invoke service using service-name registered in Eureka
+		# http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr
+		# Disbling - to use Routes and Filters
+		#spring.cloud.gateway.discovery.locator.enabled=true
+		spring.cloud.gateway.discovery.locator.enabled=false
+
+		# Option to lower case serviceId in predicates and filters, defaults to false. 
+		# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**
+		# Disbling - to use Routes and Filters
+		#spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+		spring.cloud.gateway.discovery.locator.lower-case-service-id=false
+
+		# Option to lower case serviceId in predicates and filters, defaults to false. 
+		# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**
+		# spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+
+		# End: Api Gateway	
+
 	```
 
-> Note: This is an ***important*** note.
-
-- **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
+> Note: When using routes in API Gateway, eureka discover client must be disabled in `application.properties`.
 
 - **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
+  - [https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc/filters/rewritepath.html](https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc/filters/rewritepath.html)
 
 ---
 

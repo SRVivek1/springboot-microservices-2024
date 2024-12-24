@@ -30,5 +30,28 @@ http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversi
 
 # After 'spring.cloud.gateway.discovery.locator.lower-case-service-id=true' is set.
 http://localhost:8765/b3-currency-exchange-service/currency-exchange/from/usd/to/inr
-	http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+
+--------------------------------
+# API Gateway URL with routes
+--------------------------------
+http://localhost:8765/currency-exchange/from/usd/to/inr
+http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+# URL Rewrite with Route for - http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100
+
+
+
+
+
+
+
+
+
+
+
+
+
 
