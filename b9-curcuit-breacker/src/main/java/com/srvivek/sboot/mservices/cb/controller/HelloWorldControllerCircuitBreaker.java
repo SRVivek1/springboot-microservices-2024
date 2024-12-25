@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.srvivek.sboot.mservices.cb.exception.CustomRetryRuntimeException;
 import com.srvivek.sboot.mservices.cb.exception.DefaultRetryRuntimeException;
 
-import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
-public class HelloWorldController {
+public class HelloWorldControllerCircuitBreaker {
 
-	private static final Logger logger = LoggerFactory.getLogger(HelloWorldController.class);
+	private static final Logger logger = LoggerFactory.getLogger(HelloWorldControllerCircuitBreaker.class);
 	private Integer counter = 1;
 
 	/**
@@ -21,40 +21,16 @@ public class HelloWorldController {
 	 * 
 	 * @return
 	 */
-	@GetMapping("/greet")
-	@Retry(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")
+	@GetMapping("/cb/greet")
+	// @Retry(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")
+	@CircuitBreaker(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")
 	public String greeting() {
 
 		logger.info("***** HelloWorldController.greeting() method called.");
 		logger.info("***** Request id : {}", counter);
 		try {
-			if (counter % 5 != 0) {
+			if (counter % 2 == 0) {
 				throw new DefaultRetryRuntimeException("curcuite breacker test. Request Id : " + counter);
-			}
-		} catch (Exception ex) {
-			logger.info("**** Failed for request id : {}", counter);
-			throw ex;
-		} finally {
-			counter++;
-		}
-
-		return "Guten Morgen";
-	}
-
-	/**
-	 * Custom retry as configured in the application.properties.
-	 * 
-	 * @return
-	 */
-	@GetMapping("/greet-cr")
-	@Retry(name = "b9-cb-retries", fallbackMethod = "hardcodedResponseFallbackMethod")
-	public String greetingCustomRetries() {
-
-		logger.info("***** HelloWorldController.greeting() method called.");
-		logger.info("***** Request id : {}", counter);
-		try {
-			if (counter % 5 == 0) {
-				throw new CustomRetryRuntimeException("curcuite breacker test. Request Id : " + counter);
 			}
 		} catch (Exception ex) {
 			logger.info("**** Failed for request id : {}", counter);
