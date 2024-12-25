@@ -3,6 +3,7 @@
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
 - **<ins>Steps</ins>**
+  - ***Project Setup:*** Some change/step
   - ***Step-1:*** Some change/step
   - ***Step-2:*** Some change/step
 - **<ins>Maven / External dependency</ins>**

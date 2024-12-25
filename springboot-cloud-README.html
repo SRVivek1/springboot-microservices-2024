@@ -1322,6 +1322,219 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </li>
 </ul>
 <hr>
+<h2 id="11-circuit-breaker-using-resilience4j-in-progress">11. Circuit Breaker using Resilience4j [<em><strong>in progress</strong></em>]</h2>
+<h3 id="project-ref-b9-curcuit-breacker">Project ref: <em>b9-curcuit-breacker</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li><code>Resilience4j</code> is a replacement of <code>netflix-hystrix</code> for circuit breaker framework.</li>
+<li>Resilience4j is a lightweight fault tolerance library designed for functional programming.</li>
+<li>Resilience4j provides higher-order functions (decorators) to enhance any functional interface, lambda expression or method reference with a Circuit Breaker, Rate Limiter, Retry or Bulkhead.</li>
+<li>**NOTE: ** <em>Resilience4j 1</em> requires Java 8, while <em>Resilience4j 2</em> requires Java 17.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project setup:</strong></em> Create a new springboot project with below dependencies.</li>
+<li><em><strong>Step-1:</strong></em> Add following dependencies i	n <code>POM.xml</code>.
+<ul>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-actuator</code></li>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-web</code></li>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-aop</code></li>
+<li><code>io.github.resilience4j</code>:<code>resilience4j-spring-boot2</code>:<code>2.2.0</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Annotate the controller API method with <code>@Retry(name = &quot;default&quot;)</code>.
+<ul>
+<li>This enables <code>reties</code> for the API with default configuration with max attempt <strong>3</strong>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> We can provide a custom name and provide customized config for <code>reties</code>.
+<ul>
+<li>Annotate the controller API method with <code>@Retry(name = &quot;b9-cb-retries&quot;)</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Add below properties in <code>application.properties</code> to control max retries.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.maxAttempts=5</code> <strong>#NEW</strong></li>
+<li><code>#resilience4j.retry.instances.b9-cb-retries.maxRetryAttempts=5</code> <strong>#OLD</strong></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Add below properties in <code>application.properties</code> to wait duration between each retries, in this example - 1 seconds.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.wait-duration=1s</code></li>
+</ul>
+</li>
+<li><em><strong>Step-6:</strong></em> Increase the wait duration exponentionally between each reties.
+<ul>
+<li>So first retry after <em>1s, next 2s, next 4s, next 8s</em> and so on.</li>
+<li><code>resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true</code></li>
+</ul>
+</li>
+<li><em><strong>Step-7:</strong></em> Configure <strong>fallbackMathod</strong> property to return <strong>hard-coded</strong> response if failed after reties.
+<ul>
+<li><code>@Retry(name = &quot;default&quot;, fallbackMethod=&quot;hardcodedResponse&quot;)</code></li>
+<li>Define a method names <code>hardcodedResponse</code> with method argument accepting <code>Throwable</code> intance.</li>
+<li>We can overload this method with different Exception types, to process <code>fallback</code> for different APIs.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-aop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.resilience4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>resilience4j-spring-boot2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import io.github.resilience4j.retry.annotation.Retry;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldController</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(HelloWorldController.class);
+		<span class="hljs-keyword">private</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+		<span class="hljs-comment">/**
+		* Retry default return failure after 3 retries.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/greet&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;default&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">5</span> != <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Custom retry as configured in the application.properties.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/greet-cr&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;b9-cb-retries&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greetingCustomRetries</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">6</span> != <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CustomRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Circuit breaker fallback method.
+		* 
+		* <span class="hljs-doctag">@param</span> ex
+		*/</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">hardcodedResponseFallbackMethod</span><span class="hljs-params">(Exception ex)</span> {
+
+			<span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> DefaultRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for DefaultRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> CustomRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for CustomRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;default response.&quot;</span>;
+			}
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b9-curcuit-breacker</span>
+<span class="hljs-comment">
+	# Start: Circuit breaker config</span>
+<span class="hljs-comment">
+	# custom Retry - Max Retries for 5</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.max-attempts</span>=<span class="hljs-string">5</span>
+<span class="hljs-comment">
+	# Wait duration between each retries</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.wait-duration</span>=<span class="hljs-string">1s</span>
+<span class="hljs-comment">
+	# Increase the wait duration exponentionally between each reties</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+
+	# End: Circuit breaker config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Some important key point / takeaway note.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started">https://resilience4j.readme.io/docs/getting-started</a></li>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3">https://resilience4j.readme.io/docs/getting-started-3</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html">https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             
