@@ -1,5 +1,6 @@
 # target folder
 target/
+00-sboot-test-app/
 
 # Compiled class file
 *.class

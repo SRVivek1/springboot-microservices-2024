@@ -570,7 +570,7 @@
   - `TBU`
 ---
 
-## 10. Exception Handling
+## 10. Exception / Error Handling (Custom Exceptions)
 ### Project ref: *a2-sboot-ms-social-media-app*
 - **<ins>Purpose / Feature</ins>**
   - Spring boot provides mechanism to handle and customize the exceptions thrown by the applications.

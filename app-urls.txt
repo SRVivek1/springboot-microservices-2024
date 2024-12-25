@@ -1,0 +1,57 @@
+--------------------------------
+Currency Exchange service
+--------------------------------
+http://localhost:8000/currency-exchange/from/usd/to/inr
+
+http://localhost:8000/jpa/currency-exchange/from/USD/to/INR
+
+
+--------------------------------
+Currency conversion service
+--------------------------------
+http://localhost:8000/currency-conversion/from/usd/to/inr/quantity/10
+http://localhost:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+
+
+--------------------------------
+Eureka Server
+--------------------------------
+http://localhost:8761/
+
+
+
+
+--------------------------------
+API Gateway
+--------------------------------
+http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr
+http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+# After 'spring.cloud.gateway.discovery.locator.lower-case-service-id=true' is set.
+http://localhost:8765/b3-currency-exchange-service/currency-exchange/from/usd/to/inr
+http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+
+--------------------------------
+# API Gateway URL with routes
+--------------------------------
+http://localhost:8765/currency-exchange/from/usd/to/inr
+http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+
+# URL Rewrite with Route for - http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
