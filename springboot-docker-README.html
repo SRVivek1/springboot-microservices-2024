@@ -157,10 +157,9 @@
 </li>
 <li><em><strong>Step-1:</strong></em> Create a new file named <em><strong>Dockerfile</strong></em> in project root directory.</li>
 <li><em><strong>Step-2:</strong></em> Add the instructions to compose required softwares in target docker image.</li>
-<li><em><strong>Step-3:</strong></em> Execute below docker command to create image using <code>Dockerfile</code>.
-<ul>
-<li><em><strong>docker build --debug -t srvivek/hello-world-docker:v1 .</strong></em></li>
-</ul>
+<li><em><strong>Step-3:</strong></em> Execute below docker command to create image using <code>Dockerfile</code>.<pre><code class="language-sh">    <span class="hljs-comment"># Create an image from the &#x27;Dockerfile&#x27; present i current directory.</span>
+    docker build --debug -t srvivek/hello-world-docker:v1 .
+</code></pre>
 </li>
 <li><em><strong>Step-4:</strong></em> Create and run container using the created docker image, and connect map local port <code>9000</code> to container port <code>5000</code>.<pre><code class="language-sh">    <span class="hljs-comment"># List images</span>
     docker image <span class="hljs-built_in">ls</span>
@@ -174,6 +173,9 @@
 
     <span class="hljs-comment"># Create and run container using image id.</span>
     docker run -d -p 9000:5000 da6e304ee5d9
+
+    <span class="hljs-comment"># check logs of container</span>
+    docker container logs 6c29fd75b10a
 </code></pre>
 <ul>
 <li>we can also use image id instead of the image name.</li>
@@ -234,9 +236,70 @@
 </ul>
 </li>
 <li>
+<p><strong>Docker compose:</strong> <em>Dockerfile</em></p>
+<pre><code class="language-properties">    <span class="hljs-attr">FROM</span> <span class="hljs-string">openjdk:17</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">./target/*.jar app.jar</span>
+    <span class="hljs-attr">EXPOSE</span> <span class="hljs-string">5000</span>
+    <span class="hljs-attr">ENTRYPOINT</span> <span class="hljs-string">[ &quot;java&quot;, &quot;-jar&quot;, &quot;/app.jar&quot; ]</span>
+</code></pre>
+</li>
+<li>
 <p><strong><ins>References:</ins></strong></p>
 <ul>
 <li><a href="https://docs.docker.com/engine/install/ubuntu/">https://docs.docker.com/engine/install/ubuntu/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-docker---multi-stage-dockerfile">2. Docker - Multi stage Dockerfile</h2>
+<h3 id="project-ref-c2-sb-docker-multi-stage-dockerfile">Project ref: <em>c2-sb-docker-multi-stage-dockerfile</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>It's not recommended to build on local machine and then copy in docker image. As there may be change of different output when running build locally and run on difernt machine.</li>
+<li>That's the resion when docker image is build entire build process should happen inside docker image.
+<ul>
+<li>The best practice is to build every thing which is needed inside the docker image.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Same as <em>c1-sb-docker-hello-world</em></li>
+<li><em><strong>Step-1:</strong></em> Update <em><strong>Dockerfile</strong></em> to add maven build steps.</li>
+<li><em><strong>Step-2:</strong></em> Create a new docker image with different version tag e.g. <code>v2</code>.</li>
+<li><strong>Docker compose:</strong> <em>Dockerfile</em><pre><code class="language-properties"><span class="hljs-comment">	# Stage 1</span>
+<span class="hljs-comment">    # AS build - names the stage as &#x27;build&#x27;</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">maven:3.8.5-openjdk-17 AS build</span>
+<span class="hljs-comment">    # Set workdir dir</span>
+    <span class="hljs-attr">WORKDIR</span> <span class="hljs-string">/home/app</span>
+<span class="hljs-comment">    # copy java-maven project contents to given path</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">. /home/app/</span>
+<span class="hljs-comment">    # build and package content as jar</span>
+    <span class="hljs-attr">RUN</span> <span class="hljs-string">mvn -f /home/app/pom.xml clean package</span>
+<span class="hljs-comment">
+    # Stage 2</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">openjdk:17</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">--from=build /home/app/target/*.jar app.jar</span>
+    <span class="hljs-attr">EXPOSE</span> <span class="hljs-string">5000</span>
+    <span class="hljs-attr">ENTRYPOINT</span> 	<span class="hljs-string">[ &quot;sh&quot;, &quot;-c&quot;, &quot;java -jar /app.jar&quot; ]</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>App links:</ins></strong></p>
+<ul>
+<li><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="http://website.com/some-resource-path">xyz service</a></li>
 </ul>
 </li>
 </ul>

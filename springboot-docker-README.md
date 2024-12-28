@@ -10,7 +10,10 @@
   - ***Step-1:*** Create a new file named ***Dockerfile*** in project root directory.
   - ***Step-2:*** Add the instructions to compose required softwares in target docker image.
   - ***Step-3:*** Execute below docker command to create image using `Dockerfile`.
-    - ***docker build --debug -t srvivek/hello-world-docker:v1 .***
+    ```sh
+        # Create an image from the 'Dockerfile' present i current directory.
+        docker build --debug -t srvivek/hello-world-docker:v1 .
+    ```
   - ***Step-4:*** Create and run container using the created docker image, and connect map local port `9000` to container port `5000`.
     ```sh
         # List images
@@ -25,6 +28,9 @@
 
         # Create and run container using image id.
         docker run -d -p 9000:5000 da6e304ee5d9
+
+        # check logs of container
+        docker container logs 6c29fd75b10a
     ```
     - we can also use image id instead of the image name.
 
@@ -59,6 +65,13 @@
 	```properties
 		server.port=5000
 	```
+- **Docker compose:** *Dockerfile*
+    ```properties
+        FROM openjdk:17
+        COPY ./target/*.jar app.jar
+        EXPOSE 5000
+        ENTRYPOINT [ "java", "-jar", "/app.jar" ]
+    ```
 
 - **<ins>References:</ins>**
   - [https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
@@ -66,67 +79,40 @@
 ---
 
 ## 2. Docker - Multi stage Dockerfile
-### Project ref: *xx-xxxx-xx-xxxx*
+### Project ref: *c2-sb-docker-multi-stage-dockerfile*
 - **<ins>Purpose / Feature</ins>**
-  - This is xyz feature.
+  - It's not recommended to build on local machine and then copy in docker image. As there may be change of different output when running build locally and run on difernt machine.
+  - That's the resion when docker image is build entire build process should happen inside docker image.
+    - The best practice is to build every thing which is needed inside the docker image.
 - **<ins>Steps</ins>**
-  - ***Project Setup:*** Some change/step
-  - ***Step-1:*** Some change/step
-  - ***Step-2:*** Some change/step
-- **<ins>Maven / External dependency</ins>**
-  - Required dependency.
- 	```xml
-    	<dependency>
-			<groupId>xxx.xxxx.xxxx</groupId>
-			<artifactId>xxx-xxxx-xxx-xxxxx</artifactId>
-		</dependency>
-- **<ins>Code / Config changes</ins>**
-  - **Controller:** *AbcController.java*
-    - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
-	```java
-		@PostMapping("/users")
-		public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-
-			// Impacted code goes here.
-		}
-	```
-  - **Service:** *AbcResource.java*
-    - imports
-      - `import some.dependent.resource`
-    - Annotate the method parameter for validation.
-	```java
-		public Object createUser(@Valid @RequestBody User user) {
-
-			// Impacted code goes here.
-		}
-	```
-  - **Application Config:** *application.properties*
+  - ***Project Setup:*** Same as *c1-sb-docker-hello-world*
+  - ***Step-1:*** Update ***Dockerfile*** to add maven build steps.
+  - ***Step-2:*** Create a new docker image with different version tag e.g. `v2`.
+  - **Docker compose:** *Dockerfile*
 	```properties
-		spring.abc.xyz=false
+		# Stage 1
+        # AS build - names the stage as 'build'
+        FROM maven:3.8.5-openjdk-17 AS build
+        # Set workdir dir
+        WORKDIR /home/app
+        # copy java-maven project contents to given path
+        COPY . /home/app/
+        # build and package content as jar
+        RUN mvn -f /home/app/pom.xml clean package
+
+        # Stage 2
+        FROM openjdk:17
+        COPY --from=build /home/app/target/*.jar app.jar
+        EXPOSE 5000
+        ENTRYPOINT 	[ "sh", "-c", "java -jar /app.jar" ]
 	```
 
-> Note: This is an ***important*** note.
+> Note: For `ENTRYPOINT` we can also provide link to `.sh` file.
 
 - **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
-
+  - Drawback:
+    - Build takes logner duration every time an image is build. Even a small/minor change. 
 - **<ins>App links:</ins>**
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
-
-- **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
-
 ---
 
