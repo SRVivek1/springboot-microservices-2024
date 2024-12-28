@@ -16,7 +16,8 @@
 }
 
 </style>
-            
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
 <style>
@@ -176,6 +177,16 @@
 
     <span class="hljs-comment"># check logs of container</span>
     docker container logs 6c29fd75b10a
+
+    <span class="hljs-comment"># login to docker</span>
+    docker login
+    docker login -u <span class="hljs-variable">$USERNAME</span>
+
+    <span class="hljs-comment"># publish image on docker hub</span>
+    docker image push srvivek/hello-world-docker:v1
+
+    <span class="hljs-comment"># docker logout</span>
+    docker <span class="hljs-built_in">logout</span>
 </code></pre>
 <ul>
 <li>we can also use image id instead of the image name.</li>
@@ -247,6 +258,7 @@
 <p><strong><ins>References:</ins></strong></p>
 <ul>
 <li><a href="https://docs.docker.com/engine/install/ubuntu/">https://docs.docker.com/engine/install/ubuntu/</a></li>
+<li><a href="https://spring.io/guides/gs/spring-boot-docker">https://spring.io/guides/gs/spring-boot-docker</a></li>
 </ul>
 </li>
 </ul>
@@ -394,8 +406,97 @@
 </li>
 </ul>
 <hr>
+<h2 id="3-docker---sboot-mave-plugin-to-create-image">3. Docker - SBoot mave plugin to create image</h2>
+<h3 id="project-ref-c4-sb-docker-sboot-maven-plugin">Project ref: <em>c4-sb-docker-sboot-maven-plugin</em></h3>
+<ul>
+<li>
+<h2 id="purpose--feature"><strong><ins>Purpose / Feature</ins></strong></h2>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Same as <em>c3-sb-docker-improved-layer-caching</em></li>
+<li><em><strong>Step-1:</strong></em> Remove <code>Dockerfile</code> as Sboot-maven plugin doesn't require Dockerfile.</li>
+<li><em><strong>Step-2:</strong></em> Add configuration in <code>spring-boot-maven-plugin</code> to customize docker image.</li>
+<li><em><strong>Step-2:</strong></em> Run <em><strong>mvn spring-boot:build-image</strong></em> to generate docker image.</li>
+<li><em><strong>Step-3:</strong></em> Spring uses <code>OCI</code> format to build image, docker is compatible with <code>OCI</code>.
+<ul>
+<li>Requires latest eclipse IDE and JDK 17 or higher version.</li>
+<li>It uses <code>paketobuildpacks</code> to create docker image.</li>
+<li>It creates very efficient and smaller image files.</li>
+</ul>
+</li>
+<li><strong>Spring boot maven plugin:</strong> <em>pom.xml</em><pre><code class="language-xml">    	<span class="hljs-tag">&lt;<span class="hljs-name">build</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+                        <span class="hljs-tag">&lt;<span class="hljs-name">image</span>&gt;</span>
+                            <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>srvivek/hello-world-docker:v4<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span>
+                        <span class="hljs-tag">&lt;/<span class="hljs-name">image</span>&gt;</span>
+                    <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+                <span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">build</span>&gt;</span>
+</code></pre>
+</li>
+<li><strong>Docker compose:</strong> <em>Dockerfile</em><pre><code class="language-properties"><span class="hljs-comment">    # Stage 1 - build and cache resources expecting less frequent changes</span>
+<span class="hljs-comment">    # AS build - names the stage as &#x27;build&#x27;</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">maven:3.8.5-openjdk-17 AS build</span>
+<span class="hljs-comment">    # Set workdir dir</span>
+    <span class="hljs-attr">WORKDIR</span> <span class="hljs-string">/home/app</span>
+<span class="hljs-comment">    # copy pom.xml and main app class.</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">./src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java \
+    /home/app/src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java</span>
 
-            
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">./pom.xml /home/app/pom.xml</span>
+<span class="hljs-comment">
+    # build and store layer with mvn downloads and basic app</span>
+    <span class="hljs-attr">RUN</span> <span class="hljs-string">mvn -f /home/app/pom.xml clean package</span>
+<span class="hljs-comment">
+
+    # Stage 2 : Now copy other resources which can changed frequesntly</span>
+<span class="hljs-comment">
+    # copy java-maven project contents to given path</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">. /home/app/</span>
+<span class="hljs-comment">
+    # build and package content as jar</span>
+    <span class="hljs-attr">RUN</span> <span class="hljs-string">mvn -f /home/app/pom.xml clean package</span>
+<span class="hljs-comment">
+
+    # Stage 3</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">openjdk:17</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">--from=build /home/app/target/*.jar app.jar</span>
+    <span class="hljs-attr">EXPOSE</span> <span class="hljs-string">5000</span>
+    <span class="hljs-attr">ENTRYPOINT</span> 	<span class="hljs-string">[ &quot;sh&quot;, &quot;-c&quot;, &quot;java -jar /app.jar&quot; ]</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: For <code>ENTRYPOINT</code> we can also provide link to <code>.sh</code> file.</p>
+</blockquote>
+<ul>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>Drawback:
+<ul>
+<li>Build takes logner duration every time an image is build. Even a small/minor change.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>App links:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-boot/maven-plugin/build-image.html">https://docs.spring.io/spring-boot/maven-plugin/build-image.html</a></li>
+<li><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             
         </body>
         </html>

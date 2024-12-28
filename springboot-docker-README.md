@@ -31,6 +31,16 @@
 
         # check logs of container
         docker container logs 6c29fd75b10a
+
+        # login to docker
+        docker login
+        docker login -u $USERNAME
+
+        # publish image on docker hub
+        docker image push srvivek/hello-world-docker:v1
+
+        # docker logout
+        docker logout
     ```
     - we can also use image id instead of the image name.
 
@@ -75,6 +85,7 @@
 
 - **<ins>References:</ins>**
   - [https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
+  - [https://spring.io/guides/gs/spring-boot-docker](https://spring.io/guides/gs/spring-boot-docker)
 
 ---
 
@@ -169,5 +180,77 @@
   - Drawback:
     - Build takes logner duration every time an image is build. Even a small/minor change. 
 - **<ins>App links:</ins>**
+  - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
+---
+
+## 3. Docker - SBoot mave plugin to create image
+### Project ref: *c4-sb-docker-sboot-maven-plugin*
+- **<ins>Purpose / Feature</ins>**
+  - 
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Same as *c3-sb-docker-improved-layer-caching*
+  - ***Step-1:*** we don't need `Dockerfile` whlile using spring-boot-maven-plugin tobuild image.
+  - ***Step-2:*** Add configuration in `spring-boot-maven-plugin` to customize docker image.
+  - ***Step-2:*** Run ***mvn spring-boot:build-image*** to generate docker image.
+  - ***Step-3:*** Spring uses `OCI` format to build image, docker is compatible with `OCI`.
+    - Requires latest eclipse IDE and JDK 17 or higher version.
+    - It uses `paketobuildpacks` to create docker image.
+    - It creates very efficient and smaller image files.
+  - **Spring boot maven plugin:** *pom.xml*
+    ```xml
+        	<build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <name>srvivek/hello-world-docker:v4</name>
+                            </image>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+    ```
+  - **Docker compose:** *Dockerfile*
+	```properties
+        # Stage 1 - build and cache resources expecting less frequent changes
+        # AS build - names the stage as 'build'
+        FROM maven:3.8.5-openjdk-17 AS build
+        # Set workdir dir
+        WORKDIR /home/app
+        # copy pom.xml and main app class.
+        COPY ./src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java \
+        /home/app/src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java
+
+        COPY ./pom.xml /home/app/pom.xml
+
+        # build and store layer with mvn downloads and basic app
+        RUN mvn -f /home/app/pom.xml clean package
+
+
+        # Stage 2 : Now copy other resources which can changed frequesntly
+
+        # copy java-maven project contents to given path
+        COPY . /home/app/
+
+        # build and package content as jar
+        RUN mvn -f /home/app/pom.xml clean package
+
+
+        # Stage 3
+        FROM openjdk:17
+        COPY --from=build /home/app/target/*.jar app.jar
+        EXPOSE 5000
+        ENTRYPOINT 	[ "sh", "-c", "java -jar /app.jar" ]
+	```
+
+> Note: For `ENTRYPOINT` we can also provide link to `.sh` file.
+
+- **<ins>Notes:</ins>**
+  - Drawback:
+    - Build takes logner duration every time an image is build. Even a small/minor change. 
+- **<ins>App links:</ins>**
+  - [https://docs.spring.io/spring-boot/maven-plugin/build-image.html](https://docs.spring.io/spring-boot/maven-plugin/build-image.html)
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
 ---
