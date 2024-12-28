@@ -116,3 +116,58 @@
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
 ---
 
+## 3. Docker - Image layer caching: improved image building performance
+### Project ref: *c3-sb-docker-improved-layer-caching*
+- **<ins>Purpose / Feature</ins>**
+  - Each instruction in this Dockerfile translates to a layer in your final image. You can think of image layers as a stack, with each layer adding more content on top of the layers that came before it.
+  - Whenever a layer changes, that layer will need to be re-built including all other layers that come after it are also affected. 
+    - Then all downstream layers need to be rebuilt as well, even if they wouldn't build anything differently.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Same as *c2-sb-docker-multi-stage-dockerfile*
+  - ***Step-1:*** Update ***Dockerfile*** and create layer for all resources at top which will be changed less frequently. E.g.
+      - Copy POM.xml, Sboot main app runner `C3SbDockerHelloWorldApplication.java`.
+  - ***Step-2:*** Add Run maven build command with above files. to create and cache layers to be reused.
+    - This will also cache all the mvn dependencies which gets downloaded every time. Hence reducing build duration.
+  - ***Step-3:*** Now copy all other resources from project and rerun maven build to generate final image. 
+    - Each command generates a seperate layer. Hence unless there's  a change in POM.xml or app main runner class from 2nd build onwards fist five layers/commands will be used from cache. 
+  - **Docker compose:** *Dockerfile*
+	```properties
+        # Stage 1 - build and cache resources expecting less frequent changes
+        # AS build - names the stage as 'build'
+        FROM maven:3.8.5-openjdk-17 AS build
+        # Set workdir dir
+        WORKDIR /home/app
+        # copy pom.xml and main app class.
+        COPY ./src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java \
+        /home/app/src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java
+
+        COPY ./pom.xml /home/app/pom.xml
+
+        # build and store layer with mvn downloads and basic app
+        RUN mvn -f /home/app/pom.xml clean package
+
+
+        # Stage 2 : Now copy other resources which can changed frequesntly
+
+        # copy java-maven project contents to given path
+        COPY . /home/app/
+
+        # build and package content as jar
+        RUN mvn -f /home/app/pom.xml clean package
+
+
+        # Stage 3
+        FROM openjdk:17
+        COPY --from=build /home/app/target/*.jar app.jar
+        EXPOSE 5000
+        ENTRYPOINT 	[ "sh", "-c", "java -jar /app.jar" ]
+	```
+
+> Note: For `ENTRYPOINT` we can also provide link to `.sh` file.
+
+- **<ins>Notes:</ins>**
+  - Drawback:
+    - Build takes logner duration every time an image is build. Even a small/minor change. 
+- **<ins>App links:</ins>**
+  - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
+---

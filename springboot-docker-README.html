@@ -254,8 +254,7 @@
 <h2 id="2-docker---multi-stage-dockerfile">2. Docker - Multi stage Dockerfile</h2>
 <h3 id="project-ref-c2-sb-docker-multi-stage-dockerfile">Project ref: <em>c2-sb-docker-multi-stage-dockerfile</em></h3>
 <ul>
-<li>
-<p><strong><ins>Purpose / Feature</ins></strong></p>
+<li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>It's not recommended to build on local machine and then copy in docker image. As there may be change of different output when running build locally and run on difernt machine.</li>
 <li>That's the resion when docker image is build entire build process should happen inside docker image.
@@ -265,8 +264,7 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Steps</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
 <ul>
 <li><em><strong>Project Setup:</strong></em> Same as <em>c1-sb-docker-hello-world</em></li>
 <li><em><strong>Step-1:</strong></em> Update <em><strong>Dockerfile</strong></em> to add maven build steps.</li>
@@ -290,16 +288,108 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>App links:</ins></strong></p>
+</ul>
+<blockquote>
+<p>Note: For <code>ENTRYPOINT</code> we can also provide link to <code>.sh</code> file.</p>
+</blockquote>
+<ul>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>Drawback:
+<ul>
+<li>Build takes logner duration every time an image is build. Even a small/minor change.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>App links:</ins></strong>
 <ul>
 <li><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></li>
 </ul>
 </li>
-<li>
-<p><strong><ins>References:</ins></strong></p>
+</ul>
+<hr>
+<h2 id="3-docker---image-layer-caching-improved-image-building-performance">3. Docker - Image layer caching: improved image building performance</h2>
+<h3 id="project-ref-c3-sb-docker-improved-layer-caching">Project ref: <em>c3-sb-docker-improved-layer-caching</em></h3>
 <ul>
-<li><a href="http://website.com/some-resource-path">xyz service</a></li>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Each instruction in this Dockerfile translates to a layer in your final image. You can think of image layers as a stack, with each layer adding more content on top of the layers that came before it.</li>
+<li>Whenever a layer changes, that layer will need to be re-built including all other layers that come after it are also affected.
+<ul>
+<li>Then all downstream layers need to be rebuilt as well, even if they wouldn't build anything differently.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Same as <em>c2-sb-docker-multi-stage-dockerfile</em></li>
+<li><em><strong>Step-1:</strong></em> Update <em><strong>Dockerfile</strong></em> and create layer for all resources at top which will be changed less frequently. E.g.
+<ul>
+<li>Copy POM.xml, Sboot main app runner <code>C3SbDockerHelloWorldApplication.java</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Add Run maven build command with above files. to create and cache layers to be reused.
+<ul>
+<li>This will also cache all the mvn dependencies which gets downloaded every time. Hence reducing build duration.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Now copy all other resources from project and rerun maven build to generate final image.
+<ul>
+<li>Each command generates a seperate layer. Hence unless there's  a change in POM.xml or app main runner class from 2nd build onwards fist five layers/commands will be used from cache.</li>
+</ul>
+</li>
+<li><strong>Docker compose:</strong> <em>Dockerfile</em><pre><code class="language-properties"><span class="hljs-comment">    # Stage 1 - build and cache resources expecting less frequent changes</span>
+<span class="hljs-comment">    # AS build - names the stage as &#x27;build&#x27;</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">maven:3.8.5-openjdk-17 AS build</span>
+<span class="hljs-comment">    # Set workdir dir</span>
+    <span class="hljs-attr">WORKDIR</span> <span class="hljs-string">/home/app</span>
+<span class="hljs-comment">    # copy pom.xml and main app class.</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">./src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java \
+    /home/app/src/main/java/com/srvivek/sboot/mservices/docker/C3SbDockerHelloWorldApplication.java</span>
+
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">./pom.xml /home/app/pom.xml</span>
+<span class="hljs-comment">
+    # build and store layer with mvn downloads and basic app</span>
+    <span class="hljs-attr">RUN</span> <span class="hljs-string">mvn -f /home/app/pom.xml clean package</span>
+<span class="hljs-comment">
+
+    # Stage 2 : Now copy other resources which can changed frequesntly</span>
+<span class="hljs-comment">
+    # copy java-maven project contents to given path</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">. /home/app/</span>
+<span class="hljs-comment">
+    # build and package content as jar</span>
+    <span class="hljs-attr">RUN</span> <span class="hljs-string">mvn -f /home/app/pom.xml clean package</span>
+<span class="hljs-comment">
+
+    # Stage 3</span>
+    <span class="hljs-attr">FROM</span> <span class="hljs-string">openjdk:17</span>
+    <span class="hljs-attr">COPY</span> <span class="hljs-string">--from=build /home/app/target/*.jar app.jar</span>
+    <span class="hljs-attr">EXPOSE</span> <span class="hljs-string">5000</span>
+    <span class="hljs-attr">ENTRYPOINT</span> 	<span class="hljs-string">[ &quot;sh&quot;, &quot;-c&quot;, &quot;java -jar /app.jar&quot; ]</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: For <code>ENTRYPOINT</code> we can also provide link to <code>.sh</code> file.</p>
+</blockquote>
+<ul>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>Drawback:
+<ul>
+<li>Build takes logner duration every time an image is build. Even a small/minor change.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>App links:</ins></strong>
+<ul>
+<li><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></li>
 </ul>
 </li>
 </ul>
