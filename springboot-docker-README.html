@@ -415,7 +415,7 @@
 <li><strong><ins>Steps</ins></strong>
 <ul>
 <li><em><strong>Project Setup:</strong></em> Same as <em>c3-sb-docker-improved-layer-caching</em></li>
-<li><em><strong>Step-1:</strong></em> Remove <code>Dockerfile</code> as Sboot-maven plugin doesn't require Dockerfile.</li>
+<li><em><strong>Step-1:</strong></em> we don't need <code>Dockerfile</code> whlile using spring-boot-maven-plugin tobuild image.</li>
 <li><em><strong>Step-2:</strong></em> Add configuration in <code>spring-boot-maven-plugin</code> to customize docker image.</li>
 <li><em><strong>Step-2:</strong></em> Run <em><strong>mvn spring-boot:build-image</strong></em> to generate docker image.</li>
 <li><em><strong>Step-3:</strong></em> Spring uses <code>OCI</code> format to build image, docker is compatible with <code>OCI</code>.
