@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>1&period; Docker - Cretae docker image of an SBoot application</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="1-docker---cretae-docker-image-of-an-sboot-application">1. Docker - Cretae docker image of an SBoot application</h2>
+<h3 id="project-ref-c1-sb-docker-hello-world">Project ref: <em>c1-sb-docker-hello-world</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>We can have <strong>Dockerfile</strong> in our project to create docker image from the app jar.</li>
+<li>We can also configure base OS, softawares required and execution steps to launch the app.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em>
+<ul>
+<li>Create\reuse a simple 'Sboot app with a rest controller'.</li>
+<li>Create a <em><strong>dockerhub</strong></em> account and setup repository.</li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Create a new file named <em><strong>Dockerfile</strong></em> in project root directory.</li>
+<li><em><strong>Step-2:</strong></em> Add the instructions to compose required softwares in target docker image.</li>
+<li><em><strong>Step-3:</strong></em> Execute below docker command to create image using <code>Dockerfile</code>.
+<ul>
+<li><em><strong>docker build --debug -t srvivek/hello-world-docker:v1 .</strong></em></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Create and run container using the created docker image, and connect map local port <code>9000</code> to container port <code>5000</code>.<pre><code class="language-sh">    <span class="hljs-comment"># List images</span>
+    docker image <span class="hljs-built_in">ls</span>
+    docker images
+
+    <span class="hljs-comment"># List contaiers (including inactive one&#x27;s)</span>
+    docker container <span class="hljs-built_in">ls</span> -a
+    
+    <span class="hljs-comment"># Create and run container using image name and tag</span>
+    docker run -d -p 9000:5000 srvivek/hello-world-docker:v1
+
+    <span class="hljs-comment"># Create and run container using image id.</span>
+    docker run -d -p 9000:5000 da6e304ee5d9
+</code></pre>
+<ul>
+<li>we can also use image id instead of the image name.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Docker hub useful links</ins></strong></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Resource link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>List repositories</td>
+<td><a href="https://hub.docker.com/repositories/srvivek">https://hub.docker.com/repositories/srvivek</a></td>
+</tr>
+<tr>
+<td>Create repository</td>
+<td><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code / Config changes</ins></strong></p>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldController.java</em><pre><code class="language-java">    <span class="hljs-meta">@RestController</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldController</span> {
+
+        <span class="hljs-meta">@GetMapping(&quot;/&quot;)</span>
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">helloWorld</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;{\&quot;message\&quot;:\&quot;Hello wolrd Sboot + docker v1.\&quot;}&quot;</span>;
+        }
+    }
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">server.port</span>=<span class="hljs-string">5000</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.docker.com/engine/install/ubuntu/">https://docs.docker.com/engine/install/ubuntu/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>
