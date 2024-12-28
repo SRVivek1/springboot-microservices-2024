@@ -1,4 +1,0 @@
-FROM openjdk:17
-COPY ./targedestjar app.jar
-EXPOSE 5000
-ENTRYPOINT [ "java", "-jar", "/app.jar" ]
