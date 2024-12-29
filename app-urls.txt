@@ -44,14 +44,8 @@ http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+--------------------------------
+# Zipkin server
+--------------------------------
+http://localhost:9411/
+http://localhost:9411/zipkin/

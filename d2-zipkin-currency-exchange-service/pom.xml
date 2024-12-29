@@ -115,6 +115,12 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<image>
+						<!--<name>srvivek/${project.artifactId}:${project.version}</name>-->
+						<name>srvivek/d2-zipkin-currency-exchange-service:0.0.1-SNAPSHOT</name>
+					</image>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
