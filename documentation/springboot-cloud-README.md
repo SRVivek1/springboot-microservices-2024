@@ -8,13 +8,13 @@
 
 | **Application** | **Port** | **Info** |
 | --------------- | -------- | -------- |
-| Limits Microservice | *8080, 8081, etc.* | ~ |
-| Spring Cloud Config Server | *8888* | Port 8888 is default port for config srver as per spring docs. |
-| Currency Exchange Microservice | *8000, 8001, 8002, etc.* | ~ |
-| Currency Conversion Microservice | *8100, 8101, 8102, etc.* | ~ |
-| Netflix Eureka Naming Server | *8761* | ~ |
-| API Gateway | *8765* | ~ |
-| Zipkin Distributed Tracing Server | *9411* | ~ |
+| Limits Microservice | *8080, 8081, etc.* | POC app developed |
+| Spring Cloud Config Server | *8888* | It is default port for config srver as per spring docs. |
+| Currency Exchange Microservice | *8000, 8001, 8002, etc.* | POC app developed |
+| Currency Conversion Microservice | *8100, 8101, 8102, etc.* | POC app developed |
+| Netflix Eureka | *8761* | Naming Server |
+| API Gateway | *8765* | Entry point to all external requests. |
+| Zipkin | *9411* | Distributed Tracing Server  |
 
 ---
 

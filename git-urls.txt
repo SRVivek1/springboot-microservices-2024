@@ -18,3 +18,11 @@ Step by Step changes are detailed here
     --> https://github.com/in28minutes/spring-microservices-v3/tree/main/04.docker/01-step-by-step-changes#readme
 
 
+
+
+Microservices with Spring Boot, Spring Cloud, Docker & Kubernetes
+--------------------------------------------------------------------
+    --> https://github.com/in28minutes/spring-microservices-v3/blob/main/v3-upgrade.md
+
+
+
