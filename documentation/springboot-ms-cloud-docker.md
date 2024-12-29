@@ -1,3 +1,19 @@
+## 0. Resources
+- **Exchange**
+  - 
+- **Currency Conversion**
+  - http://localhost:8100/currency-conversion/from/usd/to/inr/quantity/10
+  - http://localhost:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+- **Eureka**
+  - http://localhost:8761/
+- **Zipkin**
+  - http://localhost:9411/
+- **API Gateway**
+  - http://localhost:8765/currency-exchange/from/usd/to/inr
+  - http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100
+  - http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100
+
+
 ## 1. Spring cloud : Tracing service with zipkinm server (Docker)
 ### Project ref: *N/A*
 - **<ins>Purpose / Feature</ins>**
