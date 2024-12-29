@@ -2,7 +2,7 @@
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>0&period; Resources</title>
+            <title>Spring boot microservices with docker</title>
             <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -137,7 +137,8 @@
         
         </head>
         <body class="vscode-body vscode-light">
-            <h2 id="0-resources">0. Resources</h2>
+            <h1 id="spring-boot-microservices-with-docker">Spring boot microservices with docker</h1>
+<h2 id="0-resources">0. Resources</h2>
 <ul>
 <li><strong>Exchange</strong>
 <ul>
@@ -419,6 +420,121 @@
 </li>
 </ul>
 <hr>
+<h2 id="3-docker-componse">3. Docker componse:</h2>
+<h3 id="project-ref-d5-docker-componse">Project ref: <em>d5-docker-componse</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Docker Compose is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience.</li>
+<li>Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file.</li>
+<li>Compose works in all environments; production, staging, development, testing, as well as CI workflows.</li>
+<li>It also has commands for managing the whole lifecycle of your application:
+<ul>
+<li>Start, stop, and rebuild services</li>
+<li>View the status of running services</li>
+<li>Stream the log output of running services</li>
+<li>Run a one-off command on a service</li>
+</ul>
+</li>
+<li>The Compose file
+<ul>
+<li>The default path for a Compose file is <em><strong>compose.yaml</strong></em> (preferred) or <em><strong>compose.yml</strong></em> that is placed in the working directory.</li>
+<li>Compose also supports <em><strong>docker-compose.yaml</strong></em> and <em><strong>docker-compose.yml</strong></em> for backwards compatibility of earlier versions.
+<ul>
+<li>If both files exist, Compose prefers the canonical <em><strong>compose.yaml</strong></em>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Check and install docker-componse.</li>
+<li><em><strong>Step-1:</strong></em> Create <code>docker-compose.yaml</code>.
+<ul>
+<li>Don't use <code>tabs</code> for formatting/indentation, use only spaces.</li>
+<li>Add all service configs (image, port, mem. limit etc.)</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Run command <em><strong>docker-compose up</strong></em> to launch all services configured.
+<ul>
+<li>This command will look for the <em><strong>docker-compose.yaml</strong></em> in working directory.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>docker-ccompose.yaml</ins></strong><pre><code class="language-yaml">  <span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3.7&#x27;</span>
+
+  <span class="hljs-attr">services:</span>   
+    <span class="hljs-attr">naming-server:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/b6-naming-service:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8761:8761&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+    
+    <span class="hljs-attr">currency-exchange:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d2-zipkin-currency-exchange-service:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8000:8000&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">currency-conversion:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d3-zepkin-currency-conversion-service-openfeign:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8100:8100&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">api-gateway:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d4-zepkin-api-gateway-routes:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8765:8765&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">zipkin-server:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">openzipkin/zipkin</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;9411:9411&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span> <span class="hljs-comment">#Restart if there is a problem starting up</span>
+
+  <span class="hljs-attr">networks:</span>
+    <span class="hljs-attr">currency-network:</span>
+</code></pre>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.docker.com/compose/gettingstarted/">https://docs.docker.com/compose/gettingstarted/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="----------------------------end----------------------------">--------------------------- End ---------------------------</h1>
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             

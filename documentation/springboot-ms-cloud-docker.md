@@ -1,3 +1,5 @@
+# Spring boot microservices with docker
+
 ## 0. Resources
 - **Exchange**
   - http://localhost:8000/currency-exchange/from/usd/to/inr
@@ -187,3 +189,94 @@
 	```
 ---
 
+## 3. Docker componse: 
+### Project ref: *d5-docker-componse*
+- **<ins>Purpose / Feature</ins>**
+  - Docker Compose is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience.
+  - Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file.
+  - Compose works in all environments; production, staging, development, testing, as well as CI workflows. 
+  - It also has commands for managing the whole lifecycle of your application:
+    - Start, stop, and rebuild services
+    - View the status of running services
+    - Stream the log output of running services
+    - Run a one-off command on a service
+  - The Compose file
+    - The default path for a Compose file is ***compose.yaml*** (preferred) or ***compose.yml*** that is placed in the working directory. 
+    - Compose also supports ***docker-compose.yaml*** and ***docker-compose.yml*** for backwards compatibility of earlier versions. 
+      - If both files exist, Compose prefers the canonical ***compose.yaml***.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Check and install docker-componse.
+  - ***Step-1:*** Create `docker-compose.yaml`.
+    - Don't use `tabs` for formatting/indentation, use only spaces.
+    - Add all service configs (image, port, mem. limit etc.)
+  - ***Step-2:*** Run command ***docker-compose up*** to launch all services configured.
+    - This command will look for the ***docker-compose.yaml*** in working directory.
+- **<ins>docker-ccompose.yaml</ins>**
+ 	```yaml
+      version: '3.7'
+
+      services:   
+        naming-server:
+          image: srvivek/b6-naming-service:0.0.1-SNAPSHOT
+          mem_limit: 800m
+          ports:
+            - "8761:8761"
+          networks:
+            - currency-network
+        
+        currency-exchange:
+          image: srvivek/d2-zipkin-currency-exchange-service:0.0.1-SNAPSHOT
+          mem_limit: 800m
+          ports:
+            - "8000:8000"
+          networks:
+            - currency-network
+          depends_on:
+            - naming-server
+          environment: # Properties - override defaults in appplication.properties
+            EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE: http://naming-server:8761/eureka
+            MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+
+        currency-conversion:
+          image: srvivek/d3-zepkin-currency-conversion-service-openfeign:0.0.1-SNAPSHOT
+          mem_limit: 800m
+          ports:
+            - "8100:8100"
+          networks:
+            - currency-network
+          depends_on:
+            - naming-server
+          environment: # Properties - override defaults in appplication.properties
+            EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE: http://naming-server:8761/eureka
+            MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+
+        api-gateway:
+          image: srvivek/d4-zepkin-api-gateway-routes:0.0.1-SNAPSHOT
+          mem_limit: 800m
+          ports:
+            - "8765:8765"
+          networks:
+            - currency-network
+          depends_on:
+            - naming-server
+          environment: # Properties - override defaults in appplication.properties
+            EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE: http://naming-server:8761/eureka
+            MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+
+        zipkin-server:
+          image: openzipkin/zipkin
+          mem_limit: 800m
+          ports:
+            - "9411:9411"
+          networks:
+            - currency-network
+          restart: always #Restart if there is a problem starting up
+
+      networks:
+        currency-network:
+  ```
+- **<ins>References:</ins>**
+  - [https://docs.docker.com/compose/gettingstarted/](https://docs.docker.com/compose/gettingstarted/)
+---
+
+# --------------------------- End ---------------------------

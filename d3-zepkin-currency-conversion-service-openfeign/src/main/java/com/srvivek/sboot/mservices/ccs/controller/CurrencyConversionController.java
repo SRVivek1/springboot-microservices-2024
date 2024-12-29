@@ -49,7 +49,12 @@ public class CurrencyConversionController {
 		uriVariables.put("from", from);
 		uriVariables.put("to", to);
 
-		// Send request to Currency exchange micro-service
+		/*
+		 * Send request to Currency exchange micro-service.
+		 * 
+		 * Note: The localhost URL will not work inside docker. Use system property or
+		 * service name to get working URL.
+		 */
 		final ResponseEntity<CurrencyConversion> response = restTemplate.getForEntity(
 				"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
 				uriVariables);
