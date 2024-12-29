@@ -35,3 +35,61 @@
   - 
 ---
 
+## 2. Spring cloud: Zipkin client
+### Project ref: *d2-zipkin-currency-exchange-service*
+- **<ins>Purpose / Feature</ins>**
+  - Centralized tracing using logs, matrices and/or graphs.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** An existing microservice / create one.
+  - ***Step-1:*** pom.xml: Add micrometer, micrometer tracing bridge & opentelemetry dependencies.
+    - Micrometer: Assigns ID to request, which remains same when other microservices are called in the same request. 
+      - E.g. Req. 1: currency-conversion-service --> currency-exchange-service 
+  - ***Step-2:*** Add sampling configuration to define how much percentage of request will be sampled.
+    - `management.tracing.sampling.probability=1.0 # 1.0 -> 100%,  #SB3 `
+    - `logging.pattern.level=%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}] #SB3`
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<!-- SB3 :  Micrometer 
+            > OpenTelemetry 
+            > Zipkin 
+      -->
+
+      <!-- Micrometer - Vendor-neutral application observability facade. 
+          Instrument your JVM-based application code without vendor lock-in.  
+          Observation (Metrics & Logs) + Tracing.
+      -->
+      <dependency>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-observation</artifactId>
+      </dependency>
+
+      <!-- Open Telemetry
+          - Open Telemetry as Bridge (RECOMMENDED)
+          - Simplified Observability (metrics, logs, and traces) -->
+      <dependency>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-tracing-bridge-otel</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>io.opentelemetry</groupId>
+          <artifactId>opentelemetry-exporter-zipkin</artifactId>
+      </dependency>
+  - **Application Config:** *application.properties*
+	```properties
+		# logging
+    logging.pattern.level=%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]
+
+    logging.level.com.srvivek.sboot=debug
+
+
+    # Start: micrometer configuration
+
+    # Add sampling configuration to define how much percentage of request will be sampled.
+    management.tracing.sampling.probability=1.0
+
+    # End: micrometer configuration
+	```
+---
+
