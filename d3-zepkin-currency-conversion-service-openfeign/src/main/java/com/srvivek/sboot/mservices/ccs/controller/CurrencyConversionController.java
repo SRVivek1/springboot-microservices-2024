@@ -24,6 +24,9 @@ public class CurrencyConversionController {
 	@Autowired
 	private CurrencyExchangeProxy currencyExchangeProxy;
 
+	@Autowired
+	private RestTemplate restTemplate;
+
 	/**
 	 * Convert currency using {@link RestTemplate}
 	 * 
@@ -47,9 +50,10 @@ public class CurrencyConversionController {
 		uriVariables.put("to", to);
 
 		// Send request to Currency exchange micro-service
-		final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+		final ResponseEntity<CurrencyConversion> response = restTemplate.getForEntity(
 				"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
 				uriVariables);
+
 		final CurrencyConversion currencyConversionExchange = response.getBody();
 
 		logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
