@@ -39,6 +39,9 @@
         # publish image on docker hub
         docker image push srvivek/hello-world-docker:v1
 
+        # Delete image from local
+        docker rmi srvivek/hello-world-docker:v1
+
         # docker logout
         docker logout
     ```
@@ -183,7 +186,7 @@
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
 ---
 
-## 3. Docker - SBoot mave plugin to create image
+## 3. Docker - SBoot maven plugin to create image
 ### Project ref: *c4-sb-docker-sboot-maven-plugin*
 - **<ins>Purpose / Feature</ins>**
   - 
@@ -252,5 +255,6 @@
     - Build takes logner duration every time an image is build. Even a small/minor change. 
 - **<ins>App links:</ins>**
   - [https://docs.spring.io/spring-boot/maven-plugin/build-image.html](https://docs.spring.io/spring-boot/maven-plugin/build-image.html)
+  - [https://spring.io/blog/2020/01/27/creating-docker-images-with-spring-boot-2-3-0-m1](https://spring.io/blog/2020/01/27/creating-docker-images-with-spring-boot-2-3-0-m1)
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
 ---
