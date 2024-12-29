@@ -56,8 +56,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<name>srvivek/hello-world-docker:v4</name>
+						<name>srvivek/${project.artifactId}:${project.version}</name>
 					</image>
+					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 				</configuration>
 			</plugin>
 		</plugins>

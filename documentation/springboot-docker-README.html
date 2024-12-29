@@ -431,13 +431,14 @@
 <li><strong>Spring boot maven plugin:</strong> <em>pom.xml</em><pre><code class="language-xml">    	<span class="hljs-tag">&lt;<span class="hljs-name">build</span>&gt;</span>
             <span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span>
                 <span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span>
-                    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-                    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-                    <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
-                        <span class="hljs-tag">&lt;<span class="hljs-name">image</span>&gt;</span>
-                            <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>srvivek/hello-world-docker:v4<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span>
-                        <span class="hljs-tag">&lt;/<span class="hljs-name">image</span>&gt;</span>
-                    <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
+                  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+                  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+                  <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">image</span>&gt;</span>
+                      <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>srvivek/${project.artifactId}:${project.version}<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span>
+                    <span class="hljs-tag">&lt;/<span class="hljs-name">image</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">pullPolicy</span>&gt;</span>IF_NOT_PRESENT<span class="hljs-tag">&lt;/<span class="hljs-name">pullPolicy</span>&gt;</span>
+                  <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span>
                 <span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span>
             <span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span>
         <span class="hljs-tag">&lt;/<span class="hljs-name">build</span>&gt;</span>

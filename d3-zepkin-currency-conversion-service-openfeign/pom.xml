@@ -124,9 +124,9 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<!--<name>srvivek/${project.artifactId}:${project.version}</name>-->
-						<name>srvivek/d3-zepkin-currency-conversion-service-openfeign:0.0.1-SNAPSHOT</name>
+						<name>srvivek/${project.artifactId}:${project.version}</name>
 					</image>
+					<pullPolicy>IF_NOT_PRESENT</pullPolicy>
 				</configuration>
 			</plugin>
 		</plugins>

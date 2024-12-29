@@ -204,13 +204,14 @@
         	<build>
                 <plugins>
                     <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <image>
-                                <name>srvivek/hello-world-docker:v4</name>
-                            </image>
-                        </configuration>
+                      <groupId>org.springframework.boot</groupId>
+                      <artifactId>spring-boot-maven-plugin</artifactId>
+                      <configuration>
+                        <image>
+                          <name>srvivek/${project.artifactId}:${project.version}</name>
+                        </image>
+                        <pullPolicy>IF_NOT_PRESENT</pullPolicy>
+                      </configuration>
                     </plugin>
                 </plugins>
             </build>

@@ -1,6 +1,7 @@
 ## 0. Resources
 - **Exchange**
-  - 
+  - http://localhost:8000/currency-exchange/from/usd/to/inr
+  - http://localhost:8000/jpa/currency-exchange/from/USD/to/INR
 - **Currency Conversion**
   - http://localhost:8100/currency-conversion/from/usd/to/inr/quantity/10
   - http://localhost:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100
