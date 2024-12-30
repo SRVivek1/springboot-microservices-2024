@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Spring boot microservice with Kubernetes</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="spring-boot-microservice-with-kubernetes">Spring boot microservice with Kubernetes</h1>
+<h3 id="kubernetes">Kubernetes:</h3>
+<ul>
+<li>Kubernetes, also known as K8s, is an open source system for automating deployment, scaling, and management of containerized applications.</li>
+<li>It groups containers that make up an application into logical units for easy management and discovery.</li>
+<li>Kubernetes builds upon 15 years of experience of running production workloads at Google, combined with best-of-breed ideas and practices from the community.</li>
+<li><strong>Typical features:</strong>
+<ul>
+<li><em>Auto Scaling:</em>
+<ul>
+<li>Scale containers based on demand.</li>
+</ul>
+</li>
+<li><em>Auto Discovery:</em>
+<ul>
+<li>Help microservices to find one another.</li>
+</ul>
+</li>
+<li><em>Load Balancer:</em>
+<ul>
+<li>Distribute load among multiple instances of a microservice.</li>
+</ul>
+</li>
+<li><em>Self Healing:</em>
+<ul>
+<li>Do health check and replace falling instances.</li>
+</ul>
+</li>
+<li><em>Zero Downtime Deployment:</em>
+<ul>
+<li>Release new versions without downtime.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Docker container orchestration services:</strong>
+<ul>
+<li><em>AWS:</em>
+<ul>
+<li>Elastic Container Service (ECS)</li>
+<li>Fargate:
+<ul>
+<li>Serverless version of ECS.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em>Cloud Neutral:</em>
+<ul>
+<li>Kubernetes (k8s)</li>
+<li>Can be used in internal Data centers.
+<ul>
+<li>Also, supports all cloud platforms.
+<ul>
+<li>AWS   --&gt; Elastic Kubernetes Services (EKS)</li>
+<li>GCP   --&gt; Google Kubernets Engine (GKE)</li>
+<li>Azure --&gt; Azure Kubernetes Services (AKS)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="1-install-kubernetes-locallly-todo">1. Install Kubernetes locallly {TODO}</h2>
+<h3 id="project-ref-na">Project ref: <em>N/A</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Kubernetes on local machine.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Install kubernetes locally.
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/</a></li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Create kubernetes cluster with default node pool.
+<ul>
+<li>Needs installation of <code>kubeadm</code>, <code>kind</code> or <code>minikube</code> for cluster administration.
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/tools/">https://kubernetes.io/docs/tasks/tools/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> TODO</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/">https://kubernetes.io/docs/tasks/tools/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-gcp---google-cloud-with-kubernetes">2. GCP - Google Cloud with Kubernetes</h2>
+<h3 id="project-ref-e1-kubernetes-deployment-with-yaml"><em><strong>Project ref:</strong></em> <em>e1-kubernetes-deployment-with-yaml</em></h3>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>GCP kubernetes engine provides default node pool with 3 nodes.</li>
+<li>We can add more <em>Node pools</em> with different type of hardware specification.</li>
+<li><strong>Workloads:</strong>
+<ul>
+<li>In workloads we can see all runnin services.</li>
+<li>Each running instance is called <strong>POD</strong>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>GCP K8S project setup</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Create project in console <code>kubernetes-poc-1</code>.</li>
+<li><em><strong>Step-2:</strong></em> Enable <code>Kubernetes API</code>.</li>
+<li><em><strong>Step-3:</strong></em> Create cluster and choose <code>Standard</code>.
+<ul>
+<li>With Autopilot, GKE provisions and manages your cluster's underlying infrastructure, including nodes and node pools, giving you an optimized cluster with a hands-off experience.</li>
+<li>If you need more control over your cluster configuration, select &quot;Switch to Standard cluster.&quot;</li>
+<li>Cluster Modes:
+<ul>
+<li>Standard:</li>
+<li>Autopilot:</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Fetch cluster auth data and configures cluster.
+<ul>
+<li><code>gcloud container clusters get-credentials my-standard-cluster-1 --zone us-central1-c --project operating-ally-446306-t7</code></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Deploy microservices
+<ul>
+<li><code>kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE</code></li>
+</ul>
+</li>
+<li><em><strong>Step-6:</strong></em> View deployed services
+<ul>
+<li><code>kubectl get deployment</code></li>
+</ul>
+</li>
+<li><em><strong>Step-7:</strong></em> Exponse deployed service using load blancer on port 8080
+<ul>
+<li><code>kubectl expose deployment hello-world-rest-api --type=LoadBalancer --port=8080</code></li>
+</ul>
+</li>
+<li><em><strong>Step-8:</strong></em> List running service with details (IP, port, age etc.)
+<ul>
+<li><code>kubectl get services</code></li>
+</ul>
+</li>
+<li><em><strong>Step-9:</strong></em> watch progress
+<ul>
+<li><code>kubectl get services --watch</code></li>
+</ul>
+</li>
+<li><em><strong>Step-10:</strong></em> Hit service
+<ul>
+<li><code>curl 35.184.204.214:8080/hello-world</code></li>
+</ul>
+</li>
+<li><strong>Enable google cloud shell:</strong>
+<ul>
+<li><code>https://shell.cloud.google.com/?pli=1&amp;show=ide&amp;environment_deployment=ide</code></li>
+</ul>
+</li>
+<li><strong>Note:</strong>
+<ul>
+<li>Services are set of pods with a network endpoint that can be used for discovery and load balancing.</li>
+<li>Ingress are collection of rules for routing external HTTP(S) trafic to servies.
+<ul>
+<li>Using ingress we can create one load balacer for multiple services.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Commands:</strong><pre><code class="language-sh">  
+  <span class="hljs-comment"># If using gcloud local installation</span>
+  <span class="hljs-comment"># login</span>
+  gcloud auth login
+
+  <span class="hljs-comment"># Connect to gcloud-shell</span>
+  <span class="hljs-comment"># It will generate and store a local ssh file for future logins</span>
+  gcloud cloud-shell ssh
+
+  <span class="hljs-comment"># set project using project id-operating-ally-446306-t7</span>
+  <span class="hljs-comment"># Check project info for &#x27;project-id&#x27;</span>
+  gcloud config <span class="hljs-built_in">set</span> project operating-ally-446306-t7
+
+  <span class="hljs-comment"># Fetch cluster auth data and configures cluster</span>
+  gcloud container clusters get-credentials my-standard-cluster-1 --zone us-central1-c --project operating-ally-446306-t7
+  
+  <span class="hljs-comment"># Deploy microservices</span>
+  kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE
+  
+  <span class="hljs-comment"># View deployed services</span>
+  kubectl get deployment
+  
+  <span class="hljs-comment"># Exponse deployed service using load blancer on port 8080</span>
+  kubectl expose deployment hello-world-rest-api --<span class="hljs-built_in">type</span>=LoadBalancer --port=8080
+
+  <span class="hljs-comment"># List running service with details (IP, port, age etc.)</span>
+  kubectl get services
+
+  <span class="hljs-comment">#watch progress</span>
+  kubectl get services --watch
+  
+  <span class="hljs-comment"># hit service</span>
+  curl 35.184.204.214:8080/hello-world
+  
+  <span class="hljs-comment"># get list of events for the cluster</span>
+  kubectl get events
+
+  <span class="hljs-comment"># Scale the service deployement to 3 PODs</span>
+  kubectl scale deployment hello-world-rest-api --replicas=3
+  
+  <span class="hljs-comment"># List all the PODs</span>
+  kubectl get pod
+
+  <span class="hljs-comment"># Mnual scaling</span>
+  <span class="hljs-comment"># Default cluster pool has only 3 nodes.</span>
+  <span class="hljs-comment"># If we need more pods then we need to scale-up our cluster</span>
+  gcloud container clusters resize my-standard-cluster-1 --node-pool default-pool --num-nodes=2 --zone=us-central1-c
+  
+  <span class="hljs-comment"># Auto scaling microservice</span>
+  <span class="hljs-comment"># It can scale only upto number of nodes present in cluster.</span>
+  kubectl autoscale deployment hello-world-rest-api --max=4 --cpu-percent=70
+
+  <span class="hljs-comment"># Details of HPA - Horizontal pod autoscaling</span>
+  kubectl get hpa
+  
+  <span class="hljs-comment"># cluster auto scaling</span>
+  gcloud container cluster update my-standard-cluster-1 --enable-autoscaling --min-nodes=1 --max-nodes=10
+
+  <span class="hljs-comment"># Config Map</span>
+  <span class="hljs-comment"># Configuration to database or something like that</span>
+  kubectl create configmap hello-world-config --from-literal=RDS_DB_NAME=todos
+  
+  <span class="hljs-comment"># list configs present</span>
+  kubectl get configmap
+
+  <span class="hljs-comment"># Show data in config map</span>
+  kubectl describe configmap hello-world-config
+  
+  <span class="hljs-comment"># Store secrets / password in config map</span>
+  <span class="hljs-comment"># Secret is stores as &#x27;Opaque&#x27; type</span>
+  kubectl create secret generic hello-world-secrets-1 --from-literal=RDS_PASSWORD=dummytodos
+  kubectl get secret
+  kubectl describe secret hello-world-secrets-1
+  
+  <span class="hljs-comment"># deploy cluster using yaml definition</span>
+  kubectl apply -f deployment.yaml
+  
+  <span class="hljs-comment"># Create new node-pool</span>
+  gcloud container node-pools create my-new-pool --cluster=my-standard-cluster-1 --zone=us-central1-c
+
+  <span class="hljs-comment"># Delete nodes from node-pool</span>
+  gcloud container node-pools delete my-new-pool --cluster=my-standard-cluster-1 --zone=us-central1-c
+
+  <span class="hljs-comment"># list node pools details (name, disk-size, machine-type, node-version)</span>
+  gcloud container node-pools list --zone=us-central1-c --cluster=my-standard-cluster-1
+  
+  <span class="hljs-comment">#</span>
+  kubectl get pods -o wide
+  
+  <span class="hljs-comment">#</span>
+  kubectl <span class="hljs-built_in">set</span> image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE
+  
+  <span class="hljs-comment"># list services replicasets &amp; pods</span>
+  kubectl get services
+  kubectl get replicasets
+  kubectl get pods
+  
+  <span class="hljs-comment"># delete pod</span>
+  kubectl delete pod hello-world-rest-api-58dc9d7fcc-8pv7r
+  
+  <span class="hljs-comment">#</span>
+  kubectl scale deployment hello-world-rest-api --replicas=1
+  
+  <span class="hljs-comment"># List projects</span>
+  gcloud projects list
+  
+  <span class="hljs-comment"># delete ervice</span>
+  kubectl delete service hello-world-rest-api
+  
+  <span class="hljs-comment"># delete deployment</span>
+  kubectl delete deployment hello-world-rest-api
+  
+  <span class="hljs-comment"># delete cluster</span>
+  gcloud container clusters delete my-standard-cluster-1 --zone us-central1-c 
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Some important key point / takeaway note.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Pros &amp; Cons</ins></strong></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pros 1</td>
+<td>Cons 1</td>
+</tr>
+<tr>
+<td>Pros 2</td>
+<td>Cons 2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
+<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell">https://cloud.google.com/sdk/gcloud/reference/cloud-shell</a></li>
+<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp">https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<hr>
+
+            
+            
+        </body>
+        </html>
