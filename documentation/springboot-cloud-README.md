@@ -8,13 +8,13 @@
 
 | **Application** | **Port** | **Info** |
 | --------------- | -------- | -------- |
-| Limits Microservice | *8080, 8081, etc.* | ~ |
-| Spring Cloud Config Server | *8888* | Port 8888 is default port for config srver as per spring docs. |
-| Currency Exchange Microservice | *8000, 8001, 8002, etc.* | ~ |
-| Currency Conversion Microservice | *8100, 8101, 8102, etc.* | ~ |
-| Netflix Eureka Naming Server | *8761* | ~ |
-| API Gateway | *8765* | ~ |
-| Zipkin Distributed Tracing Server | *9411* | ~ |
+| Limits Microservice | *8080, 8081, etc.* | POC app developed |
+| Spring Cloud Config Server | *8888* | It is default port for config srver as per spring docs. |
+| Currency Exchange Microservice | *8000, 8001, 8002, etc.* | POC app developed |
+| Currency Conversion Microservice | *8100, 8101, 8102, etc.* | POC app developed |
+| Netflix Eureka | *8761* | Naming Server |
+| API Gateway | *8765* | Entry point to all external requests. |
+| Zipkin | *9411* | Distributed Tracing Server  |
 
 ---
 
@@ -1039,21 +1039,24 @@
 ---
 
 
-## 12. Using Resilience4j - circuit breaker [***In progress***]
+## 12. Using Resilience4j - circuit breaker
 ### Project ref: *b9-curcuit-breacker*
 - **<ins>Purpose / Feature</ins>**
   - **Note:** This project is extention to `Using Resilience4j - retry`. So all settings will remain same except for that instead of ***@Retry** annotation we'll use ***@CircuitBreaker*** annotation.
   - If there are continious failure identified for a microservice, then after certain attemts, circuit breaker stop processing the API and send the response directly from `fallbackMethod`.
   - The CircuitBreaker is implemented via a finite state machine with three normal states: CLOSED, OPEN and HALF_OPEN and two special states DISABLED and FORCED_OPEN.
-  - The CircuitBreaker uses a sliding window to store and aggregate the outcome of calls. 
-  - You can choose between a count-based sliding window and a time-based sliding window. 
-  - The count-based sliding window aggregrates the outcome of the last N calls. 
-  - The time-based sliding window aggregrates the outcome of the calls of the last N seconds.
+  - It uses a sliding window to store and aggregate the outcome of calls. You can choose between a count-based sliding window and a time-based sliding window. 
+    - The count-based sliding window aggregrates the outcome of the last N calls. 
+    - The time-based sliding window aggregrates the outcome of the calls of the last N seconds.
+  - **Aspect order:** The Resilience4j Aspects order is the following:
+    - Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) ) 
 - **<ins>Steps</ins>**
   - ***Project setup:*** Follow `Section 11. Using Resilience4j - retry` for project setup.
   - ***Step-1:*** Replace `@Retry` annotation with `@CircuitBreaker` annotation.
       - `@CircuitBreaker(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")`
   - ***Step-2:*** keep other settings as it.
+  - ***Step-3:*** Configure to increase retry duration exponentilly in case all requests keep failing.
+    - `resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -1077,7 +1080,7 @@
 			<version>2.2.0</version>
 		</dependency>
 - **<ins>Code / Config changes</ins>**
-  - **Controller:** *HelloWorldController.java*
+  - **Controller:** *HelloWorldControllerCircuitBreaker.java*
     - imports
       - `import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;`
     - Annotate the method with `@CircuitBreaker` annotation.
@@ -1150,16 +1153,202 @@
 > Note: This is an ***important*** note.
 
 - **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
+  - There's many more advance configutation for circuit breaked and retry.
+    - Follow the link in `Reference` section.
+  - The fallback method mechanism works like a try/catch block. If a fallback method is configured, every exception is forwarded to a fallback method executor. 
+  - The fallback method executor is searching for the best matching fallback method which can handle the exception. Similar to a catch block. 
+  - The fallback is executed independently of the current state of the circuit breaker.
+  - It's important to remember that a fallback method should be placed in the same class and must have the same method signature with just ONE extra target exception parameter.
 
 - **<ins>References:</ins>**
-  - [https://resilience4j.readme.io/docs/circuitbreaker](https://resilience4j.readme.io/docs/circuitbreaker)
-  - [https://resilience4j.readme.io/docs/getting-started-3](https://resilience4j.readme.io/docs/getting-started-3)
-  - [https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html](https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html)
+  - Advance configurations:
+    - [https://resilience4j.readme.io/docs/getting-started-3#configuration](https://resilience4j.readme.io/docs/getting-started-3#configuration)
 
 ---
 
+## 13. Using Resilience4j - API advance configuration
+### Project ref: *b9-curcuit-breacker*
+- **<ins>Purpose / Feature</ins>**
+  - **Note:** Advance API configuration.
+  - **Aspect order:** The Resilience4j Aspects order is the following:
+    - Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) ) 
+  - **Rate Limiting:** Setting up the max allowed API calls to the annotated API method during a time period.
+  - **Time Limiting:** Setting up max API calls allowed in a defined time duration.
+  - **Bulk Head:** Define the max concurrent requests to be processed by the API.
+  - We can also enable Health checks circuit breaked and Ratelimiter which are by default disabled.
+- **<ins>Steps</ins>**
+  - ***Project setup:*** Follow `Section 11. Using Resilience4j - retry` for project setup.
+  - ***Step-1:*** Add annotation **@RateLimiter**, to configure the no. of requests allowed in a give time period.
+  - ***Step-2:*** Add annotation **@Bulkhead**, to configure the no. of requests allowed for concurrent execution. 
+  - ***Step-3:*** Add annotation **@TimeLimiter**, for configure allowed execution time.
+- **<ins>Maven / External dependency</ins>**
+  - Required dependency.
+ 	```xml
+    	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+- **<ins>Code / Config changes</ins>**
+  - **Controller:** *HelloWorldControllerCircuitBreaker.java*
+    - imports
+      - `import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;`
+    - Annotate the method with `@CircuitBreaker` annotation.
+	```java		
+		@RestController
+		public class HelloWorldControllerCircuitBreaker {
+
+			private static final Logger logger = LoggerFactory.getLogger(HelloWorldControllerCircuitBreaker.class);
+			private Integer counter = 1;
+
+			/**
+			* Retry default return failure after 3 retries.
+			* 
+			* @return
+			*/
+			@GetMapping("/cb/greet")
+			@CircuitBreaker(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+			@Retry(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+			public String greeting() {
+
+				logger.info("***** HelloWorldController.greeting() method called.");
+				logger.info("***** Request id : {}", counter);
+				try {
+					if (counter % 2 == 0) {
+						throw new DefaultRetryRuntimeException("curcuite breacker test. Request Id : " + counter);
+					}
+				} catch (Exception ex) {
+					logger.info("**** Failed for request id : {}", counter);
+					throw ex;
+				} finally {
+					counter++;
+				}
+
+				return "Guten Morgen";
+			}
+
+			/**
+			* Testing other annotations.
+			* 
+			* @return
+			*/
+			@GetMapping("/cb/greet-adv")
+			@CircuitBreaker(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+			// we can also add fallbackMethod = "RateLimiterFallbackMethod"
+			@RateLimiter(name = "greeting-api")
+			// we can also add fallbackMethod = "bulkHeadFallbackMethod"
+			@Bulkhead(name = "greeting-api")
+			@Retry(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+			// We can also add fallbackMethod = "timeLimiterFallbackMethod"
+			@TimeLimiter(name = "greeting-api")
+			public String greetingAdvance() {
+
+				logger.info("***** HelloWorldController.greeting() method called.");
+				logger.info("***** Request id : {}", counter);
+				try {
+					if (counter % 2 == 0) {
+						throw new DefaultRetryRuntimeException("curcuite breacker test. Request Id : " + counter);
+					}
+				} catch (Exception ex) {
+					logger.info("**** Failed for request id : {}", counter);
+					throw ex;
+				} finally {
+					counter++;
+				}
+
+				return "Guten Morgen";
+			}
+
+			/**
+			* Circuit breaker fallback method.
+			* 
+			* @param ex
+			*/
+			public String hardcodedResponseFallbackMethod(Exception ex) {
+
+				if (ex instanceof DefaultRetryRuntimeException) {
+					return "Guten Morgen, default resonse for DefaultRetryRuntimeException";
+				} else if (ex instanceof CustomRetryRuntimeException) {
+					return "Guten Morgen, default resonse for CustomRetryRuntimeException";
+				} else {
+					return "default response.";
+				}
+			}
+		}
+	```
+  - **Application Config:** *application.properties*
+	```properties
+		spring.application.name=b9-curcuit-breacker
+
+		# Start: Circuit breaker config
+
+		# custom Retry - Max Retries for 5
+		resilience4j.retry.instances.b9-cb-retries.max-attempts=5
+
+		# Wait duration between each retries
+		resilience4j.retry.instances.b9-cb-retries.wait-duration=1s
+
+		# Increase the wait duration exponentionally between each reties
+		resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true
+
+		# Start: Enable health checks for actuator
+		management.health.circuitbreakers.enabled: true
+		management.health.ratelimiters.enabled: true
+
+		resilience4j.ratelimiter.instances.default.register-health-indicator=true
+		resilience4j.ratelimiter.instances.greeting-api.register-health-indicator=true
+		resilience4j.ratelimiter.instances.b9-cb-retries.register-health-indicator=true
+
+		# End: Enable health checks for actuator
 
 
+		# Ratelimiter - allows max of 2 reuests in every 10 seconds.
+		resilience4j.ratelimiter.instances.greeting-api.limit-for-period=2
+		resilience4j.ratelimiter.instances.greeting-api.limit-refresh-period=10s
+		resilience4j.ratelimiter.instances.greeting-api.timeout-duration=3s
+		resilience4j.ratelimiter.instances.greeting-api.event-consumer-buffer-size=100
+
+		# BulkHead - Allows maximum of only 10 concurrent calls.
+		resilience4j.bulkhead.instances.greeting-api.max-concurrent-calls=10
+		resilience4j.thread-pool-bulkhead.instances.greeting-api.core-thread-pool-size=2
+		resilience4j.thread-pool-bulkhead.instances.greeting-api.max-thread-pool-size=5
+		resilience4j.thread-pool-bulkhead.instances.greeting-api.queue-capacity=1
+		resilience4j.thread-pool-bulkhead.instances.greeting-api.writable-stack-trace-enabled=true
+		resilience4j.thread-pool-bulkhead.instances.greeting-api.keep-alive-duration=600s
+
+
+		# TimeLimier - 
+		resilience4j.timelimiter.instances.greeting-api.timeout-duration=2s
+		resilience4j.timelimiter.instances.greeting-api.cancel-running-future=true
+
+
+		# End: Circuit breaker config
+	```
+
+> Note: This is an ***important*** note.
+
+- **<ins>Notes:</ins>**
+  - There's many more advance configutation for circuit breaked and retry.
+    - Follow the link in `Reference` section.
+
+- **<ins>References:</ins>**
+  - Advance configurations:
+    - [https://resilience4j.readme.io/docs/getting-started-3#configuration](https://resilience4j.readme.io/docs/getting-started-3#configuration)
+
+---
+#### End of document.
+---

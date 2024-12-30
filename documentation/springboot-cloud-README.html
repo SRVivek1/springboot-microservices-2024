@@ -1532,7 +1532,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </li>
 </ul>
 <hr>
-<h2 id="12-using-resilience4j---circuit-breaker-in-progress">12. Using Resilience4j - circuit breaker [<em><strong>In progress</strong></em>]</h2>
+<h2 id="12-using-resilience4j---circuit-breaker">12. Using Resilience4j - circuit breaker</h2>
 <h3 id="project-ref-b9-curcuit-breacker-1">Project ref: <em>b9-curcuit-breacker</em></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
@@ -1540,10 +1540,17 @@ With service name it finds the server details from <code>Eureka Server</code>.
 <li><strong>Note:</strong> This project is extention to <code>Using Resilience4j - retry</code>. So all settings will remain same except for that instead of *<strong>@Retry</strong> annotation we'll use <em><strong>@CircuitBreaker</strong></em> annotation.</li>
 <li>If there are continious failure identified for a microservice, then after certain attemts, circuit breaker stop processing the API and send the response directly from <code>fallbackMethod</code>.</li>
 <li>The CircuitBreaker is implemented via a finite state machine with three normal states: CLOSED, OPEN and HALF_OPEN and two special states DISABLED and FORCED_OPEN.</li>
-<li>The CircuitBreaker uses a sliding window to store and aggregate the outcome of calls.</li>
-<li>You can choose between a count-based sliding window and a time-based sliding window.</li>
+<li>It uses a sliding window to store and aggregate the outcome of calls. You can choose between a count-based sliding window and a time-based sliding window.
+<ul>
 <li>The count-based sliding window aggregrates the outcome of the last N calls.</li>
 <li>The time-based sliding window aggregrates the outcome of the calls of the last N seconds.</li>
+</ul>
+</li>
+<li><strong>Aspect order:</strong> The Resilience4j Aspects order is the following:
+<ul>
+<li>Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) )</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><strong><ins>Steps</ins></strong>
@@ -1555,6 +1562,11 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 </li>
 <li><em><strong>Step-2:</strong></em> keep other settings as it.</li>
+<li><em><strong>Step-3:</strong></em> Configure to increase retry duration exponentilly in case all requests keep failing.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true</code></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><strong><ins>Maven / External dependency</ins></strong>
@@ -1584,7 +1596,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </li>
 <li><strong><ins>Code / Config changes</ins></strong>
 <ul>
-<li><strong>Controller:</strong> <em>HelloWorldController.java</em>
+<li><strong>Controller:</strong> <em>HelloWorldControllerCircuitBreaker.java</em>
 <ul>
 <li>imports
 <ul>
@@ -1667,10 +1679,232 @@ With service name it finds the server details from <code>Eureka Server</code>.
 <li>
 <p><strong><ins>Notes:</ins></strong></p>
 <ul>
-<li>Some important key point / takeaway note.</li>
-<li>Some takeaway:
+<li>There's many more advance configutation for circuit breaked and retry.
 <ul>
-<li>Sub topic takeaway.</li>
+<li>Follow the link in <code>Reference</code> section.</li>
+</ul>
+</li>
+<li>The fallback method mechanism works like a try/catch block. If a fallback method is configured, every exception is forwarded to a fallback method executor.</li>
+<li>The fallback method executor is searching for the best matching fallback method which can handle the exception. Similar to a catch block.</li>
+<li>The fallback is executed independently of the current state of the circuit breaker.</li>
+<li>It's important to remember that a fallback method should be placed in the same class and must have the same method signature with just ONE extra target exception parameter.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li>Advance configurations:
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3#configuration">https://resilience4j.readme.io/docs/getting-started-3#configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="13-using-resilience4j---api-advance-configuration">13. Using Resilience4j - API advance configuration</h2>
+<h3 id="project-ref-b9-curcuit-breacker-2">Project ref: <em>b9-curcuit-breacker</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li><strong>Note:</strong> Advance API configuration.</li>
+<li><strong>Aspect order:</strong> The Resilience4j Aspects order is the following:
+<ul>
+<li>Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) )</li>
+</ul>
+</li>
+<li><strong>Rate Limiting:</strong> Setting up the max allowed API calls to the annotated API method during a time period.</li>
+<li><strong>Time Limiting:</strong> Setting up max API calls allowed in a defined time duration.</li>
+<li><strong>Bulk Head:</strong> Define the max concurrent requests to be processed by the API.</li>
+<li>We can also enable Health checks circuit breaked and Ratelimiter which are by default disabled.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project setup:</strong></em> Follow <code>Section 11. Using Resilience4j - retry</code> for project setup.</li>
+<li><em><strong>Step-1:</strong></em> Add annotation <strong>@RateLimiter</strong>, to configure the no. of requests allowed in a give time period.</li>
+<li><em><strong>Step-2:</strong></em> Add annotation <strong>@Bulkhead</strong>, to configure the no. of requests allowed for concurrent execution.</li>
+<li><em><strong>Step-3:</strong></em> Add annotation <strong>@TimeLimiter</strong>, for configure allowed execution time.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-aop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.resilience4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>resilience4j-spring-boot2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldControllerCircuitBreaker.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;</code></li>
+</ul>
+</li>
+<li>Annotate the method with <code>@CircuitBreaker</code> annotation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldControllerCircuitBreaker</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(HelloWorldControllerCircuitBreaker.class);
+		<span class="hljs-keyword">private</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+		<span class="hljs-comment">/**
+		* Retry default return failure after 3 retries.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/cb/greet&quot;)</span>
+		<span class="hljs-meta">@CircuitBreaker(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Testing other annotations.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/cb/greet-adv&quot;)</span>
+		<span class="hljs-meta">@CircuitBreaker(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-comment">// we can also add fallbackMethod = &quot;RateLimiterFallbackMethod&quot;</span>
+		<span class="hljs-meta">@RateLimiter(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-comment">// we can also add fallbackMethod = &quot;bulkHeadFallbackMethod&quot;</span>
+		<span class="hljs-meta">@Bulkhead(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-comment">// We can also add fallbackMethod = &quot;timeLimiterFallbackMethod&quot;</span>
+		<span class="hljs-meta">@TimeLimiter(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greetingAdvance</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Circuit breaker fallback method.
+		* 
+		* <span class="hljs-doctag">@param</span> ex
+		*/</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">hardcodedResponseFallbackMethod</span><span class="hljs-params">(Exception ex)</span> {
+
+			<span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> DefaultRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for DefaultRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> CustomRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for CustomRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;default response.&quot;</span>;
+			}
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b9-curcuit-breacker</span>
+<span class="hljs-comment">
+	# Start: Circuit breaker config</span>
+<span class="hljs-comment">
+	# custom Retry - Max Retries for 5</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.max-attempts</span>=<span class="hljs-string">5</span>
+<span class="hljs-comment">
+	# Wait duration between each retries</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.wait-duration</span>=<span class="hljs-string">1s</span>
+<span class="hljs-comment">
+	# Increase the wait duration exponentionally between each reties</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Start: Enable health checks for actuator</span>
+	<span class="hljs-attr">management.health.circuitbreakers.enabled</span>: <span class="hljs-string">true</span>
+	<span class="hljs-attr">management.health.ratelimiters.enabled</span>: <span class="hljs-string">true</span>
+
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.default.register-health-indicator</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.register-health-indicator</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.b9-cb-retries.register-health-indicator</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Enable health checks for actuator</span>
+<span class="hljs-comment">
+
+	# Ratelimiter - allows max of 2 reuests in every 10 seconds.</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.limit-for-period</span>=<span class="hljs-string">2</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.limit-refresh-period</span>=<span class="hljs-string">10s</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.timeout-duration</span>=<span class="hljs-string">3s</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.event-consumer-buffer-size</span>=<span class="hljs-string">100</span>
+<span class="hljs-comment">
+	# BulkHead - Allows maximum of only 10 concurrent calls.</span>
+	<span class="hljs-attr">resilience4j.bulkhead.instances.greeting-api.max-concurrent-calls</span>=<span class="hljs-string">10</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.core-thread-pool-size</span>=<span class="hljs-string">2</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.max-thread-pool-size</span>=<span class="hljs-string">5</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.queue-capacity</span>=<span class="hljs-string">1</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.writable-stack-trace-enabled</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.keep-alive-duration</span>=<span class="hljs-string">600s</span>
+<span class="hljs-comment">
+
+	# TimeLimier - </span>
+	<span class="hljs-attr">resilience4j.timelimiter.instances.greeting-api.timeout-duration</span>=<span class="hljs-string">2s</span>
+	<span class="hljs-attr">resilience4j.timelimiter.instances.greeting-api.cancel-running-future</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+
+	# End: Circuit breaker config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>There's many more advance configutation for circuit breaked and retry.
+<ul>
+<li>Follow the link in <code>Reference</code> section.</li>
 </ul>
 </li>
 </ul>
@@ -1678,12 +1912,16 @@ With service name it finds the server details from <code>Eureka Server</code>.
 <li>
 <p><strong><ins>References:</ins></strong></p>
 <ul>
-<li><a href="https://resilience4j.readme.io/docs/circuitbreaker">https://resilience4j.readme.io/docs/circuitbreaker</a></li>
-<li><a href="https://resilience4j.readme.io/docs/getting-started-3">https://resilience4j.readme.io/docs/getting-started-3</a></li>
-<li><a href="https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html">https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html</a></li>
+<li>Advance configurations:
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3#configuration">https://resilience4j.readme.io/docs/getting-started-3#configuration</a></li>
 </ul>
 </li>
 </ul>
+</li>
+</ul>
+<hr>
+<h4 id="end-of-document">End of document.</h4>
 <hr>
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>

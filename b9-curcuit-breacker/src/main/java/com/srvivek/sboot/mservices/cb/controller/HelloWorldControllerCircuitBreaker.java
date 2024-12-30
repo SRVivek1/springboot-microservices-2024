@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.srvivek.sboot.mservices.cb.exception.CustomRetryRuntimeException;
 import com.srvivek.sboot.mservices.cb.exception.DefaultRetryRuntimeException;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 @RestController
 public class HelloWorldControllerCircuitBreaker {
@@ -22,9 +26,41 @@ public class HelloWorldControllerCircuitBreaker {
 	 * @return
 	 */
 	@GetMapping("/cb/greet")
-	// @Retry(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")
-	@CircuitBreaker(name = "default", fallbackMethod = "hardcodedResponseFallbackMethod")
+	@CircuitBreaker(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+	@Retry(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
 	public String greeting() {
+
+		logger.info("***** HelloWorldController.greeting() method called.");
+		logger.info("***** Request id : {}", counter);
+		try {
+			if (counter % 2 == 0) {
+				throw new DefaultRetryRuntimeException("curcuite breacker test. Request Id : " + counter);
+			}
+		} catch (Exception ex) {
+			logger.info("**** Failed for request id : {}", counter);
+			throw ex;
+		} finally {
+			counter++;
+		}
+
+		return "Guten Morgen";
+	}
+
+	/**
+	 * Testing other annotations.
+	 * 
+	 * @return
+	 */
+	@GetMapping("/cb/greet-adv")
+	@CircuitBreaker(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+	// we can also add fallbackMethod = "RateLimiterFallbackMethod"
+	@RateLimiter(name = "greeting-api")
+	// we can also add fallbackMethod = "bulkHeadFallbackMethod"
+	@Bulkhead(name = "greeting-api")
+	@Retry(name = "greeting-api", fallbackMethod = "hardcodedResponseFallbackMethod")
+	// We can also add fallbackMethod = "timeLimiterFallbackMethod"
+	@TimeLimiter(name = "greeting-api")
+	public String greetingAdvance() {
 
 		logger.info("***** HelloWorldController.greeting() method called.");
 		logger.info("***** Request id : {}", counter);
