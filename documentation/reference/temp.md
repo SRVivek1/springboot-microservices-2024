@@ -1,2 +1,3 @@
-- ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `#f03c15`
-- ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) `#c5f015`
+---
+test md syntaxes
+---
