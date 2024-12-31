@@ -6,8 +6,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.srvivek.sboot.mservices.ccs.bean.CurrencyConversion;
 
-//@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")
+// Connect to locahost:8000 to find the service
+//@FeignClient(name = "E2-CURRENCY-EXCHANGE-SERVICE-KUBERNETES", url = "localhost:8000")
+
+// Find server info from Eureka with help of service name.
 //@FeignClient(name = "E2-CURRENCY-EXCHANGE-SERVICE-KUBERNETES")
+
+// if 'CURRENCY_EXCHANGE_SERVICE_HOST' found in system property use the value to connect to the service or else
+// connect to the 'localhost'.
 @FeignClient(name = "E2-CURRENCY-EXCHANGE-SERVICE-KUBERNETES", url = "${CURRENCY_EXCHANGE_SERVICE_HOST:http://localhost}:8000")
 public interface CurrencyExchangeProxy {
 
