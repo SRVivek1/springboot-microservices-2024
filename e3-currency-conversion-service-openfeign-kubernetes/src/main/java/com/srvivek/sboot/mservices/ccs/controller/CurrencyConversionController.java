@@ -40,11 +40,13 @@ public class CurrencyConversionController {
 			@PathVariable BigDecimal quantity) {
 
 		logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
-
+		
 		// Standardize
 		from = from.toUpperCase();
 		to = to.toUpperCase();
 
+		logger.info("calculateCurrencyConversion called with {} to {} with {}", from, to, quantity);
+		
 		final Map<String, String> uriVariables = new HashMap<>();
 		uriVariables.put("from", from);
 		uriVariables.put("to", to);
@@ -91,6 +93,8 @@ public class CurrencyConversionController {
 		from = from.toUpperCase();
 		to = to.toUpperCase();
 
+		logger.info("calculateCurrencyConversionFeign called with {} to {} with {}", from, to, quantity);
+		
 		// Send request to Currency exchange micro-service
 		final CurrencyConversion currencyConversionExchange = currencyExchangeProxy
 				.retrieveExchangeRateFromDatabase(from, to);

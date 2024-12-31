@@ -63,8 +63,6 @@ public class CurrencyExchangeController {
 		from = from.toUpperCase();
 		to = to.toUpperCase();
 
-		final String port = environment.getProperty("local.server.port");
-
 		final CurrencyExchange currencyExchange = currencyExchangeRepository.findByFromAndTo(from, to);
 
 		if (currencyExchange == null) {
@@ -72,7 +70,10 @@ public class CurrencyExchangeController {
 					String.format("Currency exchange not available - from %s to %s", from, to));
 		}
 
-		currencyExchange.setEnvironment(port);
+		final String PORT = environment.getProperty("local.server.port");
+		final String HOST = environment.getProperty("HOSTNAME");
+		final String VERSION = "v11";
+		currencyExchange.setEnvironment(String.format("%s %s %s", PORT, VERSION, HOST));
 
 		logger.debug("Response {}", currencyExchange);
 
