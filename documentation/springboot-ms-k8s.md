@@ -450,21 +450,9 @@
         sessionAffinity: None
         type: LoadBalancer
 	```
-
-> Note: This is an ***important*** note.
-
 - **<ins>Notes:</ins>**
   - When a deployment is created, kubernetes automatically creates service host property.
     - `<DEPLOYMENT_SERVICE_NAME>_SERVICE_HOST`
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
 
 - **<ins>App links:</ins>**
   - [https://hub.docker.com/repository/create?namespace=srvivek](https://hub.docker.com/repository/create?namespace=srvivek)
