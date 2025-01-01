@@ -570,7 +570,7 @@
   kubectl get secret
   kubectl describe secret hello-world-secrets-1
   
-  <span class="hljs-comment"># deploy cluster using yaml definition</span>
+  <span class="hljs-comment"># Update/deploy cluster using yaml definition</span>
   kubectl apply -f deployment.yaml
   
   <span class="hljs-comment"># Create new node-pool</span>
@@ -589,9 +589,6 @@
   <span class="hljs-comment"># This will automatically deploy the new image with &#x27;0 downtime&#x27;.</span>
   kubectl <span class="hljs-built_in">set</span> image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE
   
-  <span class="hljs-comment"># download yaml config for current deployment</span>
-
-
   <span class="hljs-comment"># list services replicasets &amp; pods</span>
   kubectl get services
   kubectl get replicasets
@@ -612,6 +609,9 @@
   <span class="hljs-comment"># delete deployment</span>
   kubectl delete deployment hello-world-rest-api
   
+  <span class="hljs-comment"># Delete all services related to a service - pods, service replicasets &amp; deployment.apps</span>
+  kubectl delete all -l app=currency-exchange-service
+
   <span class="hljs-comment"># delete cluster</span>
   gcloud container clusters delete my-standard-cluster-1 --zone us-central1-c 
 
@@ -876,7 +876,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="xx-google-cloud-logging-and-tracing">XX. Google Cloud: Logging and Tracing</h2>
+<h2 id="6-google-cloud-logging-and-tracing">6. Google Cloud: Logging and Tracing</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
 <ul>
@@ -887,7 +887,18 @@
 <li><strong><ins>Steps</ins></strong>
 <ul>
 <li><em><strong>Project Setup:</strong></em> Some change/step</li>
-<li><em><strong>Step-1:</strong></em> Enable logging and tracing in GCP.</li>
+<li><em><strong>Step-1:</strong></em> Enable logging and tracing in GCP.
+<ul>
+<li>Navigate to API and Services in GKE, goto <code>API Library</code>.</li>
+<li>Search and open below services.
+<ul>
+<li><code>cloud logging API</code></li>
+<li><code>Stackdriver API</code></li>
+</ul>
+</li>
+<li>If not enabled, Click on <code>Manage</code> and</li>
+</ul>
+</li>
 <li><em><strong>Step-2:</strong></em> Some change/step</li>
 </ul>
 </li>

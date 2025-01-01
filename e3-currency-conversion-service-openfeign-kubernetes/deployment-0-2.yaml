@@ -23,11 +23,11 @@ spec:
         app: currency-conversion-service-openfeign
     spec:
       containers:
-      - image: srvivek/e3-currency-conversion-service-openfeign-kubernetes:0.0.11-SNAPSHOT
+      - image: srvivek/e3-currency-conversion-service-openfeign-kubernetes:0.0.12-SNAPSHOT
         imagePullPolicy: IfNotPresent
         name: e3-currency-conversion-service-openfeign-kubernetes
         env:
-        - name: CURRENCY_EXCHANGE_SERVICE_HOST
+        - name: CURRENCY_EXCHANGE_URI
           value: currency-exchange-service
       restartPolicy: Always
 ---

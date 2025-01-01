@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.srvivek.sboot.mservices</groupId>
 	<artifactId>e3-currency-conversion-service-openfeign-kubernetes</artifactId>
-	<version>0.0.11-SNAPSHOT</version>
+	<version>0.0.12-SNAPSHOT</version>
 	<name>e3-currency-conversion-service-openfeign-kubernetes</name>
 	<description>Demo project for Spring Boot</description>
 	<url />
