@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: currency-exchange-service
+  name: currency-exchange-service
+  namespace: default
+spec:
+  replicas: 2 # 2 instances should be available
+  selector:
+    matchLabels:
+      app: currency-exchange-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: currency-exchange-service
+    spec:
+      containers:
+      - image: srvivek/e2-currency-exchange-service-kubernetes:0.0.11-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: e2-currency-exchange-service-kubernetes
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+  labels:
+    app: currency-exchange-service
+  name: currency-exchange-service
+  namespace: default
+spec:
+  allocateLoadBalancerNodePorts: true
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: currency-exchange-service
+  sessionAffinity: None
+  type: LoadBalancer

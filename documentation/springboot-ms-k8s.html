@@ -723,6 +723,28 @@
 <li><code>kubectl expose deployment currency-conversion-service --type=LoadBalancer --port=8100</code></li>
 </ul>
 </li>
+<li><em><strong>Step-7:</strong></em> Lets download the deployment and service config in yaml
+<ul>
+<li><strong>Deployment</strong> <code>kubectl get deployment currency-exchange-service -o yaml &gt;&gt; deployment.yaml</code></li>
+<li><strong>Service:</strong> <code>kubectl get services currency-exchange-service -o yaml &gt;&gt; services.yaml</code></li>
+</ul>
+</li>
+<li><em><strong>Step-8:</strong></em> We can change the yaml config as per requirement and deploy to upadate it on GKE.
+<ul>
+<li><strong>Difference:</strong> <code>kubectl diff -f deployment.yaml</code></li>
+<li><strong>Deploy:</strong> <code>kubectl apply -f deployment.yaml</code></li>
+</ul>
+</li>
+<li><em><strong>Step-9:</strong></em> Verify pods and run test to verify load balancer
+<ul>
+<li><code>watch -n 0.1 curl http://34.44.230.142:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100</code></li>
+</ul>
+</li>
+<li><strong>Step-10:</strong> Cleaning generated config yaml.
+<ul>
+<li>check <code>deployment.yaml</code> code in below section.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><strong><ins>Code / Config changes</ins></strong>
@@ -767,6 +789,57 @@
   # Enables LoadBalancer retries.</span>
   <span class="hljs-attr">spring.cloud.loadbalancer.retry.enabled</span>=<span class="hljs-string">true</span>
 <span class="hljs-comment">  # End: Spring Load Balancer</span>
+</code></pre>
+</li>
+<li><strong>Kubernetes declarative deployment:</strong> <em>deployment.yaml</em><pre><code class="language-yaml">  <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span>
+  <span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span>
+  <span class="hljs-attr">metadata:</span>
+    <span class="hljs-attr">annotations:</span>
+      <span class="hljs-attr">deployment.kubernetes.io/revision:</span> <span class="hljs-string">&quot;1&quot;</span>
+    <span class="hljs-attr">labels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">namespace:</span> <span class="hljs-string">default</span>
+  <span class="hljs-attr">spec:</span>
+    <span class="hljs-attr">replicas:</span> <span class="hljs-number">2</span> <span class="hljs-comment"># 2 instances should be available</span>
+    <span class="hljs-attr">selector:</span>
+      <span class="hljs-attr">matchLabels:</span>
+        <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">strategy:</span>
+      <span class="hljs-attr">rollingUpdate:</span>
+        <span class="hljs-attr">maxSurge:</span> <span class="hljs-number">25</span><span class="hljs-string">%</span>
+        <span class="hljs-attr">maxUnavailable:</span> <span class="hljs-number">25</span><span class="hljs-string">%</span>
+      <span class="hljs-attr">type:</span> <span class="hljs-string">RollingUpdate</span>
+    <span class="hljs-attr">template:</span>
+      <span class="hljs-attr">metadata:</span>
+        <span class="hljs-attr">labels:</span>
+          <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+      <span class="hljs-attr">spec:</span>
+        <span class="hljs-attr">containers:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/e2-currency-exchange-service-kubernetes:0.0.11-SNAPSHOT</span>
+          <span class="hljs-attr">imagePullPolicy:</span> <span class="hljs-string">IfNotPresent</span>
+          <span class="hljs-attr">name:</span> <span class="hljs-string">e2-currency-exchange-service-kubernetes</span>
+        <span class="hljs-attr">restartPolicy:</span> <span class="hljs-string">Always</span>
+  <span class="hljs-string">---</span>
+  <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+  <span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>
+  <span class="hljs-attr">metadata:</span>
+    <span class="hljs-attr">annotations:</span>
+      <span class="hljs-attr">cloud.google.com/neg:</span> <span class="hljs-string">&#x27;{&quot;ingress&quot;:true}&#x27;</span>
+    <span class="hljs-attr">labels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">namespace:</span> <span class="hljs-string">default</span>
+  <span class="hljs-attr">spec:</span>
+    <span class="hljs-attr">allocateLoadBalancerNodePorts:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">ports:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">port:</span> <span class="hljs-number">8000</span>
+      <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span>
+      <span class="hljs-attr">targetPort:</span> <span class="hljs-number">8000</span>
+    <span class="hljs-attr">selector:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+    <span class="hljs-attr">sessionAffinity:</span> <span class="hljs-string">None</span>
+    <span class="hljs-attr">type:</span> <span class="hljs-string">LoadBalancer</span>
 </code></pre>
 </li>
 </ul>

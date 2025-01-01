@@ -349,6 +349,16 @@
   - ***Step-6:*** Exponse deployed service using load blancer service.
     - `kubectl expose deployment currency-exchange-service --type=LoadBalancer --port=8000`
     - `kubectl expose deployment currency-conversion-service --type=LoadBalancer --port=8100`
+  - ***Step-7:*** Lets download the deployment and service config in yaml
+    - **Deployment** `kubectl get deployment currency-exchange-service -o yaml >> deployment.yaml`
+    - **Service:** `kubectl get services currency-exchange-service -o yaml >> services.yaml`
+  - ***Step-8:*** We can change the yaml config as per requirement and deploy to upadate it on GKE.
+    - **Difference:** `kubectl diff -f deployment.yaml`
+    - **Deploy:** `kubectl apply -f deployment.yaml`
+  - ***Step-9:*** Verify pods and run test to verify load balancer
+    - `watch -n 0.1 curl http://34.44.230.142:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100`
+  - **Step-10:** Cleaning generated config yaml.
+    - check `deployment.yaml` code in below section.
 - **<ins>Code / Config changes</ins>**
   - **Feign proxy:** *CurrencyExchangeProxy.java*
     - imports
@@ -387,6 +397,58 @@
       # Enables LoadBalancer retries.
       spring.cloud.loadbalancer.retry.enabled=true
       # End: Spring Load Balancer
+	```
+  - **Kubernetes declarative deployment:** *deployment.yaml*
+	```yaml
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        annotations:
+          deployment.kubernetes.io/revision: "1"
+        labels:
+          app: currency-exchange-service
+        name: currency-exchange-service
+        namespace: default
+      spec:
+        replicas: 2 # 2 instances should be available
+        selector:
+          matchLabels:
+            app: currency-exchange-service
+        strategy:
+          rollingUpdate:
+            maxSurge: 25%
+            maxUnavailable: 25%
+          type: RollingUpdate
+        template:
+          metadata:
+            labels:
+              app: currency-exchange-service
+          spec:
+            containers:
+            - image: srvivek/e2-currency-exchange-service-kubernetes:0.0.11-SNAPSHOT
+              imagePullPolicy: IfNotPresent
+              name: e2-currency-exchange-service-kubernetes
+            restartPolicy: Always
+      ---
+      apiVersion: v1
+      kind: Service
+      metadata:
+        annotations:
+          cloud.google.com/neg: '{"ingress":true}'
+        labels:
+          app: currency-exchange-service
+        name: currency-exchange-service
+        namespace: default
+      spec:
+        allocateLoadBalancerNodePorts: true
+        ports:
+        - port: 8000
+          protocol: TCP
+          targetPort: 8000
+        selector:
+          app: currency-exchange-service
+        sessionAffinity: None
+        type: LoadBalancer
 	```
 
 > Note: This is an ***important*** note.
