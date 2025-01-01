@@ -16,7 +16,8 @@
 }
 
 </style>
-            
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
 <style>
@@ -241,7 +242,160 @@
 </li>
 </ul>
 <hr>
-<h2 id="2-gcp---google-cloud-with-kubernetes">2. GCP - Google Cloud with Kubernetes</h2>
+<h2 id="2-google-cloud---introduction-to-google-kubernetes-engine-gke">2. Google Cloud - Introduction to Google Kubernetes Engine (GKE)</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Provides Kubernetes solution in cloud.</li>
+<li><strong>Terms:</strong>
+<ul>
+<li><strong>Cluster:</strong> A group of compute engine instances.
+<ul>
+<li><em>Master Node:</em></li>
+<li><em>Worker Nodes:</em></li>
+</ul>
+</li>
+<li><strong>Master Node:</strong>
+<ul>
+<li>Also known as <code>Control plane</code> as it manages everything inside cluster. E.g. Creating new nodes or creating new deployment for a service etc.</li>
+<li><code>cubectl</code> commands are execued on <code>Master Node</code>.</li>
+<li>It consists of a set of components.</li>
+<li><strong>Components:</strong>
+<ul>
+<li><em>API Server:</em>
+<ul>
+<li>Manages all communications for a K8S cluster (from nodes and outside).</li>
+<li>When any command is executed, it is received by this component.</li>
+</ul>
+</li>
+<li><em>Scheduler:</em>
+<ul>
+<li>Decides nodes for the deployment of a service.</li>
+</ul>
+</li>
+<li><em>Controller Manager:</em>
+<ul>
+<li>Manages deployments and replicasets.</li>
+</ul>
+</li>
+<li><em>etcd:</em>
+<ul>
+<li>A distributed dataset storing the cluster state. This information is used in providing high availability.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Worker Node:</strong>
+<ul>
+<li>Runs the work load. All our services (as PODs) run on worker nodes.</li>
+<li><strong>Components:</strong>
+<ul>
+<li><em>kubelet:</em>
+<ul>
+<li>Manages communication with Master node(s).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Kubernetes Pods:</strong>
+<ul>
+<li>These are smallest deployable units in kubernetes.</li>
+<li>A Pod <em>contains one or more containers</em>. However most of the Pods contains single container.</li>
+<li>Each Pod is assigned an <em>ephemeral (that lasts for short duration)</em> IP address.</li>
+<li>All containers in a Pods share:
+<ul>
+<li>Network</li>
+<li>Storage</li>
+<li>IP Address</li>
+<li>Ports and</li>
+<li>Volumes (Shared persistence disks)</li>
+</ul>
+</li>
+<li>Pods can in any status of the following: <strong>Running / Pending / Succeeded / Failed / Unknown</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Deployment vs Replica set:</strong>
+<ul>
+<li><em>Deployment:</em>
+<ul>
+<li>A deployment is created for each microservice using <code>kubectl create deployment ....</code> command.
+<ul>
+<li>It will create a new replica set for the microservice.</li>
+</ul>
+</li>
+<li>A single deployment represents a microservice (with all it's releases).</li>
+<li>It manage new releases ensuring <code>0 downtime</code> using <code>kubectl set image deployment ....</code> command.
+<ul>
+<li>It will create a new replica set version for the new version of microservice.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em>Replica set:</em>
+<ul>
+<li>A ReplicaSet's purpose is to maintain a stable set of replica Pods running at any given time. As such, it is often used to guarantee the availability of a specified number of identical Pods.
+<ul>
+<li>Ensures that a specific number of Pods are running for a specific microservice version.</li>
+<li>A Deployment is a higher-level concept that manages ReplicaSets and provides declarative updates to Pods along with a lot of other useful features. Therefore, we recommend using Deployments instead of directly using ReplicaSets, unless you require custom update orchestration or don't require updates at all.</li>
+</ul>
+</li>
+<li>Automitically launches new pods if a pod goes down / killed.</li>
+</ul>
+</li>
+<li><strong>Kubernetes Service:</strong>
+<ul>
+<li>Each time a new Pod is created it will have a new IP address. This could impact the external users accessing Pods with IP address.</li>
+<li>To ensure that external users are not impacted even though internally IP is changed we expose service using stable service Pod / IP address.
+<ul>
+<li><code>kubectl expose deployment hello-world-rest-api --type=LoadBalancer --port=8080</code></li>
+</ul>
+</li>
+<li><strong>Types:</strong>
+<ul>
+<li><em>Cluster IP:</em>
+<ul>
+<li>It exposes service on a cluster-internal IP, to access inside cluster (intra cluster communications).</li>
+</ul>
+</li>
+<li><em>Load Balancer:</em>
+<ul>
+<li>It exposes service externally using a cloud provider's load balancer.</li>
+<li>Check in <code>GCP load balancers</code> for all load balancers created on platform.</li>
+<li>This approach work on all cloud provider kubernetes engine/service.
+<ul>
+<li><em>Not recommended:</em> We can also create load balancer for each micrservice.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em>Node port:</em>
+<ul>
+<li>It exposes service on each node's ip at a static port (the NodePort).</li>
+<li><em>Use case:</em>
+<ul>
+<li>When we don't want to create an exernal load balancer for each micro-service. We can create one ingress component to load balance multiple microserices by routing.</li>
+<li>Using ingress we can expose Pods NodePort to expose externally to outside world.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-gcp---google-cloud-with-kubernetes-hands-on">3. GCP - Google Cloud with Kubernetes [Hands-on]</h2>
 <h3 id="project-ref-e1-kubernetes-deployment-with-yaml"><em><strong>Project ref:</strong></em> <em>e1-kubernetes-deployment-with-yaml</em></h3>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
@@ -259,7 +413,7 @@
 <li><strong><ins>GCP K8S project setup</ins></strong>
 <ul>
 <li><em><strong>Step-1:</strong></em> Create project in console <code>kubernetes-poc-1</code>.</li>
-<li><em><strong>Step-2:</strong></em> Enable <code>Kubernetes API</code>.</li>
+<li><em><strong>Step-2:</strong></em> Enable <code>Kubernetes API</code> in GCP platform (pop-up).</li>
 <li><em><strong>Step-3:</strong></em> Create cluster and choose <code>Standard</code>.
 <ul>
 <li>With Autopilot, GKE provisions and manages your cluster's underlying infrastructure, including nodes and node pools, giving you an optimized cluster with a hands-off experience.</li>
@@ -314,22 +468,30 @@
 </li>
 <li><strong>Note:</strong>
 <ul>
-<li>Services are set of pods with a network endpoint that can be used for discovery and load balancing.</li>
-<li>Ingress are collection of rules for routing external HTTP(S) trafic to servies.
+<li><strong>Services</strong> are set of pods with a network endpoint that can be used for discovery and load balancing.</li>
+<li><strong>Ingress</strong> are collection of rules for routing external HTTP(S) trafic to servies.
 <ul>
 <li>Using ingress we can create one load balacer for multiple services.</li>
+<li>It can route requests to load balancers and Node ports.</li>
 </ul>
 </li>
 </ul>
 </li>
 <li><strong>Commands:</strong><pre><code class="language-sh">  
+  <span class="hljs-comment"># initalize the sdk</span>
+  <span class="hljs-comment"># Requires login to GCP account.</span>
+  gcloud init
+
   <span class="hljs-comment"># If using gcloud local installation</span>
-  <span class="hljs-comment"># login</span>
+  <span class="hljs-comment"># login to GCP account</span>
   gcloud auth login
 
   <span class="hljs-comment"># Connect to gcloud-shell</span>
   <span class="hljs-comment"># It will generate and store a local ssh file for future logins</span>
   gcloud cloud-shell ssh
+
+  <span class="hljs-comment"># Automatic authentication with GCP CLI tools in Cloud Shell is disabled. To enable, rerun above command with `--authorize-session` flag.</span>
+  gcloud cloud-shell --authorize-session ssh
 
   <span class="hljs-comment"># set project using project id-operating-ally-446306-t7</span>
   <span class="hljs-comment"># Check project info for &#x27;project-id&#x27;</span>
@@ -344,11 +506,23 @@
   <span class="hljs-comment"># View deployed services</span>
   kubectl get deployment
   
-  <span class="hljs-comment"># Exponse deployed service using load blancer on port 8080</span>
+  <span class="hljs-comment"># View deployment info for specific deployment</span>
+  kubectl get deployment currency-exchange-service
+
+  <span class="hljs-comment"># view the deployment config in yaml format</span>
+  kubectl get deployment currency-exchange-service -o yaml
+
+  <span class="hljs-comment"># Exponse deployed service using load blancer (stable service IP) on port 8080</span>
   kubectl expose deployment hello-world-rest-api --<span class="hljs-built_in">type</span>=LoadBalancer --port=8080
 
   <span class="hljs-comment"># List running service with details (IP, port, age etc.)</span>
   kubectl get services
+
+  <span class="hljs-comment"># View service info for specific deployment</span>
+  kubectl get services currency-exchange-service
+
+  <span class="hljs-comment"># view the deployment config in yaml format</span>
+  kubectl get services currency-exchange-service -o yaml
 
   <span class="hljs-comment">#watch progress</span>
   kubectl get services --watch
@@ -408,12 +582,16 @@
   <span class="hljs-comment"># list node pools details (name, disk-size, machine-type, node-version)</span>
   gcloud container node-pools list --zone=us-central1-c --cluster=my-standard-cluster-1
   
-  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># get detailed status of pods - Name, status, containers, restart, IP, age etc.</span>
   kubectl get pods -o wide
   
-  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># Update / Set a new image for running deployement / microservice</span>
+  <span class="hljs-comment"># This will automatically deploy the new image with &#x27;0 downtime&#x27;.</span>
   kubectl <span class="hljs-built_in">set</span> image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE
   
+  <span class="hljs-comment"># download yaml config for current deployment</span>
+
+
   <span class="hljs-comment"># list services replicasets &amp; pods</span>
   kubectl get services
   kubectl get replicasets
@@ -422,7 +600,7 @@
   <span class="hljs-comment"># delete pod</span>
   kubectl delete pod hello-world-rest-api-58dc9d7fcc-8pv7r
   
-  <span class="hljs-comment">#</span>
+  <span class="hljs-comment"># Set desired cound of Pods in the replica-set</span>
   kubectl scale deployment hello-world-rest-api --replicas=1
   
   <span class="hljs-comment"># List projects</span>
@@ -441,6 +619,158 @@
 </li>
 </ul>
 </li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
+<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell">https://cloud.google.com/sdk/gcloud/reference/cloud-shell</a></li>
+<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp">https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-gcp---install-gcloud-locally">4. GCP - Install gcloud locally</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>This is abc feature.</li>
+<li>This is xyz feature.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Requires <strong>kubectl</strong>.
+<ul>
+<li>Follow <code>Section 1</code> for instructions.</li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Download <em><strong>Google Cloud SDK</strong></em> and follow instructions on website to instal it.</li>
+<li><em><strong>Step-2:</strong></em> Download <em><strong>kubectl</strong></em> executable and follow instructions on website to install it.</li>
+<li><em><strong>Step-3:</strong></em> Install <code>gke-gcloud-auth-plugin</code> required to use <code>kubectl</code> with <code>gcloud</code>.
+<ul>
+<li><code>gcloud components install gke-gcloud-auth-plugin</code></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Initialize gcloud <code>gcloud init</code> to initialize the sdk.</li>
+<li><em><strong>Step-5:</strong></em> Authorize with GCP account. <code>gcloud auth login</code>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: Install the SDK where user level access are granted. Don't use root user / sudo.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://cloud.google.com/sdk/docs/install">https://cloud.google.com/sdk/docs/install</a></li>
+<li><a href="https://cloud.google.com/sdk/docs/uninstall-cloud-sdk">https://cloud.google.com/sdk/docs/uninstall-cloud-sdk</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-deploy-application-using-kubernetes-in-progress">5. Deploy application using kubernetes [<em><strong>in progress</strong></em>]</h2>
+<h3 id="project-ref">Project ref:</h3>
+<ul>
+<li><em>e2-currency-exchange-service-kubernetes</em> &amp;</li>
+<li><em>e3-currency-conversion-service-openfeign-kubernetes</em></li>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Deploy microservices in GKE from local using <code>gcloud CLI</code> and <code>kubectl</code> commands.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> POM.xml: Remove following dependencies as <code>kubernetes</code> provide inbuild support for these funcationalities.
+<ul>
+<li>Eureka client</li>
+<li>config client</li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> <em>Feign proxy:</em> Update feign client to use url property to define service URL.
+<ul>
+<li><code>@FeignClient(name = &quot;E2-CURRENCY-EXCHANGE-SERVICE-KUBERNETES&quot;, url = &quot;${CURRENCY_EXCHANGE_SERVICE_HOST:http://localhost}:8000&quot;)</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> <em>application.properties</em> Add management properties to enable monitoring.</li>
+<li><em><strong>Step-3:</strong></em> gcloud setup
+<ul>
+<li><code>gcloud auth login</code></li>
+<li><code>gcloud container clusters get-credentials my-standard-cluster-1 --zone us-central1-c --project operating-ally-446306-t7</code></li>
+</ul>
+</li>
+<li>Cretae deployment(Deploy services) using following command
+<ul>
+<li><code>kubectl create deployment currency-exchange-service --image=srvivek/e2-currency-exchange-service-kubernetes:0.0.11-SNAPSHOT</code></li>
+<li><code>kubectl create deployment currency-conversion-service --image=srvivek/e3-currency-conversion-service-openfeign-kubernetes:0.0.11-SNAPSHOT</code></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Set currency exchange host name using env. prop. to be used in feign.
+<ul>
+<li><code>kubectl set env deployment/currency-conversion-service CURRENCY_EXCHANGE_SERVICE_HOST=currency-exchange-service</code>
+<ul>
+<li><strong>Imp.:</strong> Check notes for default host property available in kubernetes.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> List env set for all pods
+<ul>
+<li><code>kubectl set env pods --all --list</code></li>
+</ul>
+</li>
+<li><em><strong>Step-6:</strong></em> Exponse deployed service using load blancer service.
+<ul>
+<li><code>kubectl expose deployment currency-exchange-service --type=LoadBalancer --port=8000</code></li>
+<li><code>kubectl expose deployment currency-conversion-service --type=LoadBalancer --port=8100</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Feign proxy:</strong> <em>CurrencyExchangeProxy.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">  <span class="hljs-meta">@FeignClient(name = &quot;E2-CURRENCY-EXCHANGE-SERVICE-KUBERNETES&quot;, url = &quot;${CURRENCY_EXCHANGE_SERVICE_HOST:http://localhost}:8000&quot;)</span>
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
+
+    <span class="hljs-comment">/**
+    * Method as defined in the host service.
+    * <span class="hljs-doctag">@param</span> from
+    * <span class="hljs-doctag">@param</span> to
+    * <span class="hljs-doctag">@return</span>
+    */</span>
+    <span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
+    <span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
+
+  }
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">  <span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">e3-currency-conversion-service-ofeign-kubernetes</span>
+  <span class="hljs-attr">server.port</span>=<span class="hljs-string">8100</span>
+<span class="hljs-comment">
+  # Start: CHANGE-KUBERNETES</span>
+  <span class="hljs-attr">management.endpoint.health.probes.enabled</span>=<span class="hljs-string">true</span>
+  <span class="hljs-attr">management.health.livenessstate.enabled</span>=<span class="hljs-string">true</span>
+  <span class="hljs-attr">management.health.readinessstate.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">  # End: CHANGE-KUBERNETES</span>
+<span class="hljs-comment">
+  # Start: Spring Load Balancer</span>
+<span class="hljs-comment">  # Enable load balancer.</span>
+  <span class="hljs-attr">spring.cloud.loadbalancer.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+  # Enables LoadBalancer retries.</span>
+  <span class="hljs-attr">spring.cloud.loadbalancer.retry.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">  # End: Spring Load Balancer</span>
+</code></pre>
+</li>
+</ul>
+</li>
 </ul>
 <blockquote>
 <p>Note: This is an <em><strong>important</strong></em> note.</p>
@@ -449,7 +779,11 @@
 <li>
 <p><strong><ins>Notes:</ins></strong></p>
 <ul>
-<li>Some important key point / takeaway note.</li>
+<li>When a deployment is created, kubernetes automatically creates service host property.
+<ul>
+<li><code>&lt;DEPLOYMENT_SERVICE_NAME&gt;_SERVICE_HOST</code></li>
+</ul>
+</li>
 <li>Some takeaway:
 <ul>
 <li>Sub topic takeaway.</li>
@@ -480,18 +814,23 @@
 </tbody>
 </table>
 <ul>
-<li><strong><ins>References:</ins></strong>
+<li>
+<p><strong><ins>App links:</ins></strong></p>
 <ul>
-<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
-<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell">https://cloud.google.com/sdk/gcloud/reference/cloud-shell</a></li>
-<li><a href="https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp">https://cloud.google.com/sdk/gcloud/reference/cloud-shell/scp</a></li>
+<li><a href="https://hub.docker.com/repository/create?namespace=srvivek">https://hub.docker.com/repository/create?namespace=srvivek</a></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/generated/kubectl_set/kubectl_set_env/">https://kubernetes.io/docs/reference/kubectl/generated/kubectl_set/kubectl_set_env/</a></li>
+<li></li>
 </ul>
 </li>
 </ul>
 <hr>
-<hr>
 
-            
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             
         </body>
         </html>
