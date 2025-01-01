@@ -247,7 +247,7 @@
       kubectl get secret
       kubectl describe secret hello-world-secrets-1
       
-      # deploy cluster using yaml definition
+      # Update/deploy cluster using yaml definition
       kubectl apply -f deployment.yaml
       
       # Create new node-pool
@@ -266,9 +266,6 @@
       # This will automatically deploy the new image with '0 downtime'.
       kubectl set image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE
       
-      # download yaml config for current deployment
-
-
       # list services replicasets & pods
       kubectl get services
       kubectl get replicasets
@@ -289,6 +286,9 @@
       # delete deployment
       kubectl delete deployment hello-world-rest-api
       
+      # Delete all services related to a service - pods, service replicasets & deployment.apps
+      kubectl delete all -l app=currency-exchange-service
+
       # delete cluster
       gcloud container clusters delete my-standard-cluster-1 --zone us-central1-c 
     
@@ -462,5 +462,36 @@
   - 
 
 ---
+## 6. Google Cloud: Logging and Tracing
+- **<ins>About / Introduction</ins>**
+  - This is abc feature.
+  - This is xyz feature.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Some change/step
+  - ***Step-1:*** Enable logging and tracing in GCP.
+    - Navigate to API and Services in GKE, goto `API Library`.
+    - Search and open below services.
+      - `cloud logging API`
+      - `Stackdriver API`
+    - If not enabled, Click on `Manage` and 
+  - ***Step-2:*** Some change/step
+> Note: This is an ***important*** note.
 
+- **<ins>Notes:</ins>**
+  - Some important key point / takeaway note.
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
+- **<ins>References:</ins>**
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [xyz service](http://website.com/some-resource-path)
+
+---
 
