@@ -550,7 +550,10 @@
 
   <span class="hljs-comment"># Details of HPA - Horizontal pod autoscaling</span>
   kubectl get hpa
-  
+
+  <span class="hljs-comment"># delete hpa</span>
+  kubectl delete hpa hello-world-rest-api
+
   <span class="hljs-comment"># cluster auto scaling</span>
   gcloud container cluster update my-standard-cluster-1 --enable-autoscaling --min-nodes=1 --max-nodes=10
 
