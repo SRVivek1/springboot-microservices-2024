@@ -22,7 +22,6 @@
 
 - **<ins>References:</ins>**
   - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
 
 ---
 

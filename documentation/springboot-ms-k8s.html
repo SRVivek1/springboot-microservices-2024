@@ -544,7 +544,7 @@
   <span class="hljs-comment"># If we need more pods then we need to scale-up our cluster</span>
   gcloud container clusters resize my-standard-cluster-1 --node-pool default-pool --num-nodes=2 --zone=us-central1-c
   
-  <span class="hljs-comment"># Auto scaling microservice</span>
+  <span class="hljs-comment"># Horizontal Auto scaling microservice</span>
   <span class="hljs-comment"># It can scale only upto number of nodes present in cluster.</span>
   kubectl autoscale deployment hello-world-rest-api --max=4 --cpu-percent=70
 
@@ -1048,7 +1048,174 @@
 <li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">https://kubernetes.io/docs/concepts/configuration/configmap/</a></li>
-<li><a href="http://website.com/some-resource-path">xyz service</a></li>
+<li></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-kubernetes--exploring-deployments---liveness-and-readiness-probes">8. Kubernetes : Exploring deployments - Liveness and Readiness probes</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li><strong>Liveness Probes:</strong>
+<ul>
+<li>The kubelet uses liveness probes to check health of a microservice and/or to restart POD if liveness probe is not successful.
+<ul>
+<li>For example, liveness probes could catch a deadlock, where an application is running, but unable to make progress. Restarting a container in such a state can help to make the application more available despite bugs.</li>
+</ul>
+</li>
+<li>A common pattern for liveness probes is to use the same low-cost HTTP endpoint as for readiness probes, but with a higher failureThreshold. This ensures that the pod is observed as not-ready for some period of time before it is hard killed.</li>
+<li><strong>Caution:</strong>
+<ul>
+<li>Liveness probes can be a powerful way to recover from application failures, but they should be used with caution.</li>
+<li>Liveness probes must be configured carefully to ensure that they truly indicate unrecoverable application failure, for example a deadlock.</li>
+</ul>
+</li>
+<li><strong>Note:</strong>
+<ul>
+<li>Incorrect implementation of liveness probes can lead to cascading failures. This results in restarting of container under high load; failed client requests as your application became less scalable; and increased workload on remaining pods due to some failed pods.</li>
+<li>Understand the difference between readiness and liveness probes and when to apply them for your app.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Readiness Probes:</strong>
+<ul>
+<li>The kubelet uses readiness probes to know when a container is ready to start accepting traffic. One use of this signal is to control which Pods are used as backends for Services.
+<ul>
+<li>A Pod is considered ready when its Ready condition is true. When a Pod is not ready, it is removed from Service load balancers. A Pod's Ready condition is false when its Node's Ready condition is not true, when one of the Pod's readinessGates is false, or when at least one of its containers is not ready.</li>
+</ul>
+</li>
+<li><em><strong>If <code>Readiness probe</code> is not succesfull. no traffic is sent.</strong></em></li>
+</ul>
+</li>
+<li><strong>Startup Probes:</strong>
+<ul>
+<li>The kubelet uses startup probes to know when a container application has started. If such a probe is configured, liveness and readiness probes do not start until it succeeds, making sure those probes don't interfere with the application startup.
+<ul>
+<li>This can be used to adopt liveness checks on slow starting containers, avoiding them getting killed by the kubelet before they are up and running.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Springboot Actuator:</strong> Springboot Actuator (&gt;=2.3) provides inbuild readiness and liveness probes.
+<ul>
+<li><code>actuator/health/readiness</code></li>
+<li><code>actuator/health/liveness</code></li>
+</ul>
+</li>
+<li></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Microservices running in GKE.</li>
+<li><em><strong>Step-1:</strong></em> Get rollout history/revisions of specific deployment.
+<ul>
+<li><code>kubectl rollout history deployment currency-conversion-service-openfeign</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> In case of any error occurs during deployment. We can always rollback to old working revision.
+<ul>
+<li><code>kubectl rollout undo deployment currency-conversion-service-openfeign --to-revision=2</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>deployment.yaml</ins></strong></p>
+<ul>
+<li>Liveness and Readiness probes updated in deployment decaration.</li>
+</ul>
+<pre><code class="language-yaml">      <span class="hljs-comment"># ... other config</span>
+      <span class="hljs-attr">template:</span>
+        <span class="hljs-attr">metadata:</span>
+          <span class="hljs-attr">labels:</span>
+            <span class="hljs-attr">app:</span> <span class="hljs-string">currency-exchange-service</span>
+        <span class="hljs-attr">spec:</span>
+          <span class="hljs-attr">containers:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/e2-currency-exchange-service-kubernetes:0.0.11-SNAPSHOT</span>
+            <span class="hljs-attr">imagePullPolicy:</span> <span class="hljs-string">IfNotPresent</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">e2-currency-exchange-service-kubernetes</span>
+            <span class="hljs-attr">readinessProbe:</span>
+              <span class="hljs-attr">httpGet:</span>
+                <span class="hljs-attr">port:</span> <span class="hljs-number">8000</span>
+                <span class="hljs-attr">path:</span> <span class="hljs-string">/actuator/health/readiness</span>
+            <span class="hljs-attr">livenessProbe:</span>
+              <span class="hljs-attr">httpGet:</span>
+                <span class="hljs-attr">port:</span> <span class="hljs-number">8000</span>
+                <span class="hljs-attr">path:</span> <span class="hljs-string">/actuator/health/liveness</span>
+          <span class="hljs-attr">restartPolicy:</span> <span class="hljs-string">Always</span>
+      <span class="hljs-comment"># ... other config</span>
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p>Note: Readiness and Liveness probes help to increase high availability of our application.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="9-kubernetes-horizontal-autoscaling-microservices">9. Kubernetes: Horizontal Autoscaling microservices</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li><strong>Types:</strong>
+<ul>
+<li><em>Horizonal</em></li>
+</ul>
+</li>
+<li><strong>Horizontal:</strong>
+<ul>
+<li>In Kubernetes, a <em>HorizontalPodAutoscaler</em> automatically updates a workload resource (such as a Deployment or StatefulSet), with the aim of automatically scaling the workload to match demand.</li>
+<li>Horizontal scaling means that the response to increased load is to deploy more Pods.
+<ul>
+<li>This is different from vertical scaling, which for Kubernetes would mean assigning more resources (for example: memory or CPU) to the Pods that are already running for the workload.</li>
+</ul>
+</li>
+<li>If the load decreases, and the number of Pods is above the configured minimum, the HorizontalPodAutoscaler instructs the workload resource (the Deployment, StatefulSet, or other similar resource) to scale back down.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Microservices running kubernetes cluster.</li>
+<li><em><strong>Step-1:</strong></em> Manual autoscaling
+<ul>
+<li><code>kubectl autoscale deployment currency-conversion-service-openfeign --min=1 --max=3 --cpu-percent=5</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> list horizonal autoscaling
+<ul>
+<li><code>kubectl get hpa</code></li>
+<li><code>kubectl get hpa -o yaml</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> See the CPU / Memory utilization.
+<ul>
+<li><code>kubectl top pods</code></li>
+<li><code>kubectl top nodes</code></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Verify pods by increasing traffice on load.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/">https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/autoscaling/">https://kubernetes.io/docs/concepts/workloads/autoscaling/</a></li>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/generated/kubectl_autoscale/">https://kubernetes.io/docs/reference/kubectl/generated/kubectl_autoscale/</a></li>
 </ul>
 </li>
 </ul>
