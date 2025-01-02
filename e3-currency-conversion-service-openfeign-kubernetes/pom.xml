@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.srvivek.sboot.mservices</groupId>
 	<artifactId>e3-currency-conversion-service-openfeign-kubernetes</artifactId>
-	<version>0.0.12-SNAPSHOT</version>
+	<version>0.0.13-SNAPSHOT</version>
 	<name>e3-currency-conversion-service-openfeign-kubernetes</name>
 	<description>Demo project for Spring Boot</description>
 	<url />
@@ -54,7 +54,7 @@
 		</dependency>
 		-->
 		<!-- End: CHANGE-KUBERNETES -->
-		
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -68,6 +68,11 @@
 		<dependency>
 			<groupId>io.github.openfeign</groupId>
 			<artifactId>feign-micrometer</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing</artifactId>
 		</dependency>
 
 		<dependency>
@@ -98,6 +103,13 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
 				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-tracing-bom</artifactId>
+				<version>${micrometer-tracing.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
