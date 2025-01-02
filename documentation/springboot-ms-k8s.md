@@ -291,6 +291,12 @@
 
       # delete cluster
       gcloud container clusters delete my-standard-cluster-1 --zone us-central1-c 
+
+      # check logs of a POD
+      kubectl logs currency-exchange-service-5bf8dd7984-p7tmm
+
+      # follow / tail logs of a POD
+      kubectl logs -f currency-exchange-service-5bf8dd7984-p7tmm
     
     ``` 
 - **<ins>References:</ins>**
@@ -322,7 +328,7 @@
 
 ---
 
-## 5. Deploy application using kubernetes [***in progress***]
+## 5. Deploy application using kubernetes 
 ### Project ref: 
   - *e2-currency-exchange-service-kubernetes* & 
   - *e3-currency-conversion-service-openfeign-kubernetes*
@@ -462,36 +468,80 @@
   - 
 
 ---
-## 6. Google Cloud: Logging and Tracing
+## 6. Google Cloud: Logging and Tracing [***in progress***]
 - **<ins>About / Introduction</ins>**
-  - This is abc feature.
-  - This is xyz feature.
+  - Centerlized logs for the all services/containers/pods etc.
+  - Centerlized monitoring for all services/containers/pods etc.
 - **<ins>Steps</ins>**
-  - ***Project Setup:*** Some change/step
+  - ***Project Setup:*** Ensure micrometer dependencies are available in latest image.
   - ***Step-1:*** Enable logging and tracing in GCP.
     - Navigate to API and Services in GKE, goto `API Library`.
     - Search and open below services.
       - `cloud logging API`
       - `Stackdriver API`
     - If not enabled, Click on `Manage` and 
-  - ***Step-2:*** Some change/step
-> Note: This is an ***important*** note.
-
-- **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
+  - ***Step-2:*** Fire requests (10/sec) to generate logs in system.
+    - `watch -n 0.1 curl http://34.42.22.155:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100`
+  - ***Step-3:*** Now go to cluster in GCP, open the cluster link.
+    - Go below to `Features section` and click on:
+      - `View logs` - To check logs.
+        - By default logs filter is set on `cluster`, clear this.
+        - Click on `Kubernetes containers` in filter and select desired `pod`.
+          - You also select different options from filter, e.g. - cluster, service, container etc.
+      - `View GKE Dashboard` - For Cloud monitoring.
+  - ***Logs Explorer:***
+    - We can add conditions in the query panel to filter the logs.
+    - We can also use id's from log entries to find all logs to that id from query panel.
+      - E.g. `resource.type="k8s_container" textPayload:"a0f973a78782bd1ec580c444fda324c1"`
+  - ***GKE Dashboard:***
+    - All matrics for sytem monitoring and resource utilization for cluster, namespaces, Nodes, workloads, services, pods, containers etc.
+      - eg. CPU, Memory & Disk Utilization.
+      - Containers restart, error logs etc.
+    - Provides alert service.
+> Note: Ensure following dependencies are present in POM.
+  - implementation platform('io.micrometer:micrometer-tracing-bom:latest.release')
+  - implementation 'io.micrometer:micrometer-tracing'
 
 - **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-  - [xyz service](http://website.com/some-resource-path)
+  - [https://micrometer.io/docs/tracing](https://micrometer.io/docs/tracing)
 
 ---
+## 7. Google Cloud: GKE ConfigMap - Centralized Configuration
+- **<ins>About / Introduction</ins>**
+  - Provides centerlize configuration.
+  - A ConfigMap is an API object used to store non-confidential data in key-value pairs. 
+  - Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+    - **Caution:**
+      - ConfigMap does not provide secrecy or encryption. If the data you want to store are confidential, use a Secret rather than a ConfigMap, or use additional (third party) tools to keep your data private.
+      - The spec of a static Pod cannot refer to a ConfigMap or any other API objects.
+    - **Note:** 
+      - A ConfigMap is not designed to hold large chunks of data. The data stored in a ConfigMap cannot exceed 1 MiB. 
+      - If you need to store settings that are larger than this limit, you may want to consider mounting a volume or use a separate database or file service.
+  - A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+  - A ConfigMap has data and binaryData fields. These fields accept key-value pairs as their values.
+    - Both the data field and the binaryData are optional. 
+    - The data field is designed to contain UTF-8 strings while the binaryData field is designed to contain binary data as base64-encoded strings.
+  - The name of a ConfigMap must be a valid `DNS subdomain name`.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** GKE has microservices running.
+  - ***Step-1:*** Create a configMap.
+    - `kubectl create configmap currency-conversion-service-openfeign --from-literal=CURRENCY_EXCHANGE_URI=http://currency-exchange-service`
+  - ***Step-2:*** Verify / list the config map
+    - `kubectl get configmap currency-conversion-service-openfeign`
+    - `kubectl get configmap currency-conversion-service-openfeign -o yaml`
+  - ***Step-3:*** We can add the config map content in our `deloyment.yaml` file.
+    - Add `envFrom` declaration in `containers` to read data from `configmap`.
+    - Remove `env` declaration from `containers`.
+    - **New File:** *deployment-0-3-with-configmap.yaml*
+  - ***Step-4:*** Apply the new configuration.
+    - **Difference:**
+      - `kubectl diff -f deployment-0-3-with-configmap.yaml`
+    - **Apply:**
+      - `kubectl apply -f deployment-0-3-with-configmap.yaml`
 
+> Note: ***Must*** veriy the difference before applying the update yaml file. I also helps to validate yaml by throwing error, if there's any syntactical mistakes.
+
+- **<ins>References:</ins>**
+  - [https://kubernetes.io/docs/concepts/configuration/configmap/](https://kubernetes.io/docs/concepts/configuration/configmap/)
+  - [xyz service](http://website.com/some-resource-path)
+---

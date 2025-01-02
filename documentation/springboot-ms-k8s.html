@@ -615,6 +615,12 @@
   <span class="hljs-comment"># delete cluster</span>
   gcloud container clusters delete my-standard-cluster-1 --zone us-central1-c 
 
+  <span class="hljs-comment"># check logs of a POD</span>
+  kubectl logs currency-exchange-service-5bf8dd7984-p7tmm
+
+  <span class="hljs-comment"># follow / tail logs of a POD</span>
+  kubectl logs -f currency-exchange-service-5bf8dd7984-p7tmm
+
 </code></pre>
 </li>
 </ul>
@@ -667,7 +673,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="5-deploy-application-using-kubernetes-in-progress">5. Deploy application using kubernetes [<em><strong>in progress</strong></em>]</h2>
+<h2 id="5-deploy-application-using-kubernetes">5. Deploy application using kubernetes</h2>
 <h3 id="project-ref">Project ref:</h3>
 <ul>
 <li>
@@ -876,7 +882,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="6-google-cloud-logging-and-tracing">6. Google Cloud: Logging and Tracing</h2>
+<h2 id="6-google-cloud-logging-and-tracing-in-progress">6. Google Cloud: Logging and Tracing [<em><strong>in progress</strong></em>]</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
 <ul>
@@ -899,51 +905,130 @@
 <li>If not enabled, Click on <code>Manage</code> and</li>
 </ul>
 </li>
-<li><em><strong>Step-2:</strong></em> Some change/step</li>
+<li><em><strong>Step-2:</strong></em> Fire requests (10/sec) to generate logs in system.
+<ul>
+<li><code>watch -n 0.1 curl http://34.42.22.155:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Now go to cluster in GCP, open the cluster link.
+<ul>
+<li>Go below to <code>Features section</code> and click on:
+<ul>
+<li><code>View logs</code> - To check logs.
+<ul>
+<li>By default logs filter is set on <code>cluster</code>, clear this.</li>
+<li>Click on <code>Kubernetes containers</code> in filter and select desired <code>pod</code>.
+<ul>
+<li>You also select different options from filter, e.g. - cluster, service, container etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>View GKE Dashboard</code> - For Cloud monitoring.</li>
+</ul>
+</li>
+<li></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 <blockquote>
-<p>Note: This is an <em><strong>important</strong></em> note.</p>
+<p>Note: Ensure following dependencies are present in POM.</p>
 </blockquote>
 <ul>
 <li>
-<p><strong><ins>Notes:</ins></strong></p>
-<ul>
-<li>Some important key point / takeaway note.</li>
-<li>Some takeaway:
-<ul>
-<li>Sub topic takeaway.</li>
-</ul>
-</li>
-</ul>
+<p>implementation platform('io.micrometer:micrometer-tracing-bom:latest.release')</p>
 </li>
 <li>
-<p><strong><ins>Pros &amp; Cons</ins></strong></p>
+<p>implementation 'io.micrometer:micrometer-tracing'</p>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://micrometer.io/docs/tracing">https://micrometer.io/docs/tracing</a></li>
+<li><a href="http://website.com/some-resource-path">xyz service</a></li>
+</ul>
 </li>
 </ul>
-<table>
-<thead>
-<tr>
-<th>Pros</th>
-<th>Cons</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pros 1</td>
-<td>Cons 1</td>
-</tr>
-<tr>
-<td>Pros 2</td>
-<td>Cons 2</td>
-</tr>
-</tbody>
-</table>
+<hr>
+<h2 id="7-google-cloud-gke-configmap---centralized-configuration">7. Google Cloud: GKE ConfigMap - Centralized Configuration</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Provides centerlize configuration.</li>
+<li>A ConfigMap is an API object used to store non-confidential data in key-value pairs.</li>
+<li>Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+<ul>
+<li><strong>Caution:</strong>
+<ul>
+<li>ConfigMap does not provide secrecy or encryption. If the data you want to store are confidential, use a Secret rather than a ConfigMap, or use additional (third party) tools to keep your data private.</li>
+<li>The spec of a static Pod cannot refer to a ConfigMap or any other API objects.</li>
+</ul>
+</li>
+<li><strong>Note:</strong>
+<ul>
+<li>A ConfigMap is not designed to hold large chunks of data. The data stored in a ConfigMap cannot exceed 1 MiB.</li>
+<li>If you need to store settings that are larger than this limit, you may want to consider mounting a volume or use a separate database or file service.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.</li>
+<li>A ConfigMap has data and binaryData fields. These fields accept key-value pairs as their values.
+<ul>
+<li>Both the data field and the binaryData are optional.</li>
+<li>The data field is designed to contain UTF-8 strings while the binaryData field is designed to contain binary data as base64-encoded strings.</li>
+</ul>
+</li>
+<li>The name of a ConfigMap must be a valid <code>DNS subdomain name</code>.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> GKE has microservices running.</li>
+<li><em><strong>Step-1:</strong></em> Create a configMap.
+<ul>
+<li><code>kubectl create configmap currency-conversion-service-openfeign --from-literal=CURRENCY_EXCHANGE_URI=http://currency-exchange-service</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Verify / list the config map
+<ul>
+<li><code>kubectl get configmap currency-conversion-service-openfeign</code></li>
+<li><code>kubectl get configmap currency-conversion-service-openfeign -o yaml</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> We can add the config map content in our <code>deloyment.yaml</code> file.
+<ul>
+<li>Add <code>envFrom</code> declaration in <code>containers</code> to read data from <code>configmap</code>.</li>
+<li>Remove <code>env</code> declaration from <code>containers</code>.</li>
+<li><strong>New File:</strong> <em>deployment-0-3-with-configmap.yaml</em></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Apply the new configuration.
+<ul>
+<li><strong>Difference:</strong>
+<ul>
+<li><code>kubectl diff -f deployment-0-3-with-configmap.yaml</code></li>
+</ul>
+</li>
+<li><strong>Apply:</strong>
+<ul>
+<li><code>kubectl apply -f deployment-0-3-with-configmap.yaml</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: <em><strong>Must</strong></em> veriy the difference before applying the update yaml file. I also helps to validate yaml by throwing error, if there's any syntactical mistakes.</p>
+</blockquote>
 <ul>
 <li><strong><ins>References:</ins></strong>
 <ul>
-<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">https://kubernetes.io/docs/concepts/configuration/configmap/</a></li>
 <li><a href="http://website.com/some-resource-path">xyz service</a></li>
 </ul>
 </li>
