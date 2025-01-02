@@ -28,7 +28,7 @@ spec:
         name: e3-currency-conversion-service-openfeign-kubernetes
         env:
         - name: CURRENCY_EXCHANGE_URI
-          value: currency-exchange-service
+          value: http://currency-exchange-service
       restartPolicy: Always
 ---
 apiVersion: v1
