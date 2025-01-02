@@ -33,7 +33,15 @@ spec:
         #Moved to configMap declaration. Check below 
         #env:
         #- name: CURRENCY_EXCHANGE_URI
-#       #   value: http://currency-exchange-service
+        #   value: http://currency-exchange-service
+        readinessProbe:
+          httpGet:
+            port: 8100
+            path: /actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 8100
+            path: /actuator/health/liveness
       restartPolicy: Always
 ---
 apiVersion: v1
