@@ -468,7 +468,7 @@
   - 
 
 ---
-## 6. Google Cloud: Logging and Tracing [***in progress***]
+## 6. Google Cloud: Logging, Tracing and Monitoring
 - **<ins>About / Introduction</ins>**
   - Centerlized logs for the all services/containers/pods etc.
   - Centerlized monitoring for all services/containers/pods etc.

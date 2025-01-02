@@ -882,17 +882,17 @@
 </li>
 </ul>
 <hr>
-<h2 id="6-google-cloud-logging-and-tracing-in-progress">6. Google Cloud: Logging and Tracing [<em><strong>in progress</strong></em>]</h2>
+<h2 id="6-google-cloud-logging-tracing-and-monitoring">6. Google Cloud: Logging, Tracing and Monitoring</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
 <ul>
-<li>This is abc feature.</li>
-<li>This is xyz feature.</li>
+<li>Centerlized logs for the all services/containers/pods etc.</li>
+<li>Centerlized monitoring for all services/containers/pods etc.</li>
 </ul>
 </li>
 <li><strong><ins>Steps</ins></strong>
 <ul>
-<li><em><strong>Project Setup:</strong></em> Some change/step</li>
+<li><em><strong>Project Setup:</strong></em> Ensure micrometer dependencies are available in latest image.</li>
 <li><em><strong>Step-1:</strong></em> Enable logging and tracing in GCP.
 <ul>
 <li>Navigate to API and Services in GKE, goto <code>API Library</code>.</li>
@@ -927,7 +927,27 @@
 <li><code>View GKE Dashboard</code> - For Cloud monitoring.</li>
 </ul>
 </li>
-<li></li>
+</ul>
+</li>
+<li><em><strong>Logs Explorer:</strong></em>
+<ul>
+<li>We can add conditions in the query panel to filter the logs.</li>
+<li>We can also use id's from log entries to find all logs to that id from query panel.
+<ul>
+<li>E.g. <code>resource.type=&quot;k8s_container&quot; textPayload:&quot;a0f973a78782bd1ec580c444fda324c1&quot;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>GKE Dashboard:</strong></em>
+<ul>
+<li>All matrics for sytem monitoring and resource utilization for cluster, namespaces, Nodes, workloads, services, pods, containers etc.
+<ul>
+<li>eg. CPU, Memory &amp; Disk Utilization.</li>
+<li>Containers restart, error logs etc.</li>
+</ul>
+</li>
+<li>Provides alert service.</li>
 </ul>
 </li>
 </ul>
@@ -947,7 +967,6 @@
 <p><strong><ins>References:</ins></strong></p>
 <ul>
 <li><a href="https://micrometer.io/docs/tracing">https://micrometer.io/docs/tracing</a></li>
-<li><a href="http://website.com/some-resource-path">xyz service</a></li>
 </ul>
 </li>
 </ul>
