@@ -23,6 +23,20 @@
 - **<ins>Purpose / Feature</ins>**
   - Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system. 
   - With the Config Server, you have a central place to manage external properties for applications across all environments. 
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Git Repo setup
+    - Create a new git repo (local or github)
+    - Add required properties files using microervice name - `<microservice-name>[-<env>].properties`
+  - ***Step-2:*** Create a new SpringBoot project.
+    - Add dependency `spring-cloud-config-server`.
+  - ***Step-3:*** Enable as Config Server
+    - Add `@EnableConfigServer` annotation to enable application as config server.
+  - ***Step-4:*** Configure git repo URL.
+    - Add `spring.cloud.config.server.git.uri` in `application.properties`
+  - ***Step-5:*** Git URLs
+    - **Linux:** *file:///path/to/git/directory*
+    - **Windows:** *file:///c:/path/to/git/directory*
+    - **Github:** *https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git*
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -30,6 +44,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-config-server</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - B2SbootCloudConfigServerApplication.java main app.
     - imports
@@ -92,18 +107,30 @@
   - `@EnableConfigServer` annotation:
     - Help enable and configure Config. Server artifacts.
 
-
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server)
-
 ---
+
 ## 02. Develop/Enable cloud config client 
 ### Project ref: *b1-limits-service*
 - **<ins>Purpose / Feature</ins>**
   - A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer). 
   - It also picks up some additional useful features related to Environment change events.
-  - **Config client is enabled by default.  
+  - **Config client is enabled by default.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Add `spring-cloud-starter-config`dependency in *POM.xml*.
+  - ***Step-2:*** Create a configurtion class and annotate it with *ConfigurationProperties* annotation.
+    - Add `prefix` property in annotation as *microservice-name*.
+  - ***Step-3:*** Add desired properties to be read from *Config Server*.
+    - The injection will happen by look-up in config server for property named **prefix.property**.
+    - **Note:** Properties matched in *application.properties* has least priority than config-server properties.
+  - ***Step-4:*** Update *application.properties*
+    - Provide service name to look-up in Config server.
+      - `spring.cloud.config.name=limtis-service`
+      - if above property is missing it will use *spring.application.name=b1-limtis-service*
+    - Configure config-server URL.
+      - `spring.config.import=optional:configserver:http://localhost:8888/`
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -111,6 +138,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - Create a `configurationProperties` class.
     - imports
@@ -163,7 +191,6 @@
 				this.minimum = minimum;
 				this.maximum = maximum;
 			}
-
 			//getter-setters & other methods
 		}
 	```
@@ -193,15 +220,13 @@
 
 		# End: Cloud config client
 
-
 		# Start: local service configuration
 		limits-service.minimum=20
 		limits-service.maximum=21
 
 		app-config.minimum=10
 		app-config.maximum=11
-		# End: local service configuration
-	
+		# End: local service configuration	
 	```
 - **<ins>Notes:</ins>**
   - Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. 
@@ -220,11 +245,9 @@
     - Due to this you may see multiple requests being made to the Spring Cloud Config Server to fetch configuration. 
     - This is normal and is a side effect of how Spring Boot loads configuration when using `spring.config.import`.
 
-
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client)
-
 ---
 
 ## 3. RestTemplate: Connect to other mircoservice
@@ -238,6 +261,15 @@
     - Such instances may use the same underlying ClientHttpRequestFactory if they need to share HTTP client resources.
   - RestTemplate and RestClient share the same infrastructure (i.e. request factories, request interceptors and initializers, message converters, etc.), so any improvements made therein are shared as well. 
     - However, RestClient is the focus for new higher-level features.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** A SpringBoot web project.
+    - *POM.xml dependency:* `spring-boot-starter-web`
+  - ***Step-1:*** Update Configuration class to create bean of RestTemplate.
+    - It uses `RestTemplateBuilder` to build `RestTemplate` object.
+  - ***Step-2:*** Create Java bean / POJO with property names as expected to be received in Rest service response.
+  - ***Step-3:*** AutoWire RestTemplate bean in controller / service class.
+  - ***Step-4:*** Initiate call to rest service.
+    - `restTemplate.getForEntity("http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class, uriVariables);`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -245,45 +277,70 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-- **<ins>Code changes</ins>**
-  - imports
-    - `import org.springframework.web.client.RestTemplate;`
-  - Annotate the method parameter for validation.
-	```java
-				@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
-				public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
-						@PathVariable BigDecimal quantity) {
-
-					logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
-
-					// Standardize
-					from = from.toUpperCase();
-					to = to.toUpperCase();
-
-					final Map<String, String> uriVariables = new HashMap<>();
-					uriVariables.put("from", from);
-					uriVariables.put("to", to);
-					
-					// Send request to Currency exchange micro-service
-					final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
-							"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
-							uriVariables);
-					final CurrencyConversion currencyConversionExchange = response.getBody();
-
-					logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
-
-					final CurrencyConversion currencyConversion = new CurrencyConversion(currencyConversionExchange.getId(), from, to, quantity,
-							currencyConversionExchange.getConversionMultiples(),
-							quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
-					
-					logger.debug("Response returned : {}", currencyConversionExchange);
-					
-					return currencyConversion;
-				}
 	```
-  - imports
-    - `import java.math.BigDecimal;`
-  - Annotate the method parameter for validation.
+- **<ins>Code / Config changes</ins>**
+  - **Configuration:** *RestTemplateConfiguration.java*
+    - imports
+      - org.springframework.boot.web.client.RestTemplateBuilder;
+    - Create Bean of `RestTemplate`
+      ```java
+	  	@Configuration
+		public class RestTemplateConfiguration {
+			@Bean
+			RestTemplate restTemplate(RestTemplateBuilder builder) {
+				return builder.build();
+			}
+		}
+	  ```
+  - **Controller:** *CurrencyConversionController.java*
+      - imports
+        - `import org.springframework.web.client.RestTemplate;`
+      - Autowire restTemplate bean and initiate service call.
+    	```java
+    		@RestController
+    		public class CurrencyConversionController {
+
+    			private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionController.class);
+
+    			@Autowired
+    			private RestTemplate restTemplate;
+
+    			@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
+    			public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
+    					@PathVariable BigDecimal quantity) {
+
+    				logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
+
+    				// Standardize
+    				from = from.toUpperCase();
+    				to = to.toUpperCase();
+
+    				final Map<String, String> uriVariables = new HashMap<>();
+    				uriVariables.put("from", from);
+    				uriVariables.put("to", to);
+
+    				// Send request to Currency exchange micro-service
+    				// final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+    				final ResponseEntity<CurrencyConversion> response = restTemplate.getForEntity(
+    						"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
+    						uriVariables);
+    				final CurrencyConversion currencyConversion = response.getBody();
+
+    				logger.debug("Response from currency-exchange : {}", currencyConversion);
+
+    				currencyConversion.setQuantity(quantity);
+    				currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiples()));
+
+    				logger.debug("Response returned : {}", currencyConversion);
+
+    				return currencyConversion;
+    			}
+    		}
+	```
+  - **Response Bean:** *CurrencyConversion.java*
+    - imports
+      - `import java.math.BigDecimal;`
+    - Annotate the method parameter for validation.
 	```java
 		public class CurrencyConversion {
 
@@ -300,10 +357,8 @@
 	```
 > Note: When using `RestTemplate` we have to write boiler plate code to call rest service. To overcome this, we can use another spring dependency `spring-cloud-openfeign`.
 
-
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html)
-
 ---
 
 ## 4. OpenFeign client: Connect to other mircoservice
@@ -311,6 +366,16 @@
 - **<ins>Purpose / Feature</ins>**
   - Easy way to make rest service calls. 
   - Removes bioler plate code need to be written while using `RestTemplate` to invoke a rest service.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Microservice project with Rest API integration
+  - ***Step-1:*** Enable feign clients on SpringBoot main app using `@EnableFeignClients`.
+  - ***Step-2:*** Create an Interface and annotate it with `@FeignClient` and define a method signature as in target rest service.
+    - `@FeignClient(name = "b3-currency-exchange-service")`
+    - `@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")`
+  - ***Step-2:*** Create an reference object of Interface in controller / service and `@Autowired` it.
+    - `private CurrencyExchangeProxy currencyExchangeProxy;`
+  - ***Step-3:*** Initate rest API call using *proxy* instance.
+    - `final CurrencyConversion currencyConversionExchange = currencyExchangeProxy.retrieveExchangeRateFromDatabase(from, to);`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -318,24 +383,24 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
-
-- **<ins>Code changes</ins>**
-  - Application: Enable feign clients using ***@EnableFeignClients***.
-    - Scans for interfaces that declare they are feign clients `(via org.springframework.cloud.openfeign.FeignClient @FeignClient)`. 
-    - Configures component scanning directives for use with `org.springframework.context.annotation.Configuration @Configuration` classes.
-    -  imports
-       - `import org.springframework.cloud.openfeign.EnableFeignClients;`
-    - Annotate the SpringBoot application to enable feign clients.
-	```java
-		@EnableFeignClients  // Enables feign clients in application
-		@SpringBootApplication
-		public class B4CurrencyConversionServiceApplication {
-
-			public static void main(String[] args) {
-				SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
-			}
-		}
 	```
+- **<ins>Code changes</ins>**
+  - **Application:** 
+    - Enable feign clients using ***@EnableFeignClients***.
+      - Scans for interfaces that declare they are feign clients `(via org.springframework.cloud.openfeign.FeignClient @FeignClient)`. 
+      - Configures component scanning directives for use with `org.springframework.context.annotation.Configuration @Configuration` classes.
+      -  imports
+        - `import org.springframework.cloud.openfeign.EnableFeignClients;`
+      - Annotate the SpringBoot application to enable feign clients.
+		```java
+			@EnableFeignClients  // Enables feign clients in application
+			@SpringBootApplication
+			public class B4CurrencyConversionServiceApplication {
+				public static void main(String[] args) {
+					SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+				}
+			}
+		```
   - Response java bean ***CurrencyConversion.java***.
     - This class must have all the properties expecting from `currency-exchange` service, to support auto population of response data. 
     -  imports
@@ -343,7 +408,6 @@
     - Annotate the SpringBoot application to enable feign clients.
 	```java
 		public class CurrencyConversion {
-
 			private Long id;
 			private String from;
 			private String to;
@@ -351,11 +415,9 @@
 			private BigDecimal quantity;
 			private BigDecimal totalCalculatedAmount;
 			private String environment;
-
 			// constructors, setter-getters.
 		}
 	```
-
   - Create an feign client interface ***CurrencyExchangeProxy.java***
     -  imports
        - `import org.springframework.cloud.openfeign.FeignClient;`
@@ -377,7 +439,7 @@
 	- Controller/Service to use feign client interface.
     -  imports
        - `import org.springframework.cloud.openfeign.FeignClient;`
-    - Add validation in the properties of the bean.
+    - Use *proxy* class to call rest service.
 	```java
 		@RestController
 		public class CurrencyConversionController {
@@ -427,7 +489,6 @@
 - **<ins>References:</ins>**
   - [https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html](https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html)
   - [https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
-
 ---
 
 ## 5. Service Registry / Naming server : Eureka naming server
@@ -436,6 +497,13 @@
   - It's an application that contains information about all micro services including the name of the service, port, and IP address. 
   - Each microservice has to register itself with the Eureka Server.
   - Service is available at `/` context. [http://localhost:8761/](http://localhost:8761/) 
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Create a new SpringBoot project.
+  - ***Step-2:*** *POM.xml:* Add dependency of `spring-cloud-starter-netflix-eureka-server`.
+  - ***Step-3:*** Add *@EnableEurekaServer* annotation in main app to enable eureka on this project.
+  - ***Step-4:*** Add Eureka config in `application.properties`
+    - Restricts to register it self to eureka: `eureka.client.register-with-eureka=false`
+    - Do not fetch registry info from eureka: `eureka.client.fetch-registry=false`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -443,6 +511,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - **Controller:** *AbcController.java*
     - imports
@@ -488,9 +557,11 @@
 - **<ins>Purpose / Feature</ins>**
   - Register's the micro-service to Name server.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Add Eureka client in POM.xml
-  - ***Step-2:*** Configure eureka server URI in application.properties
-   
+  - ***Step-1:*** 
+    - *POM.xml* Add Eureka client - *spring-cloud-netflix-eureka-client*.
+  - ***Step-2:*** 
+    - Configure eureka server URI in *application.properties*
+      - `eureka.client.service-url.defaultZone=http://localhost:8761/eureka`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -498,6 +569,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-netflix-eureka-client</artifactId>
 		</dependency>
+	```
 - **<ins>Config changes</ins>**
   - **Application Config:** *application.properties*
 	```properties
@@ -511,20 +583,21 @@
 
 		# End: Eureka client config
 	```
-
 > Note: If `Eureka client` dependency is present in `POM.xml`, spring will automatically try to register this service to Naming server by looking for `Eureka Server` on it's default `Eureka port - 8761`.
-
 ---
-
 ## 7. Client side Load Balancing microservices
 ### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
-  - ***Step-2:*** Add eureka properties in `application.propeties`.
-  - ***Step-3:*** Update the feign client ***@FeignClient*** `annotation` and remove `url` property.
-  - ***Step-4:*** Restart your service and verify in eureka server that your micro-service is regitered.
+  - ***Step-1:*** 
+    - Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
+  - ***Step-2:*** 
+    - Add eureka properties in `application.propeties`.
+  - ***Step-3:*** 
+    - Update the feign client ***@FeignClient*** `annotation` and remove `url` property.
+  - ***Step-4:*** 
+    - Restart your service and verify in eureka server that your micro-service is regitered.
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -532,6 +605,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
 		</dependency>
+	```
 - **<ins>Code / Config changes</ins>**
   - **Feign Client:** *AbcController.java*
     - imports
@@ -542,7 +616,6 @@
 		/* Find service details from name server using service name. */
 		@FeignClient(name = "b3-currency-exchange-service") 
 		public interface CurrencyExchangeProxy {
-
 			/**
 			* Method as defined in the host service.
 			* @param from
@@ -575,7 +648,6 @@
 
 		# End: Eureka client config
 
-
 		# Start: Spring Load Balancer
 
 		# Enable load balancer.
@@ -585,7 +657,6 @@
 		spring.cloud.loadbalancer.retry.enabled=true
 
 		# End: Spring Load Balancer
-
 
 		# Start: Cloud config client
 
@@ -604,14 +675,12 @@
 		# End: Cloud config client
 	```
 	
-> Note: 
+> **Note:**
 > With service name it finds the server details from `Eureka Server`.
 > `spring-load-balancer` is mandatory dependency with feign client.
 
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html](https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html)
-
-
 ---
 
 ## 8. API Gateway

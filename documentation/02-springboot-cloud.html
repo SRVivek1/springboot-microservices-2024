@@ -157,37 +157,37 @@
 <tr>
 <td>Limits Microservice</td>
 <td><em>8080, 8081, etc.</em></td>
-<td>~</td>
+<td>POC app developed</td>
 </tr>
 <tr>
 <td>Spring Cloud Config Server</td>
 <td><em>8888</em></td>
-<td>Port 8888 is default port for config srver as per spring docs.</td>
+<td>It is default port for config srver as per spring docs.</td>
 </tr>
 <tr>
 <td>Currency Exchange Microservice</td>
 <td><em>8000, 8001, 8002, etc.</em></td>
-<td>~</td>
+<td>POC app developed</td>
 </tr>
 <tr>
 <td>Currency Conversion Microservice</td>
 <td><em>8100, 8101, 8102, etc.</em></td>
-<td>~</td>
+<td>POC app developed</td>
 </tr>
 <tr>
-<td>Netflix Eureka Naming Server</td>
+<td>Netflix Eureka</td>
 <td><em>8761</em></td>
-<td>~</td>
+<td>Naming Server</td>
 </tr>
 <tr>
 <td>API Gateway</td>
 <td><em>8765</em></td>
-<td>~</td>
+<td>Entry point to all external requests.</td>
 </tr>
 <tr>
-<td>Zipkin Distributed Tracing Server</td>
+<td>Zipkin</td>
 <td><em>9411</em></td>
-<td>~</td>
+<td>Distributed Tracing Server</td>
 </tr>
 </tbody>
 </table>
@@ -200,6 +200,39 @@
 <ul>
 <li>Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system.</li>
 <li>With the Config Server, you have a central place to manage external properties for applications across all environments.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Git Repo setup
+<ul>
+<li>Create a new git repo (local or github)</li>
+<li>Add required properties files using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create a new SpringBoot project.
+<ul>
+<li>Add dependency <code>spring-cloud-config-server</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Enable as Config Server
+<ul>
+<li>Add <code>@EnableConfigServer</code> annotation to enable application as config server.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Configure git repo URL.
+<ul>
+<li>Add <code>spring.cloud.config.server.git.uri</code> in <code>application.properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Git URLs
+<ul>
+<li><strong>Linux:</strong> <em>file:///path/to/git/directory</em></li>
+<li><strong>Windows:</strong> <em>file:///c:/path/to/git/directory</em></li>
+<li><strong>Github:</strong> <em><a href="https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git">https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</a></em></li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -311,6 +344,38 @@
 </ul>
 </li>
 <li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-config</code>dependency in <em>POM.xml</em>.</li>
+<li><em><strong>Step-2:</strong></em> Create a configurtion class and annotate it with <em>ConfigurationProperties</em> annotation.
+<ul>
+<li>Add <code>prefix</code> property in annotation as <em>microservice-name</em>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Add desired properties to be read from <em>Config Server</em>.
+<ul>
+<li>The injection will happen by look-up in config server for property named <strong>prefix.property</strong>.</li>
+<li><strong>Note:</strong> Properties matched in <em>application.properties</em> has least priority than config-server properties.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Update <em>application.properties</em>
+<ul>
+<li>Provide service name to look-up in Config server.
+<ul>
+<li><code>spring.cloud.config.name=limtis-service</code></li>
+<li>if above property is missing it will use <em>spring.application.name=b1-limtis-service</em></li>
+</ul>
+</li>
+<li>Configure config-server URL.
+<ul>
+<li><code>spring.config.import=optional:configserver:http://localhost:8888/</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
 <p><strong><ins>Maven / External dependency</ins></strong></p>
 <ul>
 <li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
@@ -383,7 +448,6 @@
 			<span class="hljs-built_in">this</span>.minimum = minimum;
 			<span class="hljs-built_in">this</span>.maximum = maximum;
 		}
-
 		<span class="hljs-comment">//getter-setters &amp; other methods</span>
 	}
 </code></pre>
@@ -412,15 +476,13 @@
 <span class="hljs-comment">
 	# End: Cloud config client</span>
 <span class="hljs-comment">
-
 	# Start: local service configuration</span>
 	<span class="hljs-attr">limits-service.minimum</span>=<span class="hljs-string">20</span>
 	<span class="hljs-attr">limits-service.maximum</span>=<span class="hljs-string">21</span>
 
 	<span class="hljs-attr">app-config.minimum</span>=<span class="hljs-string">10</span>
 	<span class="hljs-attr">app-config.maximum</span>=<span class="hljs-string">11</span>
-<span class="hljs-comment">	# End: local service configuration</span>
-
+<span class="hljs-comment">	# End: local service configuration	</span>
 </code></pre>
 </li>
 </ul>
@@ -480,6 +542,27 @@
 </li>
 </ul>
 </li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> A SpringBoot web project.
+<ul>
+<li><em>POM.xml dependency:</em> <code>spring-boot-starter-web</code></li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Update Configuration class to create bean of RestTemplate.
+<ul>
+<li>It uses <code>RestTemplateBuilder</code> to build <code>RestTemplate</code> object.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create Java bean / POJO with property names as expected to be received in Rest service response.</li>
+<li><em><strong>Step-3:</strong></em> AutoWire RestTemplate bean in controller / service class.</li>
+<li><em><strong>Step-4:</strong></em> Initiate call to rest service.
+<ul>
+<li><code>restTemplate.getForEntity(&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;, CurrencyConversion.class, uriVariables);</code></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
@@ -490,51 +573,87 @@
 </li>
 </ul>
 </li>
-<li><strong><ins>Code changes</ins></strong>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Configuration:</strong> <em>RestTemplateConfiguration.java</em>
+<ul>
+<li>imports
+<ul>
+<li>org.springframework.boot.web.client.RestTemplateBuilder;</li>
+</ul>
+</li>
+<li>Create Bean of <code>RestTemplate</code><pre><code class="language-java">	<span class="hljs-meta">@Configuration</span>
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestTemplateConfiguration</span> {
+  	<span class="hljs-meta">@Bean</span>
+  	RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">(RestTemplateBuilder builder)</span> {
+  		<span class="hljs-keyword">return</span> builder.build();
+  	}
+  }
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong>Controller:</strong> <em>CurrencyConversionController.java</em>
 <ul>
 <li>imports
 <ul>
 <li><code>import org.springframework.web.client.RestTemplate;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.<pre><code class="language-java">			<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
-			<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
-					<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+<li>Autowire restTemplate bean and initiate service call.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
 
-				logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CurrencyConversionController.class);
 
-				<span class="hljs-comment">// Standardize</span>
-				from = from.toUpperCase();
-				to = to.toUpperCase();
+		<span class="hljs-meta">@Autowired</span>
+		<span class="hljs-keyword">private</span> RestTemplate restTemplate;
 
-				<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
-				uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
-				uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
-				
-				<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
-				<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>().getForEntity(
-						<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
-						uriVariables);
-				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+		<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+				<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
 
-				logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+			logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
 
-				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from, to, quantity,
-						currencyConversionExchange.getConversionMultiples(),
-						quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
-				
-				logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
-				
-				<span class="hljs-keyword">return</span> currencyConversion;
-			}
+			<span class="hljs-comment">// Standardize</span>
+			from = from.toUpperCase();
+			to = to.toUpperCase();
+
+			<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+			uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+			uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+
+			<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+			<span class="hljs-comment">// final ResponseEntity&lt;CurrencyConversion&gt; response = new RestTemplate().getForEntity(</span>
+			<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = restTemplate.getForEntity(
+					<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+					uriVariables);
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> response.getBody();
+
+			logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversion);
+
+			currencyConversion.setQuantity(quantity);
+			currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiples()));
+
+			logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversion);
+
+			<span class="hljs-keyword">return</span> currencyConversion;
+		}
+	}
 </code></pre>
 </li>
+</ul>
+<pre><code></code></pre>
+</li>
+<li><strong>Response Bean:</strong> <em>CurrencyConversion.java</em>
+<ul>
 <li>imports
 <ul>
 <li><code>import java.math.BigDecimal;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
 
 		<span class="hljs-keyword">private</span> Long id;
 		<span class="hljs-keyword">private</span> String from;
@@ -565,52 +684,68 @@
 <h2 id="4-openfeign-client-connect-to-other-mircoservice">4. OpenFeign client: Connect to other mircoservice</h2>
 <h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
-<li>
-<p><strong><ins>Purpose / Feature</ins></strong></p>
+<li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>Easy way to make rest service calls.</li>
 <li>Removes bioler plate code need to be written while using <code>RestTemplate</code> to invoke a rest service.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Microservice project with Rest API integration</li>
+<li><em><strong>Step-1:</strong></em> Enable feign clients on SpringBoot main app using <code>@EnableFeignClients</code>.</li>
+<li><em><strong>Step-2:</strong></em> Create an Interface and annotate it with <code>@FeignClient</code> and define a method signature as in target rest service.
+<ul>
+<li><code>@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</code></li>
+<li><code>@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create an reference object of Interface in controller / service and <code>@Autowired</code> it.
+<ul>
+<li><code>private CurrencyExchangeProxy currencyExchangeProxy;</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Initate rest API call using <em>proxy</em> instance.
+<ul>
+<li><code>final CurrencyConversion currencyConversionExchange = currencyExchangeProxy.retrieveExchangeRateFromDatabase(from, to);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
-
 </code></pre>
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Code changes</ins></strong></p>
+<li><strong><ins>Code changes</ins></strong>
 <ul>
-<li>
-<p>Application: Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.</p>
+<li><strong>Application:</strong>
+<ul>
+<li>Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.
 <ul>
 <li>Scans for interfaces that declare they are feign clients <code>(via org.springframework.cloud.openfeign.FeignClient @FeignClient)</code>.</li>
 <li>Configures component scanning directives for use with <code>org.springframework.context.annotation.Configuration @Configuration</code> classes.</li>
-<li>imports
-<ul>
+<li>imports</li>
 <li><code>import org.springframework.cloud.openfeign.EnableFeignClients;</code></li>
-</ul>
-</li>
-<li>Annotate the SpringBoot application to enable feign clients.</li>
-</ul>
-<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
+<li>Annotate the SpringBoot application to enable feign clients.<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
 	<span class="hljs-meta">@SpringBootApplication</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B4CurrencyConversionServiceApplication</span> {
-
 		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
 			SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
 		}
 	}
 </code></pre>
 </li>
-<li>
-<p>Response java bean <em><strong>CurrencyConversion.java</strong></em>.</p>
+</ul>
+</li>
+</ul>
+</li>
+<li>Response java bean <em><strong>CurrencyConversion.java</strong></em>.
 <ul>
 <li>This class must have all the properties expecting from <code>currency-exchange</code> service, to support auto population of response data.</li>
 <li>imports
@@ -621,7 +756,6 @@
 <li>Annotate the SpringBoot application to enable feign clients.</li>
 </ul>
 <pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
-
 		<span class="hljs-keyword">private</span> Long id;
 		<span class="hljs-keyword">private</span> String from;
 		<span class="hljs-keyword">private</span> String to;
@@ -629,13 +763,11 @@
 		<span class="hljs-keyword">private</span> BigDecimal quantity;
 		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
 		<span class="hljs-keyword">private</span> String environment;
-
 		<span class="hljs-comment">// constructors, setter-getters.</span>
 	}
 </code></pre>
 </li>
-<li>
-<p>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em></p>
+<li>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em>
 <ul>
 <li>imports
 <ul>
@@ -664,7 +796,7 @@
 <li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
 </ul>
 </li>
-<li>Add validation in the properties of the bean.</li>
+<li>Use <em>proxy</em> class to call rest service.</li>
 </ul>
 <pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
@@ -734,6 +866,19 @@
 <li>Service is available at <code>/</code> context. <a href="http://localhost:8761/">http://localhost:8761/</a></li>
 </ul>
 </li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Create a new SpringBoot project.</li>
+<li><em><strong>Step-2:</strong></em> <em>POM.xml:</em> Add dependency of <code>spring-cloud-starter-netflix-eureka-server</code>.</li>
+<li><em><strong>Step-3:</strong></em> Add <em>@EnableEurekaServer</em> annotation in main app to enable eureka on this project.</li>
+<li><em><strong>Step-4:</strong></em> Add Eureka config in <code>application.properties</code>
+<ul>
+<li>Restricts to register it self to eureka: <code>eureka.client.register-with-eureka=false</code></li>
+<li>Do not fetch registry info from eureka: <code>eureka.client.fetch-registry=false</code></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
@@ -797,21 +942,30 @@
 <h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
 <h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
-<li>
-<p><strong><ins>Purpose / Feature</ins></strong></p>
+<li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>Register's the micro-service to Name server.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Steps</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add Eureka client in POM.xml</li>
-<li><em><strong>Step-2:</strong></em> Configure eureka server URI in application.properties</li>
+<li><em><strong>Step-1:</strong></em>
+<ul>
+<li><em>POM.xml</em> Add Eureka client - <em>spring-cloud-netflix-eureka-client</em>.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><em><strong>Step-2:</strong></em>
+<ul>
+<li>Configure eureka server URI in <em>application.properties</em>
+<ul>
+<li><code>eureka.client.service-url.defaultZone=http://localhost:8761/eureka</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
@@ -821,8 +975,7 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Config changes</ins></strong></p>
+<li><strong><ins>Config changes</ins></strong>
 <ul>
 <li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment">	# Start: Eureka client config</span>
 <span class="hljs-comment">
@@ -854,10 +1007,26 @@
 <li>
 <p><strong><ins>Steps</ins></strong></p>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
-<li><em><strong>Step-2:</strong></em> Add eureka properties in <code>application.propeties</code>.</li>
-<li><em><strong>Step-3:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
-<li><em><strong>Step-4:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
+<li><em><strong>Step-1:</strong></em>
+<ul>
+<li>Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em>
+<ul>
+<li>Add eureka properties in <code>application.propeties</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em>
+<ul>
+<li>Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em>
+<ul>
+<li>Restart your service and verify in eureka server that your micro-service is regitered.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -887,7 +1056,6 @@
 	<span class="hljs-comment">/* Find service details from name server using service name. */</span>
 	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</span> 
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
-
 		<span class="hljs-comment">/**
 		* Method as defined in the host service.
 		* <span class="hljs-doctag">@param</span> from
@@ -924,7 +1092,6 @@
 <span class="hljs-comment">
 	# End: Eureka client config</span>
 <span class="hljs-comment">
-
 	# Start: Spring Load Balancer</span>
 <span class="hljs-comment">
 	# Enable load balancer.</span>
@@ -935,7 +1102,6 @@
 <span class="hljs-comment">
 	# End: Spring Load Balancer</span>
 <span class="hljs-comment">
-
 	# Start: Cloud config client</span>
 <span class="hljs-comment">
 	# by default it&#x27;s enabled</span>
@@ -955,7 +1121,7 @@
 </li>
 </ul>
 <blockquote>
-<p>Note:
+<p><strong>Note:</strong>
 With service name it finds the server details from <code>Eureka Server</code>.
 <code>spring-load-balancer</code> is mandatory dependency with feign client.</p>
 </blockquote>
