@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,9 @@ import com.srvivek.sboot.mservices.ccs.bean.CurrencyConversion;
 public class CurrencyConversionController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionController.class);
+
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
 	public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
@@ -32,21 +36,21 @@ public class CurrencyConversionController {
 		final Map<String, String> uriVariables = new HashMap<>();
 		uriVariables.put("from", from);
 		uriVariables.put("to", to);
-		
+
 		// Send request to Currency exchange micro-service
-		final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+		// final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+		final ResponseEntity<CurrencyConversion> response = restTemplate.getForEntity(
 				"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
 				uriVariables);
-		final CurrencyConversion currencyConversionExchange = response.getBody();
+		final CurrencyConversion currencyConversion = response.getBody();
 
-		logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
+		logger.debug("Response from currency-exchange : {}", currencyConversion);
 
-		final CurrencyConversion currencyConversion = new CurrencyConversion(currencyConversionExchange.getId(), from, to, quantity,
-				currencyConversionExchange.getConversionMultiples(),
-				quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
-		
-		logger.debug("Response returned : {}", currencyConversionExchange);
-		
+		currencyConversion.setQuantity(quantity);
+		currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiples()));
+
+		logger.debug("Response returned : {}", currencyConversion);
+
 		return currencyConversion;
 	}
 }

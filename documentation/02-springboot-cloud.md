@@ -264,6 +264,15 @@
     - Such instances may use the same underlying ClientHttpRequestFactory if they need to share HTTP client resources.
   - RestTemplate and RestClient share the same infrastructure (i.e. request factories, request interceptors and initializers, message converters, etc.), so any improvements made therein are shared as well. 
     - However, RestClient is the focus for new higher-level features.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** A SpringBoot web project.
+    - *POM.xml dependency:* `spring-boot-starter-web`
+  - ***Step-1:*** Update Configuration class to create bean of RestTemplate.
+    - It uses `RestTemplateBuilder` to build `RestTemplate` object.
+  - ***Step-2:*** Create Java bean / POJO with property names as expected to be received in Rest service response.
+  - ***Step-3:*** AutoWire RestTemplate bean in controller / service class.
+  - ***Step-4:*** Initiate call to rest service.
+    - `restTemplate.getForEntity("http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class, uriVariables);`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -271,41 +280,64 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-- **<ins>Code changes</ins>**
-  - imports
-    - `import org.springframework.web.client.RestTemplate;`
-  - Annotate the method parameter for validation.
-	```java
-				@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
-				public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
-						@PathVariable BigDecimal quantity) {
+- **<ins>Code / Config changes</ins>**
+  - **Configuration:** *RestTemplateConfiguration.java*
+    - imports
+      - org.springframework.boot.web.client.RestTemplateBuilder;
+    - Create Bean of `RestTemplate`
+      ```java
+	  	@Configuration
+		public class RestTemplateConfiguration {
+			@Bean
+			RestTemplate restTemplate(RestTemplateBuilder builder) {
+				return builder.build();
+			}
+		}
+	  ```
+  - **Controller:** *CurrencyConversionController.java*
+      - imports
+        - `import org.springframework.web.client.RestTemplate;`
+      - Autowire restTemplate bean and initiate service call.
+    	```java
+    		@RestController
+    		public class CurrencyConversionController {
 
-					logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
+    			private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionController.class);
 
-					// Standardize
-					from = from.toUpperCase();
-					to = to.toUpperCase();
+    			@Autowired
+    			private RestTemplate restTemplate;
 
-					final Map<String, String> uriVariables = new HashMap<>();
-					uriVariables.put("from", from);
-					uriVariables.put("to", to);
-					
-					// Send request to Currency exchange micro-service
-					final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
-							"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
-							uriVariables);
-					final CurrencyConversion currencyConversionExchange = response.getBody();
+    			@GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
+    			public CurrencyConversion calculateCurrencyConversion(@PathVariable String from, @PathVariable String to,
+    					@PathVariable BigDecimal quantity) {
 
-					logger.debug("Response from currency-exchange : {}", currencyConversionExchange);
+    				logger.info("Executing CurrencyConversionController.calculateCurrencyConversion(..) API.");
 
-					final CurrencyConversion currencyConversion = new CurrencyConversion(currencyConversionExchange.getId(), from, to, quantity,
-							currencyConversionExchange.getConversionMultiples(),
-							quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
-					
-					logger.debug("Response returned : {}", currencyConversionExchange);
-					
-					return currencyConversion;
-				}
+    				// Standardize
+    				from = from.toUpperCase();
+    				to = to.toUpperCase();
+
+    				final Map<String, String> uriVariables = new HashMap<>();
+    				uriVariables.put("from", from);
+    				uriVariables.put("to", to);
+
+    				// Send request to Currency exchange micro-service
+    				// final ResponseEntity<CurrencyConversion> response = new RestTemplate().getForEntity(
+    				final ResponseEntity<CurrencyConversion> response = restTemplate.getForEntity(
+    						"http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class,
+    						uriVariables);
+    				final CurrencyConversion currencyConversion = response.getBody();
+
+    				logger.debug("Response from currency-exchange : {}", currencyConversion);
+
+    				currencyConversion.setQuantity(quantity);
+    				currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiples()));
+
+    				logger.debug("Response returned : {}", currencyConversion);
+
+    				return currencyConversion;
+    			}
+    		}
 	```
   - imports
     - `import java.math.BigDecimal;`
@@ -325,7 +357,6 @@
 		}
 	```
 > Note: When using `RestTemplate` we have to write boiler plate code to call rest service. To overcome this, we can use another spring dependency `spring-cloud-openfeign`.
-
 
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html)

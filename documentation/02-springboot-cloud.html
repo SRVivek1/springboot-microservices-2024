@@ -544,6 +544,27 @@
 </li>
 </ul>
 </li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> A SpringBoot web project.
+<ul>
+<li><em>POM.xml dependency:</em> <code>spring-boot-starter-web</code></li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Update Configuration class to create bean of RestTemplate.
+<ul>
+<li>It uses <code>RestTemplateBuilder</code> to build <code>RestTemplate</code> object.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create Java bean / POJO with property names as expected to be received in Rest service response.</li>
+<li><em><strong>Step-3:</strong></em> AutoWire RestTemplate bean in controller / service class.</li>
+<li><em><strong>Step-4:</strong></em> Initiate call to rest service.
+<ul>
+<li><code>restTemplate.getForEntity(&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;, CurrencyConversion.class, uriVariables);</code></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
@@ -554,44 +575,76 @@
 </li>
 </ul>
 </li>
-<li><strong><ins>Code changes</ins></strong>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Configuration:</strong> <em>RestTemplateConfiguration.java</em>
+<ul>
+<li>imports
+<ul>
+<li>org.springframework.boot.web.client.RestTemplateBuilder;</li>
+</ul>
+</li>
+<li>Create Bean of <code>RestTemplate</code><pre><code class="language-java">	<span class="hljs-meta">@Configuration</span>
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestTemplateConfiguration</span> {
+  	<span class="hljs-meta">@Bean</span>
+  	RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">(RestTemplateBuilder builder)</span> {
+  		<span class="hljs-keyword">return</span> builder.build();
+  	}
+  }
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong>Controller:</strong> <em>CurrencyConversionController.java</em>
 <ul>
 <li>imports
 <ul>
 <li><code>import org.springframework.web.client.RestTemplate;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.<pre><code class="language-java">			<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
-			<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
-					<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+<li>Autowire restTemplate bean and initiate service call.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
 
-				logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CurrencyConversionController.class);
 
-				<span class="hljs-comment">// Standardize</span>
-				from = from.toUpperCase();
-				to = to.toUpperCase();
+		<span class="hljs-meta">@Autowired</span>
+		<span class="hljs-keyword">private</span> RestTemplate restTemplate;
 
-				<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
-				uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
-				uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
-				
-				<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
-				<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>().getForEntity(
-						<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
-						uriVariables);
-				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+		<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+				<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
 
-				logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+			logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
 
-				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from, to, quantity,
-						currencyConversionExchange.getConversionMultiples(),
-						quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
-				
-				logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
-				
-				<span class="hljs-keyword">return</span> currencyConversion;
-			}
+			<span class="hljs-comment">// Standardize</span>
+			from = from.toUpperCase();
+			to = to.toUpperCase();
+
+			<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+			uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+			uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+
+			<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+			<span class="hljs-comment">// final ResponseEntity&lt;CurrencyConversion&gt; response = new RestTemplate().getForEntity(</span>
+			<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = restTemplate.getForEntity(
+					<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+					uriVariables);
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> response.getBody();
+
+			logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversion);
+
+			currencyConversion.setQuantity(quantity);
+			currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiples()));
+
+			logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversion);
+
+			<span class="hljs-keyword">return</span> currencyConversion;
+		}
+	}
 </code></pre>
+</li>
+</ul>
+<pre><code></code></pre>
 </li>
 <li>imports
 <ul>
