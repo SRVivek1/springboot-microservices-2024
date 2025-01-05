@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Spring Cloud Reference Doc&lbrack;3&period;4&period;0&rbrack;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="spring-cloud-reference-doc340">Spring Cloud Reference Doc[3.4.0]</h1>
+<pre><code>- This documentation is created for reference from the Spring cloud POC we have developed in this turotial
+</code></pre>
+<hr>
+<h2 id="00-port-standardization">00. Port standardization</h2>
+<ul>
+<li>Below are be the port specific to each service we'l be developing in this tutorial.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>Application</strong></th>
+<th><strong>Port</strong></th>
+<th><strong>Info</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Limits Microservice</td>
+<td><em>8080, 8081, etc.</em></td>
+<td>POC app developed</td>
+</tr>
+<tr>
+<td>Spring Cloud Config Server</td>
+<td><em>8888</em></td>
+<td>It is default port for config srver as per spring docs.</td>
+</tr>
+<tr>
+<td>Currency Exchange Microservice</td>
+<td><em>8000, 8001, 8002, etc.</em></td>
+<td>POC app developed</td>
+</tr>
+<tr>
+<td>Currency Conversion Microservice</td>
+<td><em>8100, 8101, 8102, etc.</em></td>
+<td>POC app developed</td>
+</tr>
+<tr>
+<td>Netflix Eureka</td>
+<td><em>8761</em></td>
+<td>Naming Server</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td><em>8765</em></td>
+<td>Entry point to all external requests.</td>
+</tr>
+<tr>
+<td>Zipkin</td>
+<td><em>9411</em></td>
+<td>Distributed Tracing Server</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="01-develop-cloud-config-server">01. Develop cloud config server</h2>
+<h3 id="project-ref-b2-sboot-cloud-config-server">Project ref: <em>b2-sboot-cloud-config-server</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system.</li>
+<li>With the Config Server, you have a central place to manage external properties for applications across all environments.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Git Repo setup
+<ul>
+<li>Create a new git repo (local or github)</li>
+<li>Add required properties files using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create a new SpringBoot project.
+<ul>
+<li>Add dependency <code>spring-cloud-config-server</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Enable as Config Server
+<ul>
+<li>Add <code>@EnableConfigServer</code> annotation to enable application as config server.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Configure git repo URL.
+<ul>
+<li>Add <code>spring.cloud.config.server.git.uri</code> in <code>application.properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Git URLs
+<ul>
+<li><strong>Linux:</strong> <em>file:///path/to/git/directory</em></li>
+<li><strong>Windows:</strong> <em>file:///c:/path/to/git/directory</em></li>
+<li><strong>Github:</strong> <em><a href="https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git">https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</a></em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-config-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>B2SbootCloudConfigServerApplication.java main app.
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.config.server.EnableConfigServer;</code></li>
+<li>Config server is enabled by adding annotation on main app.<pre><code class="language-java">	<span class="hljs-comment">/* Enable config server. */</span>
+	<span class="hljs-meta">@EnableConfigServer</span> 
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B2SbootCloudConfigServerApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B2SbootCloudConfigServerApplication.class, args);
+		}
+
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>application.properties</strong><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b2-sboot-cloud-config-server</span>
+<span class="hljs-comment">
+	# Server port for config server</span>
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8888</span>
+<span class="hljs-comment">
+	# Start: Git repo config</span>
+<span class="hljs-comment">
+	# Github.com</span>
+	<span class="hljs-attr">spring.cloud.config.server.git.uri</span>=<span class="hljs-string">https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</span>
+<span class="hljs-comment">
+	# local git</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///home/srvivek/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">
+	# windows</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///c:/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">
+	# End: Git repo config</span>
+</code></pre>
+</li>
+<li><strong>Git repo</strong>
+<ul>
+<li>In git repo, create propertie file using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code> in the base directory.<pre><code class="language-properties">	<span class="hljs-attr">./limits-service-prod.properties</span>
+	<span class="hljs-attr">./limits-service-dev.properties</span>
+	<span class="hljs-attr">./limits-service.properties</span>
+	<span class="hljs-attr">./limits-service-qa.properties</span>
+	<span class="hljs-attr">./currency-exchange-service.properties</span>
+
+</code></pre>
+</li>
+<li>Content<pre><code class="language-properties">	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.minimum=8</span>
+	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.maximum=888</span>
+	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.minimum=1</span>
+	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.maximum=111</span>
+	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.minimum=3</span>
+	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.maximum=333</span>
+	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.minimum=6</span>
+	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.maximum=666</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>@EnableConfigServer</code> annotation:
+<ul>
+<li>Help enable and configure Config. Server artifacts.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="02-developenable-cloud-config-client">02. Develop/Enable cloud config client</h2>
+<h3 id="project-ref-b1-limits-service">Project ref: <em>b1-limits-service</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer).</li>
+<li>It also picks up some additional useful features related to Environment change events.</li>
+<li>**Config client is enabled by default.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-config</code>dependency in <em>POM.xml</em>.</li>
+<li><em><strong>Step-2:</strong></em> Create a configurtion class and annotate it with <em>ConfigurationProperties</em> annotation.
+<ul>
+<li>Add <code>prefix</code> property in annotation as <em>microservice-name</em>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Add desired properties to be read from <em>Config Server</em>.
+<ul>
+<li>The injection will happen by look-up in config server for property named <strong>prefix.property</strong>.</li>
+<li><strong>Note:</strong> Properties matched in <em>application.properties</em> has least priority than config-server properties.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Update <em>application.properties</em>
+<ul>
+<li>Provide service name to look-up in Config server.
+<ul>
+<li><code>spring.cloud.config.name=limtis-service</code></li>
+<li>if above property is missing it will use <em>spring.application.name=b1-limtis-service</em></li>
+</ul>
+</li>
+<li>Configure config-server URL.
+<ul>
+<li><code>spring.config.import=optional:configserver:http://localhost:8888/</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-config<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>Create a <code>configurationProperties</code> class.
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.boot.context.properties.ConfigurationProperties;</code></li>
+</ul>
+</li>
+<li>Annotate the class for injecting properties.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@ConfigurationProperties(prefix = &quot;limits-service&quot;)</span>
+	<span class="hljs-meta">@Component</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LimitsServiceConfiguration</span> {
+
+		<span class="hljs-comment">// it will match to property named - limits-service.minimum</span>
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> minimum;
+
+		<span class="hljs-comment">// it will match to property named - limits-service.maximum</span>
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> maximum;
+
+		<span class="hljs-comment">// constructors, getter-setters.</span>
+	}
+</code></pre>
+</li>
+<li>Controller / Service class
+<ul>
+<li>imports
+<ul>
+<li><code>None specific to config client.</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LimitsServiceController</span> {
+
+		<span class="hljs-meta">@Autowired</span>
+		LimitsServiceConfiguration limitsServiceConfiguration;
+
+		<span class="hljs-comment">/**
+		* Read property value from application.properties.
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/limits&quot;)</span>
+		<span class="hljs-keyword">public</span> Limits <span class="hljs-title function_">retrieveLimits</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Limits</span>(limitsServiceConfiguration.getMinimum(), limitsServiceConfiguration.getMaximum());
+		}
+	}
+</code></pre>
+</li>
+<li>Limits Java bean to represent the data in one unit<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Limits</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> minimum;
+		<span class="hljs-keyword">private</span> <span class="hljs-type">int</span> maximum;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">Limits</span><span class="hljs-params">(<span class="hljs-type">int</span> minimum, <span class="hljs-type">int</span> maximum)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.minimum = minimum;
+			<span class="hljs-built_in">this</span>.maximum = maximum;
+		}
+		<span class="hljs-comment">//getter-setters &amp; other methods</span>
+	}
+</code></pre>
+</li>
+<li>application.properties<pre><code class="language-properties"><span class="hljs-comment">	#spring.profiles.active=dev,qa</span>
+<span class="hljs-comment">
+	# Start: Cloud config client</span>
+<span class="hljs-comment">
+	# Mention profile for default use.</span>
+<span class="hljs-comment">	# spring.cloud.config.profile=default</span>
+	<span class="hljs-attr">spring.cloud.config.profile</span>=<span class="hljs-string">dev</span>
+<span class="hljs-comment">	#spring.cloud.config.profile=qa</span>
+<span class="hljs-comment">
+	# Provide name for this services, used to match for available properties file.</span>
+<span class="hljs-comment">	# for dev profile it will check the file name - limits-service-dev.properties in config. server.</span>
+	<span class="hljs-attr">spring.cloud.config.name</span>=<span class="hljs-string">limits-service</span>
+<span class="hljs-comment">
+	# this part is mandatory if config client dependency is added in POM to start the app.</span>
+<span class="hljs-comment">	#spring.config.import=optional:configserver:</span>
+<span class="hljs-comment">
+	# 8888 - it&#x27;s default port for config server</span>
+	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:http://localhost:8888/</span>
+<span class="hljs-comment">
+	# To enable/disable remote configuration, by default is enabled </span>
+<span class="hljs-comment">	#spring.cloud.config.enabled=false </span>
+<span class="hljs-comment">
+	# End: Cloud config client</span>
+<span class="hljs-comment">
+
+	# Start: local service configuration</span>
+	<span class="hljs-attr">limits-service.minimum</span>=<span class="hljs-string">20</span>
+	<span class="hljs-attr">limits-service.maximum</span>=<span class="hljs-string">21</span>
+
+	<span class="hljs-attr">app-config.minimum</span>=<span class="hljs-string">10</span>
+	<span class="hljs-attr">app-config.maximum</span>=<span class="hljs-string">11</span>
+<span class="hljs-comment">	# End: local service configuration</span>
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Spring Boot 2.4 introduced a new way to import configuration data via the <code>spring.config.import</code> property.</li>
+<li>This is now the default way to bind to Config Server.</li>
+<li>To optionally connect to config server set the following in <code>application.properties</code>:<pre><code class="language-properties">	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:</span>
+</code></pre>
+</li>
+<li>This will connect to the Config Server at the default location of <a href="http://localhost:8888">http://localhost:8888</a>.</li>
+<li>Removing the optional: prefix will cause the Config Client to fail if it is unable to connect to Config Server.</li>
+<li>To change the location of Config Server either set <code>spring.cloud.config.uri</code> or add the url to the <code>spring.config.import</code> statement such as, <code>spring.config.import=optional:configserver:http://myhost:8888</code>.</li>
+<li>The location in the import property has precedence over the uri property.</li>
+<li>Spring Boot Config Data resolves configuration in a two step process.
+<ul>
+<li>First it loads all configuration using the default profile. This allows Spring Boot to gather all configuration which may activate any additional profiles.</li>
+<li>After it has gathered all activated profiles it will load any additional configuration for the active profiles.</li>
+<li>Due to this you may see multiple requests being made to the Spring Cloud Config Server to fetch configuration.</li>
+<li>This is normal and is a side effect of how Spring Boot loads configuration when using <code>spring.config.import</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client">https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-resttemplate-connect-to-other-mircoservice">3. RestTemplate: Connect to other mircoservice</h2>
+<h3 id="project-ref-b4-currency-conversion-service">Project ref: <em>b4-currency-conversion-service</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>A synchronous client to perform HTTP requests, exposing a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others.</li>
+<li>RestTemplate offers templates for common scenarios by HTTP method, in addition to the generalized exchange and execute methods that support less frequent cases.</li>
+<li>RestTemplate is typically used as a shared component.
+<ul>
+<li>However, its configuration does not support concurrent modification, and as such its configuration is typically prepared on startup.</li>
+</ul>
+</li>
+<li>If necessary, you can create multiple, differently configured RestTemplate instances on startup.
+<ul>
+<li>Such instances may use the same underlying ClientHttpRequestFactory if they need to share HTTP client resources.</li>
+</ul>
+</li>
+<li>RestTemplate and RestClient share the same infrastructure (i.e. request factories, request interceptors and initializers, message converters, etc.), so any improvements made therein are shared as well.
+<ul>
+<li>However, RestClient is the focus for new higher-level features.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.client.RestTemplate;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.<pre><code class="language-java">			<span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+			<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+					<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+
+				logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+
+				<span class="hljs-comment">// Standardize</span>
+				from = from.toUpperCase();
+				to = to.toUpperCase();
+
+				<span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+				uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+				uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+				
+				<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+				<span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RestTemplate</span>().getForEntity(
+						<span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+						uriVariables);
+				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+
+				logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+
+				<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from, to, quantity,
+						currencyConversionExchange.getConversionMultiples(),
+						quantity.multiply(currencyConversionExchange.getConversionMultiples()), currencyConversionExchange.getEnvironment());
+				
+				logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+				
+				<span class="hljs-keyword">return</span> currencyConversion;
+			}
+</code></pre>
+</li>
+<li>imports
+<ul>
+<li><code>import java.math.BigDecimal;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+
+		<span class="hljs-keyword">private</span> Long id;
+		<span class="hljs-keyword">private</span> String from;
+		<span class="hljs-keyword">private</span> String to;
+		<span class="hljs-keyword">private</span> BigDecimal conversionMultiples;
+		<span class="hljs-keyword">private</span> BigDecimal quantity;
+		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
+		<span class="hljs-keyword">private</span> String environment;
+
+		<span class="hljs-comment">// contructors, setter-getters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: When using <code>RestTemplate</code> we have to write boiler plate code to call rest service. To overcome this, we can use another spring dependency <code>spring-cloud-openfeign</code>.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html">https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-openfeign-client-connect-to-other-mircoservice">4. OpenFeign client: Connect to other mircoservice</h2>
+<h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <em>b5-currency-conversion-service-openfeign</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Easy way to make rest service calls.</li>
+<li>Removes bioler plate code need to be written while using <code>RestTemplate</code> to invoke a rest service.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>
+<p>Application: Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.</p>
+<ul>
+<li>Scans for interfaces that declare they are feign clients <code>(via org.springframework.cloud.openfeign.FeignClient @FeignClient)</code>.</li>
+<li>Configures component scanning directives for use with <code>org.springframework.context.annotation.Configuration @Configuration</code> classes.</li>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.EnableFeignClients;</code></li>
+</ul>
+</li>
+<li>Annotate the SpringBoot application to enable feign clients.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B4CurrencyConversionServiceApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+		}
+	}
+</code></pre>
+</li>
+<li>
+<p>Response java bean <em><strong>CurrencyConversion.java</strong></em>.</p>
+<ul>
+<li>This class must have all the properties expecting from <code>currency-exchange</code> service, to support auto population of response data.</li>
+<li>imports
+<ul>
+<li><code>import java.math.BigDecimal;</code></li>
+</ul>
+</li>
+<li>Annotate the SpringBoot application to enable feign clients.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+
+		<span class="hljs-keyword">private</span> Long id;
+		<span class="hljs-keyword">private</span> String from;
+		<span class="hljs-keyword">private</span> String to;
+		<span class="hljs-keyword">private</span> BigDecimal conversionMultiples;
+		<span class="hljs-keyword">private</span> BigDecimal quantity;
+		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
+		<span class="hljs-keyword">private</span> String environment;
+
+		<span class="hljs-comment">// constructors, setter-getters.</span>
+	}
+</code></pre>
+</li>
+<li>
+<p>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em></p>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
+
+		<span class="hljs-comment">/**
+		* Method as defined in the host service.
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
+	}
+</code></pre>
+<ul>
+<li>Controller/Service to use feign client interface.</li>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CurrencyConversionController.class);
+
+		<span class="hljs-meta">@Autowired</span>
+		<span class="hljs-keyword">private</span> CurrencyExchangeProxy currencyExchangeProxy;
+
+		<span class="hljs-comment">/**
+		* Currency conversion using feign client.
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@param</span> quantity
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/currency-conversion-feign/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversionFeign</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+				<span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+
+			logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversionFeign(..) API.&quot;</span>);
+
+			<span class="hljs-comment">// Standardize</span>
+			from = from.toUpperCase();
+			to = to.toUpperCase();
+
+			<span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> currencyExchangeProxy
+					.retrieveExchangeRateFromDatabase(from, to);
+
+			logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from,
+					to, quantity, currencyConversionExchange.getConversionMultiples(),
+					quantity.multiply(currencyConversionExchange.getConversionMultiples()),
+					currencyConversionExchange.getEnvironment());
+
+			logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+
+			<span class="hljs-keyword">return</span> currencyConversion;
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: The <code>CurrencyConversion.java</code> bean has all the properties which will be returned from `currency-exchange' service.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html">https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/">https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-service-registry--naming-server--eureka-naming-server">5. Service Registry / Naming server : Eureka naming server</h2>
+<h3 id="project-ref-b6-naming-service">Project ref: <em>b6-naming-service</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>It's an application that contains information about all micro services including the name of the service, port, and IP address.</li>
+<li>Each microservice has to register itself with the Eureka Server.</li>
+<li>Service is available at <code>/</code> context. <a href="http://localhost:8761/">http://localhost:8761/</a></li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>AbcController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@EnableEurekaServer</span>
+	<span class="hljs-meta">@SpringBootApplication</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B6NamingServiceApplication</span> {
+
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+			SpringApplication.run(B6NamingServiceApplication.class, args);
+		}	
+	}
+</code></pre>
+</li>
+<li><strong>Applcation Config:</strong> <em>application.properties</em>
+<ul>
+<li>Configure Eureka server mandatory properties.</li>
+</ul>
+<pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b6-naming-service</span>
+
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8761</span>
+<span class="hljs-comment">
+	# Eureka : start</span>
+<span class="hljs-comment">
+	# Indicates whether or not this instance should register its information with eureka server for discovery by others.</span>
+	<span class="hljs-attr">eureka.client.register-with-eureka</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# Indicates whether this client should fetch eureka registry information from eureka server.</span>
+	<span class="hljs-attr">eureka.client.fetch-registry</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# when guessing a hostname, the IP address of the server should be used in preference to the hostname reported by the OS</span>
+<span class="hljs-comment">	# eureka.instance.prefer-ip-address=true</span>
+<span class="hljs-comment">
+	# The hostname if it can be determined at configuration time (otherwise it will be guessed from OS primitives).</span>
+<span class="hljs-comment">	# eureka.instance.hostname=localhost</span>
+<span class="hljs-comment">
+	# Eureka : end</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Register's the micro-service to Name server.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Add Eureka client in POM.xml</li>
+<li><em><strong>Step-2:</strong></em> Configure eureka server URI in application.properties</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Config changes</ins></strong></p>
+<ul>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment">	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: If <code>Eureka client</code> dependency is present in <code>POM.xml</code>, spring will automatically try to register this service to Naming server by looking for <code>Eureka Server</code> on it's default <code>Eureka port - 8761</code>.</p>
+</blockquote>
+<hr>
+<h2 id="7-client-side-load-balancing-microservices">7. Client side Load Balancing microservices</h2>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Balance the traffic to the services dynamically by checking the current running instances.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
+<li><em><strong>Step-2:</strong></em> Add eureka properties in <code>application.propeties</code>.</li>
+<li><em><strong>Step-3:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
+<li><em><strong>Step-4:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-loadbalancer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code / Config changes</ins></strong></p>
+<ul>
+<li><strong>Feign Client:</strong> <em>AbcController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
+</ul>
+</li>
+<li>Annotate <code>@FeignClient</code> with only service name.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">//@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</span>
+	<span class="hljs-comment">/* Find service details from name server using service name. */</span>
+	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</span> 
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
+
+		<span class="hljs-comment">/**
+		* Method as defined in the host service.
+		* <span class="hljs-doctag">@param</span> from
+		* <span class="hljs-doctag">@param</span> to
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/jpa/currency-exchange/from/{from}/to/{to}&quot;)</span>
+		<span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">retrieveExchangeRateFromDatabase</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to)</span>;
+	}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Application Config:</strong> <em>application.properties</em></p>
+<pre><code class="language-properties"><span class="hljs-comment">
+	# load balancer</span>
+	<span class="hljs-attr">logging.level.com.netflix.discovery</span>=<span class="hljs-string">debug</span>
+<span class="hljs-comment">
+	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# Enables the Eureka health check handler.</span>
+	<span class="hljs-attr">eureka.client.healthcheck.enabled</span>=<span class="hljs-string">true</span>
+
+	<span class="hljs-attr">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">60</span>
+	<span class="hljs-attr">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">60</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+<span class="hljs-comment">
+
+	# Start: Spring Load Balancer</span>
+<span class="hljs-comment">
+	# Enable load balancer.</span>
+	<span class="hljs-attr">spring.cloud.loadbalancer.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Enables LoadBalancer retries.</span>
+	<span class="hljs-attr">spring.cloud.loadbalancer.retry.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Spring Load Balancer</span>
+<span class="hljs-comment">
+
+	# Start: Cloud config client</span>
+<span class="hljs-comment">
+	# by default it&#x27;s enabled</span>
+	<span class="hljs-attr">spring.cloud.config.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Name of the service to be shared wit config server</span>
+	<span class="hljs-attr">spring.cloud.config.name</span>=<span class="hljs-string">currency-conversion-service</span>
+<span class="hljs-comment">
+	# default active profile</span>
+	<span class="hljs-attr">spring.cloud.config.profile</span>=<span class="hljs-string">dev</span>
+<span class="hljs-comment">
+	# 8888 - it&#x27;s default port for config server</span>
+	<span class="hljs-attr">spring.config.import</span>=<span class="hljs-string">optional:configserver:http://localhost:8888</span>
+<span class="hljs-comment">
+	# End: Cloud config client</span>
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p>Note:
+With service name it finds the server details from <code>Eureka Server</code>.
+<code>spring-load-balancer</code> is mandatory dependency with feign client.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html">https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-api-gateway">8. API Gateway</h2>
+<h3 id="project-ref-b7-api-gateway">Project ref: <em>b7-api-gateway</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>All requests will be routed via API Gateway.</li>
+<li>This gives us flexibility to implement all common features at one place.</li>
+<li>Build on top of Spring WebFlux (Reactive Approach).</li>
+<li>Provide cross cutting concerns
+<ul>
+<li>Security</li>
+<li>Monitoring / Metrics</li>
+</ul>
+</li>
+<li>Features:
+<ul>
+<li>Match routes to any request attribute to route to right service.</li>
+<li>Allows to define Predicates (Matcher) &amp; Filters (eg. Authentication, Authorization, Logging etc.).</li>
+<li>Integrates with Spring Cloud Discovery client to load balancing to the service for which the request is received.</li>
+<li>Path rewriting.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Ensure following dependencies are added.
+<ul>
+<li>Eureka Discovery Client</li>
+<li>Reactive API Gateay</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Enable API gateway client discovery in <code>application.properties</code></li>
+<li><em><strong>Step-3:</strong></em> Now, we can access services with the Service name registered in Eureka server and path to controller API.
+<ul>
+<li><a href="http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8765/B5-CURRENCY-CONVERSION-SERVICE-OPENFEIGN/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Add property to accept service name in lower case
+<ul>
+<li><a href="http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8765/b5-currency-conversion-service-openfeign/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b7-api-gateway</span>
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8765</span>
+<span class="hljs-comment">
+	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# Enables the Eureka health check handler.</span>
+	<span class="hljs-attr">eureka.client.healthcheck.enabled</span>=<span class="hljs-string">true</span>
+
+	<span class="hljs-attr">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">60</span>
+	<span class="hljs-attr">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">60</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+<span class="hljs-comment">
+	# Start: Api Gateway</span>
+<span class="hljs-comment">
+	# Flag that enables Discovery Client gateway integration.</span>
+<span class="hljs-comment">	# This allows us to invoke service using service-name registered in Eureka</span>
+<span class="hljs-comment">	# http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.enabled</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Option to lower case serviceId in predicates and filters, defaults to false. </span>
+<span class="hljs-comment">	# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.lower-case-service-id</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Api Gateway</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Service client discovery is by defaut <code>disabled</code>. It need to be enabed explicitly in <code>application.properties</code>. Check above config for details.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/">https://docs.spring.io/spring-cloud-gateway/docs/current/reference/html/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="9-routes-with-spring-cloud-gateway">9. Routes with spring cloud gateway</h2>
+<h3 id="project-ref-b8-api-gateway-routes">Project ref: <em>b8-api-gateway-routes</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>API Gateway <code>Routers</code> and <code>Filters</code> provides the option to intercept and process the requests.</li>
+<li>It provides methods/APIs to match request on any attribute - <code>method, header, cookie, path, host etc.</code>.</li>
+<li>It allow to route specific URLs to desired service.</li>
+<li>We can add HTTP headers &amp; params in the request.</li>
+<li>We can also rewrite the URL.</li>
+<li>We can also implement common checks such as authentication, authorization, logging etc.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Considering tht API Gateway is already implemented.
+<ul>
+<li>If not, refer <code>section 8</code> above for API Gateway coniguration.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Update application configuration in <code>application.properties</code>.
+<ul>
+<li>Disable <code>gateway discovery locator</code> configuration in <code>application.properties</code> to auto discover clients from Eureka server.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Create a Configuration class.
+<ul>
+<li>Create a Bean of <code>o.s.c.gateway.route.RouteLocator</code> class with method accepting <code>RouteLocatorBuilder</code> class as argument.</li>
+<li>Now using <code>RouteLocatorBuilder</code> instance, we can customize routes, e.g.
+<ul>
+<li>Route any URL to <code>lb://&lt;service-name-in-eureka&gt;</code> to redirect and do load-balancing.</li>
+<li>Route to any external service <a href="http://httpbin.org/">http://httpbin.org/</a>.
+<ul>
+<li>Request failing for <code>HTTPS</code> requests, requires SSL confguration.</li>
+</ul>
+</li>
+<li>Rewrite the requested URL to corresponfing inernal service URL using filters.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Configuratio:</strong> <em>ApiGatewayConfiguration.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.cloud.gateway.route.RouteLocator;</code></li>
+<li><code>import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;</code></li>
+<li><code>import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder.Builder;</code></li>
+</ul>
+</li>
+<li>Create a <code>Bean</code> of <code>RouteLocator</code> class.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">/**
+	* Configuration class to build custom routes and request customization.
+	*/</span>
+	<span class="hljs-meta">@Configuration</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ApiGatewayConfiguration</span> {
+
+		<span class="hljs-comment">/**
+		* Define routes.
+		* <span class="hljs-doctag">@param</span> routeLocatorBuilder
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@Bean</span>
+		RouteLocator <span class="hljs-title function_">getwayRoute</span><span class="hljs-params">(RouteLocatorBuilder routeLocatorBuilder)</span> {
+			<span class="hljs-comment">/*
+			* Redirect request to external service. Also, optionally we can add http
+			* headers and request params in the request.
+			*/</span>
+			<span class="hljs-type">Builder</span> <span class="hljs-variable">routeLocator</span> <span class="hljs-operator">=</span> routeLocatorBuilder.routes()
+					.route((p) -&gt; p.path(<span class="hljs-string">&quot;/get&quot;</span>)
+							.filters(f -&gt; f.addRequestHeader(<span class="hljs-string">&quot;MY-HEADER&quot;</span>, <span class="hljs-string">&quot;MY-CUSTOM-HEADER&quot;</span>)
+									.addRequestParameter(<span class="hljs-string">&quot;MY-REQUEST-PARAM&quot;</span>, <span class="hljs-string">&quot;MY-CUSTOM-REQUEST-PARAM&quot;</span>))
+							.uri(<span class="hljs-string">&quot;http://httpbin.org:80/&quot;</span>));
+
+			<span class="hljs-comment">/**
+			* Route URLs to load balancer and eureka service name
+			*/</span>
+			routeLocator = routeLocator.route(p -&gt; p.path(<span class="hljs-string">&quot;/currency-exchange/**&quot;</span>).uri(<span class="hljs-string">&quot;lb://b3-currency-exchange-service&quot;</span>))
+					.route(p -&gt; p.path(<span class="hljs-string">&quot;/currency-conversion-feign/**&quot;</span>)
+							.uri(<span class="hljs-string">&quot;lb://b5-currency-conversion-service-openfeign&quot;</span>));
+
+			<span class="hljs-comment">/**
+			* Rewrite URL and copy the path
+			*/</span>
+			routeLocator.route(p -&gt; p.path(<span class="hljs-string">&quot;/ccfs/**&quot;</span>)
+					.filters(f -&gt; f.rewritePath(<span class="hljs-string">&quot;/ccfs/(?&lt;segment&gt;.*)&quot;</span>, <span class="hljs-string">&quot;/currency-conversion-feign/${segment}&quot;</span>))
+					.uri(<span class="hljs-string">&quot;lb://b5-currency-conversion-service-openfeign&quot;</span>));
+
+			<span class="hljs-keyword">return</span> routeLocator.build();
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b8-api-gateway-routes</span>
+
+	<span class="hljs-attr">server.port</span>=<span class="hljs-string">8765</span>
+<span class="hljs-comment">
+	# Start: Eureka client config</span>
+<span class="hljs-comment">
+	# Map of availability zone to list of fully qualified URLs to communicate with eureka server. </span>
+<span class="hljs-comment">	# Each value can be a single URL or a comma separated list of alternative locations. </span>
+<span class="hljs-comment">	# Typically the eureka server URLs carry protocol,host,port,context and version information if any. </span>
+<span class="hljs-comment">	# Example: https://ec2-256-156-243-129.compute-1.amazonaws.com:7001/eureka/ </span>
+	<span class="hljs-attr">eureka.client.service-url.defaultZone</span>=<span class="hljs-string">http://localhost:8761/eureka</span>
+<span class="hljs-comment">
+	# Enables the Eureka health check handler.</span>
+	<span class="hljs-attr">eureka.client.healthcheck.enabled</span>=<span class="hljs-string">true</span>
+
+	<span class="hljs-attr">eureka.instance.lease-renewal-interval-in-seconds</span>=<span class="hljs-string">60</span>
+	<span class="hljs-attr">eureka.instance.lease-expiration-duration-in-seconds</span>=<span class="hljs-string">60</span>
+<span class="hljs-comment">
+	# End: Eureka client config</span>
+<span class="hljs-comment">
+
+	# Start: Api Gateway</span>
+<span class="hljs-comment">
+	# Flag that enables Discovery Client gateway integration.</span>
+<span class="hljs-comment">	# This allows us to invoke service using service-name registered in Eureka</span>
+<span class="hljs-comment">	# http://localhost:8765/B3-CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/usd/to/inr</span>
+<span class="hljs-comment">	# Disbling - to use Routes and Filters</span>
+<span class="hljs-comment">	#spring.cloud.gateway.discovery.locator.enabled=true</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.enabled</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# Option to lower case serviceId in predicates and filters, defaults to false. </span>
+<span class="hljs-comment">	# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**</span>
+<span class="hljs-comment">	# Disbling - to use Routes and Filters</span>
+<span class="hljs-comment">	#spring.cloud.gateway.discovery.locator.lower-case-service-id=true</span>
+	<span class="hljs-attr">spring.cloud.gateway.discovery.locator.lower-case-service-id</span>=<span class="hljs-string">false</span>
+<span class="hljs-comment">
+	# Option to lower case serviceId in predicates and filters, defaults to false. </span>
+<span class="hljs-comment">	# Useful with eureka when it automatically uppercases serviceId. so MYSERIVCE, would match /myservice/**</span>
+<span class="hljs-comment">	# spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true</span>
+<span class="hljs-comment">
+	# End: Api Gateway	</span>
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: When using routes in API Gateway, eureka discover client must be disabled in <code>application.properties</code>.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc/filters/rewritepath.html">https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc/filters/rewritepath.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="10-api-gateway--global-filter">10. API Gateway : Global filter</h2>
+<h3 id="project-ref-b8-api-gateway-routes-1">Project ref: <em>b8-api-gateway-routes</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Contract for interception-style, chained processing of gateway requests that may be used to implement cross-cutting, application-agnostic requirements such as security, timeouts, and others</li>
+<li>Only applies to matched gateway routes. Copied from framework WebFilter.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Considering tht API Gateway is already implemented with working routes config
+<ul>
+<li>If not, refer <code>section 8</code> &amp; <code>section 9</code> above for API Gateway coniguration.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create a class implementing <code>o.s.c.g.filter.GlobalFilter class</code>.</li>
+<li><em><strong>Step-3:</strong></em> Override <code>filter(....) method</code> and add the business logic.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Configuration:</strong> <em>LoggingGlobalFilter.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import some.dependent.resource</code></li>
+<li><code>import org.springframework.cloud.gateway.filter.GatewayFilterChain;</code></li>
+<li><code>import org.springframework.cloud.gateway.filter.GlobalFilter;</code></li>
+<li><code>import org.springframework.web.server.ServerWebExchange;</code></li>
+<li><code>import reactor.core.publisher.Mono;</code></li>
+</ul>
+</li>
+<li>Implement <code>o.s.c.g.filter.GlobalFilter class</code> and <code>filter(...) method</code>.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@Component</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LoggingGlobalFilter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">GlobalFilter</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(LoggingGlobalFilter.class);
+
+		<span class="hljs-meta">@Override</span>
+		<span class="hljs-keyword">public</span> Mono&lt;Void&gt; <span class="hljs-title function_">filter</span><span class="hljs-params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> {
+
+			<span class="hljs-comment">// log the request</span>
+			logger.info(<span class="hljs-string">&quot;Request -&gt; Method: {}, Path: {}&quot;</span>, exchange.getRequest().getMethod(),
+					exchange.getRequest().getPath());
+
+			<span class="hljs-keyword">return</span> chain.filter(exchange);
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="11-using-resilience4j---retry">11. Using Resilience4j - retry</h2>
+<h3 id="project-ref-b9-curcuit-breacker">Project ref: <em>b9-curcuit-breacker</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li><code>Resilience4j</code> is a replacement of <code>netflix-hystrix</code> for circuit breaker framework.</li>
+<li>Resilience4j is a lightweight fault tolerance library designed for functional programming.</li>
+<li>Resilience4j provides higher-order functions (decorators) to enhance any functional interface, lambda expression or method reference with a Circuit Breaker, Rate Limiter, Retry or Bulkhead.</li>
+<li>**NOTE: ** <em>Resilience4j 1</em> requires Java 8, while <em>Resilience4j 2</em> requires Java 17.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project setup:</strong></em> Create a new springboot project with below dependencies.</li>
+<li><em><strong>Step-1:</strong></em> Add following dependencies i	n <code>POM.xml</code>.
+<ul>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-actuator</code></li>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-web</code></li>
+<li><code>org.springframework.boot</code>:<code>spring-boot-starter-aop</code></li>
+<li><code>io.github.resilience4j</code>:<code>resilience4j-spring-boot2</code>:<code>2.2.0</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Annotate the controller API method with <code>@Retry(name = &quot;default&quot;)</code>.
+<ul>
+<li>This enables <code>reties</code> for the API with default configuration with max attempt <strong>3</strong>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> We can provide a custom name and provide customized config for <code>reties</code>.
+<ul>
+<li>Annotate the controller API method with <code>@Retry(name = &quot;b9-cb-retries&quot;)</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Add below properties in <code>application.properties</code> to control max retries.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.maxAttempts=5</code> <strong>#NEW</strong></li>
+<li><code>#resilience4j.retry.instances.b9-cb-retries.maxRetryAttempts=5</code> <strong>#OLD</strong></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Add below properties in <code>application.properties</code> to wait duration between each retries, in this example - 1 seconds.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.wait-duration=1s</code></li>
+</ul>
+</li>
+<li><em><strong>Step-6:</strong></em> Increase the wait duration exponentionally between each reties.
+<ul>
+<li>So first retry after <em>1s, next 2s, next 4s, next 8s</em> and so on.</li>
+<li><code>resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true</code></li>
+</ul>
+</li>
+<li><em><strong>Step-7:</strong></em> Configure <strong>fallbackMathod</strong> property to return <strong>hard-coded</strong> response if failed after reties.
+<ul>
+<li><code>@Retry(name = &quot;default&quot;, fallbackMethod=&quot;hardcodedResponse&quot;)</code></li>
+<li>Define a method names <code>hardcodedResponse</code> with method argument accepting <code>Throwable</code> intance.</li>
+<li>We can overload this method with different Exception types, to process <code>fallback</code> for different APIs.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-aop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.resilience4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>resilience4j-spring-boot2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldController.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import io.github.resilience4j.retry.annotation.Retry;</code></li>
+</ul>
+</li>
+<li>Annotate the method with <code>@Retry</code> annotation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldController</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(HelloWorldController.class);
+		<span class="hljs-keyword">private</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+		<span class="hljs-comment">/**
+		* Retry default return failure after 3 retries.
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/greet&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;default&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">5</span> == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Custom retry as configured in the application.properties.
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/greet-cr&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;b9-cb-retries&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greetingCustomRetries</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">6</span> != <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CustomRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Circuit breaker fallback method.
+		* <span class="hljs-doctag">@param</span> ex
+		*/</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">hardcodedResponseFallbackMethod</span><span class="hljs-params">(Exception ex)</span> {
+
+			<span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> DefaultRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for DefaultRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> CustomRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for CustomRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;default response.&quot;</span>;
+			}
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b9-curcuit-breacker</span>
+<span class="hljs-comment">
+	# Start: Circuit breaker config</span>
+<span class="hljs-comment">
+	# custom Retry - Max Retries for 5</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.max-attempts</span>=<span class="hljs-string">5</span>
+<span class="hljs-comment">
+	# Wait duration between each retries</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.wait-duration</span>=<span class="hljs-string">1s</span>
+<span class="hljs-comment">
+	# Increase the wait duration exponentionally between each reties</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+
+	# End: Circuit breaker config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Some important key point / takeaway note.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started">https://resilience4j.readme.io/docs/getting-started</a></li>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3">https://resilience4j.readme.io/docs/getting-started-3</a></li>
+<li><a href="https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html">https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/spring-cloud-circuitbreaker-resilience4j.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="12-using-resilience4j---circuit-breaker">12. Using Resilience4j - circuit breaker</h2>
+<h3 id="project-ref-b9-curcuit-breacker-1">Project ref: <em>b9-curcuit-breacker</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li><strong>Note:</strong> This project is extention to <code>Using Resilience4j - retry</code>. So all settings will remain same except for that instead of *<strong>@Retry</strong> annotation we'll use <em><strong>@CircuitBreaker</strong></em> annotation.</li>
+<li>If there are continious failure identified for a microservice, then after certain attemts, circuit breaker stop processing the API and send the response directly from <code>fallbackMethod</code>.</li>
+<li>The CircuitBreaker is implemented via a finite state machine with three normal states: CLOSED, OPEN and HALF_OPEN and two special states DISABLED and FORCED_OPEN.</li>
+<li>It uses a sliding window to store and aggregate the outcome of calls. You can choose between a count-based sliding window and a time-based sliding window.
+<ul>
+<li>The count-based sliding window aggregrates the outcome of the last N calls.</li>
+<li>The time-based sliding window aggregrates the outcome of the calls of the last N seconds.</li>
+</ul>
+</li>
+<li><strong>Aspect order:</strong> The Resilience4j Aspects order is the following:
+<ul>
+<li>Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) )</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project setup:</strong></em> Follow <code>Section 11. Using Resilience4j - retry</code> for project setup.</li>
+<li><em><strong>Step-1:</strong></em> Replace <code>@Retry</code> annotation with <code>@CircuitBreaker</code> annotation.
+<ul>
+<li><code>@CircuitBreaker(name = &quot;default&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> keep other settings as it.</li>
+<li><em><strong>Step-3:</strong></em> Configure to increase retry duration exponentilly in case all requests keep failing.
+<ul>
+<li><code>resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff=true</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-aop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.resilience4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>resilience4j-spring-boot2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldControllerCircuitBreaker.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;</code></li>
+</ul>
+</li>
+<li>Annotate the method with <code>@CircuitBreaker</code> annotation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldControllerCircuitBreaker</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(HelloWorldControllerCircuitBreaker.class);
+		<span class="hljs-keyword">private</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+		<span class="hljs-comment">/**
+		* Retry default return failure after 3 retries.
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/cb/greet&quot;)</span>
+		<span class="hljs-comment">// @Retry(name = &quot;default&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-meta">@CircuitBreaker(name = &quot;default&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">2</span>	 == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Circuit breaker fallback method.
+		* <span class="hljs-doctag">@param</span> ex
+		*/</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">hardcodedResponseFallbackMethod</span><span class="hljs-params">(Exception ex)</span> {
+
+			<span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> DefaultRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for DefaultRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> CustomRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for CustomRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;default response.&quot;</span>;
+			}
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b9-curcuit-breacker</span>
+<span class="hljs-comment">
+	# Start: Circuit breaker config</span>
+<span class="hljs-comment">
+	# custom Retry - Max Retries for 5</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.max-attempts</span>=<span class="hljs-string">5</span>
+<span class="hljs-comment">
+	# Wait duration between each retries</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.wait-duration</span>=<span class="hljs-string">1s</span>
+<span class="hljs-comment">
+	# Increase the wait duration exponentionally between each reties</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+
+	# End: Circuit breaker config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>There's many more advance configutation for circuit breaked and retry.
+<ul>
+<li>Follow the link in <code>Reference</code> section.</li>
+</ul>
+</li>
+<li>The fallback method mechanism works like a try/catch block. If a fallback method is configured, every exception is forwarded to a fallback method executor.</li>
+<li>The fallback method executor is searching for the best matching fallback method which can handle the exception. Similar to a catch block.</li>
+<li>The fallback is executed independently of the current state of the circuit breaker.</li>
+<li>It's important to remember that a fallback method should be placed in the same class and must have the same method signature with just ONE extra target exception parameter.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li>Advance configurations:
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3#configuration">https://resilience4j.readme.io/docs/getting-started-3#configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="13-using-resilience4j---api-advance-configuration">13. Using Resilience4j - API advance configuration</h2>
+<h3 id="project-ref-b9-curcuit-breacker-2">Project ref: <em>b9-curcuit-breacker</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li><strong>Note:</strong> Advance API configuration.</li>
+<li><strong>Aspect order:</strong> The Resilience4j Aspects order is the following:
+<ul>
+<li>Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( Function ) ) ) ) )</li>
+</ul>
+</li>
+<li><strong>Rate Limiting:</strong> Setting up the max allowed API calls to the annotated API method during a time period.</li>
+<li><strong>Time Limiting:</strong> Setting up max API calls allowed in a defined time duration.</li>
+<li><strong>Bulk Head:</strong> Define the max concurrent requests to be processed by the API.</li>
+<li>We can also enable Health checks circuit breaked and Ratelimiter which are by default disabled.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project setup:</strong></em> Follow <code>Section 11. Using Resilience4j - retry</code> for project setup.</li>
+<li><em><strong>Step-1:</strong></em> Add annotation <strong>@RateLimiter</strong>, to configure the no. of requests allowed in a give time period.</li>
+<li><em><strong>Step-2:</strong></em> Add annotation <strong>@Bulkhead</strong>, to configure the no. of requests allowed for concurrent execution.</li>
+<li><em><strong>Step-3:</strong></em> Add annotation <strong>@TimeLimiter</strong>, for configure allowed execution time.</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-aop<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.resilience4j<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>resilience4j-spring-boot2<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.2.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Controller:</strong> <em>HelloWorldControllerCircuitBreaker.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;</code></li>
+</ul>
+</li>
+<li>Annotate the method with <code>@CircuitBreaker</code> annotation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldControllerCircuitBreaker</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(HelloWorldControllerCircuitBreaker.class);
+		<span class="hljs-keyword">private</span> <span class="hljs-type">Integer</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+		<span class="hljs-comment">/**
+		* Retry default return failure after 3 retries.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/cb/greet&quot;)</span>
+		<span class="hljs-meta">@CircuitBreaker(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greeting</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Testing other annotations.
+		* 
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/cb/greet-adv&quot;)</span>
+		<span class="hljs-meta">@CircuitBreaker(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-comment">// we can also add fallbackMethod = &quot;RateLimiterFallbackMethod&quot;</span>
+		<span class="hljs-meta">@RateLimiter(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-comment">// we can also add fallbackMethod = &quot;bulkHeadFallbackMethod&quot;</span>
+		<span class="hljs-meta">@Bulkhead(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-meta">@Retry(name = &quot;greeting-api&quot;, fallbackMethod = &quot;hardcodedResponseFallbackMethod&quot;)</span>
+		<span class="hljs-comment">// We can also add fallbackMethod = &quot;timeLimiterFallbackMethod&quot;</span>
+		<span class="hljs-meta">@TimeLimiter(name = &quot;greeting-api&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">greetingAdvance</span><span class="hljs-params">()</span> {
+
+			logger.info(<span class="hljs-string">&quot;***** HelloWorldController.greeting() method called.&quot;</span>);
+			logger.info(<span class="hljs-string">&quot;***** Request id : {}&quot;</span>, counter);
+			<span class="hljs-keyword">try</span> {
+				<span class="hljs-keyword">if</span> (counter % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+					<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultRetryRuntimeException</span>(<span class="hljs-string">&quot;curcuite breacker test. Request Id : &quot;</span> + counter);
+				}
+			} <span class="hljs-keyword">catch</span> (Exception ex) {
+				logger.info(<span class="hljs-string">&quot;**** Failed for request id : {}&quot;</span>, counter);
+				<span class="hljs-keyword">throw</span> ex;
+			} <span class="hljs-keyword">finally</span> {
+				counter++;
+			}
+
+			<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen&quot;</span>;
+		}
+
+		<span class="hljs-comment">/**
+		* Circuit breaker fallback method.
+		* 
+		* <span class="hljs-doctag">@param</span> ex
+		*/</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">hardcodedResponseFallbackMethod</span><span class="hljs-params">(Exception ex)</span> {
+
+			<span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> DefaultRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for DefaultRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ex <span class="hljs-keyword">instanceof</span> CustomRetryRuntimeException) {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Guten Morgen, default resonse for CustomRetryRuntimeException&quot;</span>;
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;default response.&quot;</span>;
+			}
+		}
+	}
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b9-curcuit-breacker</span>
+<span class="hljs-comment">
+	# Start: Circuit breaker config</span>
+<span class="hljs-comment">
+	# custom Retry - Max Retries for 5</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.max-attempts</span>=<span class="hljs-string">5</span>
+<span class="hljs-comment">
+	# Wait duration between each retries</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.wait-duration</span>=<span class="hljs-string">1s</span>
+<span class="hljs-comment">
+	# Increase the wait duration exponentionally between each reties</span>
+	<span class="hljs-attr">resilience4j.retry.instances.b9-cb-retries.enable-exponential-backoff</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# Start: Enable health checks for actuator</span>
+	<span class="hljs-attr">management.health.circuitbreakers.enabled</span>: <span class="hljs-string">true</span>
+	<span class="hljs-attr">management.health.ratelimiters.enabled</span>: <span class="hljs-string">true</span>
+
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.default.register-health-indicator</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.register-health-indicator</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.b9-cb-retries.register-health-indicator</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+	# End: Enable health checks for actuator</span>
+<span class="hljs-comment">
+
+	# Ratelimiter - allows max of 2 reuests in every 10 seconds.</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.limit-for-period</span>=<span class="hljs-string">2</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.limit-refresh-period</span>=<span class="hljs-string">10s</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.timeout-duration</span>=<span class="hljs-string">3s</span>
+	<span class="hljs-attr">resilience4j.ratelimiter.instances.greeting-api.event-consumer-buffer-size</span>=<span class="hljs-string">100</span>
+<span class="hljs-comment">
+	# BulkHead - Allows maximum of only 10 concurrent calls.</span>
+	<span class="hljs-attr">resilience4j.bulkhead.instances.greeting-api.max-concurrent-calls</span>=<span class="hljs-string">10</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.core-thread-pool-size</span>=<span class="hljs-string">2</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.max-thread-pool-size</span>=<span class="hljs-string">5</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.queue-capacity</span>=<span class="hljs-string">1</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.writable-stack-trace-enabled</span>=<span class="hljs-string">true</span>
+	<span class="hljs-attr">resilience4j.thread-pool-bulkhead.instances.greeting-api.keep-alive-duration</span>=<span class="hljs-string">600s</span>
+<span class="hljs-comment">
+
+	# TimeLimier - </span>
+	<span class="hljs-attr">resilience4j.timelimiter.instances.greeting-api.timeout-duration</span>=<span class="hljs-string">2s</span>
+	<span class="hljs-attr">resilience4j.timelimiter.instances.greeting-api.cancel-running-future</span>=<span class="hljs-string">true</span>
+<span class="hljs-comment">
+
+	# End: Circuit breaker config</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: This is an <em><strong>important</strong></em> note.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>There's many more advance configutation for circuit breaked and retry.
+<ul>
+<li>Follow the link in <code>Reference</code> section.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li>Advance configurations:
+<ul>
+<li><a href="https://resilience4j.readme.io/docs/getting-started-3#configuration">https://resilience4j.readme.io/docs/getting-started-3#configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4 id="end-of-document">End of document.</h4>
+<hr>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>

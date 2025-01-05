@@ -23,6 +23,20 @@
 - **<ins>Purpose / Feature</ins>**
   - Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system. 
   - With the Config Server, you have a central place to manage external properties for applications across all environments. 
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Git Repo setup
+    - Create a new git repo (local or github)
+    - Add required properties files using microervice name - `<microservice-name>[-<env>].properties`
+  - ***Step-2:*** Create a new SpringBoot project.
+    - Add dependency `spring-cloud-config-server`.
+  - ***Step-3:*** Enable as Config Server
+    - Add `@EnableConfigServer` annotation to enable application as config server.
+  - ***Step-4:*** Configure git repo URL.
+    - Add `spring.cloud.config.server.git.uri` in `application.properties`
+  - ***Step-5:*** Git URLs
+    - **Linux:** *file:///path/to/git/directory*
+    - **Windows:** *file:///c:/path/to/git/directory*
+    - **Github:** *https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git*
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -103,7 +117,20 @@
 - **<ins>Purpose / Feature</ins>**
   - A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer). 
   - It also picks up some additional useful features related to Environment change events.
-  - **Config client is enabled by default.  
+  - **Config client is enabled by default.
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Add `spring-cloud-starter-config`dependency in *POM.xml*.
+  - ***Step-2:*** Create a configurtion class and annotate it with *ConfigurationProperties* annotation.
+    - Add `prefix` property in annotation as *microservice-name*.
+  - ***Step-3:*** Add desired properties to be read from *Config Server*.
+    - The injection will happen by look-up in config server for property named **prefix.property**.
+    - **Note:** Properties matched in *application.properties* has least priority than config-server properties.
+  - ***Step-4:*** Update *application.properties*
+    - Provide service name to look-up in Config server.
+      - `spring.cloud.config.name=limtis-service`
+      - if above property is missing it will use *spring.application.name=b1-limtis-service*
+    - Configure config-server URL.
+      - `spring.config.import=optional:configserver:http://localhost:8888/`
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -163,7 +190,6 @@
 				this.minimum = minimum;
 				this.maximum = maximum;
 			}
-
 			//getter-setters & other methods
 		}
 	```
