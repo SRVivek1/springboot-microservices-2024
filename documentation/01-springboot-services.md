@@ -1,7 +1,6 @@
-# springboot-microservices-2024-[v3.4.0]
----
+# springboot Basics [v3.4.0]
 ## 1. Return response with link to newly created resource
-### Project ref: *a2-sboot-ms-social-media-app*
+### Project ref: [a2-sboot-ms-social-media-app](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a2-sboot-ms-social-media-app)
 - **<ins>Maven / External dependency</ins>**
 	- Below required resources are available in Spring web dependency.
  	```xml
@@ -13,8 +12,7 @@
     - imports
       - *`import org.springframework.web.servlet.support.ServletUriComponentsBuilder`*
 	- Build URL to new Resource using current request.
-		- *`ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId())
-						.toUri();`*
+		- *`ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(savedUser.getId()).toUri();`*
 	- Wrap new URL and response object in *`ResponseEntity`* and return the *`ResponseEntity`* object.
 		- *`return ResponseEntity.created(location).body(savedUser);`*
 	- Controller method
@@ -29,11 +27,11 @@
 	    			.buildAndExpand(savedUser.getId()).toUri();
 	    
 				return ResponseEntity.created(location).body(savedUser);
-			}	
+			}
+		```
 ---
 ## 2. Property, method param or Return type validation
-
-### Project ref: *a3-sboot-ms-validation*
+### Project ref: [a3-sboot-ms-validation](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a3-sboot-ms-validation)
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -92,7 +90,7 @@
 ---
 ## 3. API documentation using openAPI, swagger-ui
 
-### Project ref: *a4-sboot-ms-springdoc-swagger-openapi*
+### Project ref: [a4-sboot-ms-springdoc-swagger-openapi](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a4-sboot-ms-springdoc-swagger-openapi)
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -101,26 +99,22 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.7.0</version>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - `None`.
-	
 - **<ins>Swagger URL:</ins>**
   - http://localhost:8080/swagger-ui
   - http://localhost:8080/swagger-ui/index.html
-
 - **<ins>Notes:</ins>**
   - `No code change required to enable swagger documentation`.
   - It's enabled by default if the ependency is present in `POM.xml`
-
 - **<ins>References:</ins>**
   - `https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui`
   - `https://springdoc.org/#getting-started`
-
 ---
 
 ## 4. Content negotiation for Response parsing
-
-### Project ref: *a5-sboot-ms-content-negotiation*
+### Project ref: [a5-sboot-ms-content-negotiation](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a5-sboot-ms-content-negotiation)
 - **<ins>Maven / External dependency</ins>**
   - Add following dependency in POM.xml
  	```xml
@@ -129,6 +123,7 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - `None`
 - **<ins>Notes:</ins>**
@@ -137,7 +132,7 @@
 ---
 
 ## 5. Internationalization (i18n)
-### Project ref: *a6-sboot-ms-content-i18n*
+### Project ref: [a6-sboot-ms-content-i18n](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a6-sboot-ms-content-i18n)
 - **<ins>Maven / External dependency</ins>**
   - Required API is available as part of spring-context dependency.
   - This is imported with spring web dependency internally.
@@ -146,6 +141,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - imports
     - `import org.springframework.context.MessageSource;`
@@ -184,7 +180,7 @@
 ---
 
 ## 6. Microservice API Versioning
-### Project ref: *a7-sboot-ms-api-versioning*
+### Project ref: [a7-sboot-ms-api-versioning](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a7-sboot-ms-api-versioning)
 - **<ins>Maven / External dependency</ins>**
   - No dependency required.
   - API versioning is HTTP architectural style.
@@ -268,9 +264,9 @@
   - In this versioning style, a request param is sent with API version number.
   - Base URL remains unchanged. 
   - **Amazon** also follows same versoning strrateegy.
-    - **Ref:** https://
+    - **Ref:** *https://*
   - **<ins>Drawback</ins>**
-    - Polluting URL
+    - *Polluting URL*
   - **<ins>Controller Code changes</ins>**
     - imports
       - `import org.springframework.web.bind.annotation.GetMapping;`
@@ -339,7 +335,7 @@
     - e.g. `Accept: application/vnd.comp.app-v2+json`
   - Base URL remains unchanged. 
   - **Github** also follows same versoning strrateegy.
-    - **Ref:** https://
+    - **Ref:** *https://*
   - **<ins>Drawback</ins>**
     - Misuse of HTTP Headers
   - **<ins>Controller Code changes</ins>**
@@ -368,11 +364,11 @@
 					return new PersonV2(new Name("Media type", "Versioning v2"));
 				}
 			}
-		```
+	```
 ---
 
 ## 7. SpringBoot HATEOAS
-### Project ref: *a8-sboot-ms-hateoas*
+### Project ref: [a8-sboot-ms-hateoas](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a8-sboot-ms-hateoas)
 - **<ins>Maven / External dependency</ins>**
   - Add spring validation dependency.
  	```xml
@@ -380,6 +376,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - imports
     - `import org.springframework.hateoas.EntityModel;`
@@ -413,13 +410,12 @@
 - **<ins>Notes:</ins>**
   - `Spring HATEOAS` provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC. 
   - The `core problem it tries to address` is link creation and representation assembly.
-
 - **<ins>References:</ins>**
   - `https://spring.io/projects/spring-hateoas`
 ---
 
 ## 8. Static content filtering
-### Project ref: *a9-sboot-ms-static-filtering*
+### Project ref: [a9-sboot-ms-static-filtering](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a9-sboot-ms-static-filtering)
 - **<ins>Purpose / Feature</ins>**
   - Content filtering refers to removing the properties from Response bean when sending back to requestor.
   - This feature is available in `jackson-annotations-x.x.jar`, which is added as part of `spring-boot-starter-web` dependency.
@@ -472,7 +468,7 @@
 ---
 
 ## 9. Dynamic content filtering
-### Project ref: *a9-sboot-ms-static-filtering*
+### Project ref: [a9-sboot-ms-static-filtering](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a9-sboot-ms-static-filtering)
 - **<ins>Purpose / Feature</ins>**
   - Content filtering refers to removing the properties from Response bean when sending back to requestor.
   - This feature is available in `jackson-annotations-x.x.jar`, which is added as part of `spring-boot-starter-web` dependency.
@@ -571,7 +567,7 @@
 ---
 
 ## 10. Exception / Error Handling (Custom Exceptions)
-### Project ref: *a2-sboot-ms-social-media-app*
+### Project ref: [a2-sboot-ms-social-media-app](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a2-sboot-ms-social-media-app)
 - **<ins>Purpose / Feature</ins>**
   - Spring boot provides mechanism to handle and customize the exceptions thrown by the applications.
 - **<ins>Maven / External dependency</ins>**
