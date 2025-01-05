@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Spring boot microservices with docker</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="spring-boot-microservices-with-docker">Spring boot microservices with docker</h1>
+<h2 id="0-resources">0. Resources</h2>
+<ul>
+<li><strong>Exchange</strong>
+<ul>
+<li><a href="http://localhost:8000/currency-exchange/from/usd/to/inr">http://localhost:8000/currency-exchange/from/usd/to/inr</a></li>
+<li><a href="http://localhost:8000/jpa/currency-exchange/from/USD/to/INR">http://localhost:8000/jpa/currency-exchange/from/USD/to/INR</a></li>
+</ul>
+</li>
+<li><strong>Currency Conversion</strong>
+<ul>
+<li><a href="http://localhost:8100/currency-conversion/from/usd/to/inr/quantity/10">http://localhost:8100/currency-conversion/from/usd/to/inr/quantity/10</a></li>
+<li><a href="http://localhost:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8100/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+<li><strong>Eureka</strong>
+<ul>
+<li><a href="http://localhost:8761/">http://localhost:8761/</a></li>
+</ul>
+</li>
+<li><strong>Zipkin</strong>
+<ul>
+<li><a href="http://localhost:9411/">http://localhost:9411/</a></li>
+</ul>
+</li>
+<li><strong>API Gateway</strong>
+<ul>
+<li><a href="http://localhost:8765/currency-exchange/from/usd/to/inr">http://localhost:8765/currency-exchange/from/usd/to/inr</a></li>
+<li><a href="http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100">http://localhost:8765/currency-conversion-feign/from/UsD/to/iNr/quantity/100</a></li>
+<li><a href="http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100">http://localhost:8765/ccfs/from/UsD/to/iNr/quantity/100</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="1-spring-cloud--tracing-service-with-zipkinm-server-docker">1. Spring cloud : Tracing service with zipkinm server (Docker)</h2>
+<h3 id="project-ref-na">Project ref: <em>N/A</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Zipkin⁠ is a distributed tracing system.</li>
+<li>It helps gather timing data needed to troubleshoot latency problems in service architectures.</li>
+<li>Features include both the collection and lookup of this data.</li>
+<li>If you have a trace ID in a log file, you can jump directly to it. Otherwise, you can query based on attributes such as service, operation name, tags and duration. Some interesting data will be summarized for you, such as the percentage of time spent in a service, and whether or not operations failed.</li>
+<li>Each of the <code>microservice</code> send the tracing info to the zipkin tracing server. Zipkin store the information in database and provides UI.</li>
+<li>Dependencies:
+<ul>
+<li>Micrometer:
+<ul>
+<li>Bridges the Micrometer Observation API to OpenTelemetry.</li>
+<li>Hamdles logs, traces &amp; matrics.</li>
+</ul>
+</li>
+<li>OpenTelemetry:
+<ul>
+<li>Reports traces to Zipkin.</li>
+<li>Hamdles logs, traces &amp; matrics.</li>
+</ul>
+</li>
+<li>OpenZipkin brave:</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Docker must be installed and running.</li>
+<li><em><strong>Step-1:</strong></em> Pull zepkin image from docker hub and create container.
+<ul>
+<li><em><strong>docker run -d -p 9411:9411 openzipkin/zipkin</strong></em></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Now we can access <code>Zipkin</code> locally on <code>http://localhost:9411/zipkin/</code>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: We can also create spring boot app with zepkin serevr.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Some important key point / takeaway note.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://docs.spring.io/spring-boot/reference/actuator/tracing.html">https://docs.spring.io/spring-boot/reference/actuator/tracing.html</a></li>
+<li><a href="https://www.baeldung.com/tracing-services-with-zipkin">https://www.baeldung.com/tracing-services-with-zipkin</a></li>
+<li><a href="https://spring.io/projects/spring-cloud-sleuth">https://spring.io/projects/spring-cloud-sleuth</a></li>
+<li><a href="https://docs.micrometer.io/tracing/reference/1.4">https://docs.micrometer.io/tracing/reference/1.4</a></li>
+<li></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-spring-cloud-zipkin-client">2. Spring cloud: Zipkin client</h2>
+<h3 id="project-ref">Project ref:</h3>
+<ul>
+<li>
+<p><em>d1-zipkin-tracing-server</em></p>
+</li>
+<li>
+<p><em>d2-zipkin-currency-exchange-service</em></p>
+</li>
+<li>
+<p><em>d3-zepkin-currency-conversion-service-openfeign</em></p>
+</li>
+<li>
+<p><em>d4-zepkin-api-gateway-routes</em></p>
+</li>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Centralized tracing using logs, matrices and/or graphs.</li>
+<li><strong>Observation:</strong>
+<ul>
+<li><em><strong>Span Id</strong></em> is different in all microservice call trace.</li>
+<li>Another property <em><strong>Parent Id</strong></em> is present in all microservice call trace.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> An existing microservice / create one.</li>
+<li><em><strong>Step-1:</strong></em> pom.xml: Add micrometer, micrometer tracing bridge &amp; opentelemetry dependencies.
+<ul>
+<li>Micrometer: Assigns ID to request, which remains same when other microservices are called in the same request.
+<ul>
+<li>E.g. Req. 1: currency-conversion-service --&gt; currency-exchange-service</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Add sampling configuration to define how much percentage of request will be sampled.
+<ul>
+<li><code>management.tracing.sampling.probability=1.0 # 1.0 -&gt; 100%,  #SB3 </code></li>
+<li><code>logging.pattern.level=%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}] #SB3</code></li>
+</ul>
+</li>
+<li>Add <code>feign-micrometer</code> dependency to pom.xml, to trace requests made using <code>feign</code> client. By default it's not traced.</li>
+<li>Build <code>RestTemplate</code> using <code>RestTemplateBuilder</code> to enable tracing of requests.
+<ul>
+<li>If <code>new RestTemplate()</code> is used, it will not be traced.</li>
+<li>So, cretae a config class and return a Bean of <code>RestTemplate</code> and autowire in controller.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-comment">&lt;!-- SB3 :  Micrometer 
+        &gt; OpenTelemetry 
+        &gt; Zipkin 
+  --&gt;</span>
+
+  <span class="hljs-comment">&lt;!-- Micrometer - Vendor-neutral application observability facade. 
+      Instrument your JVM-based application code without vendor lock-in.  
+      Observation (Metrics &amp; Logs) + Tracing.
+  --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-observation<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+  <span class="hljs-comment">&lt;!-- Open Telemetry
+      - Open Telemetry as Bridge (RECOMMENDED)
+      - Simplified Observability (metrics, logs, and traces) --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-tracing-bridge-otel<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.opentelemetry<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>opentelemetry-exporter-zipkin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+
+  <span class="hljs-comment">&lt;!-- requres where feign client is getting used. --&gt;</span>
+  <span class="hljs-comment">&lt;!-- Enables tracing of REST API calls made using Feign - SB-V3 ONLY--&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>feign-micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+  
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code / Config changes</ins></strong></p>
+<ul>
+<li><strong>Congiration:</strong> <em>RestTemplateConfiguration.java</em>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.boot.web.client.RestTemplateBuilder;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">  <span class="hljs-meta">@Configuration</span>
+  <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestTemplateConfiguration</span> {
+
+    <span class="hljs-meta">@Bean</span>
+    RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">(RestTemplateBuilder builder)</span> {
+      <span class="hljs-keyword">return</span> builder.build();
+    }
+  }
+</code></pre>
+<ul>
+<li><strong>Controller:</strong> <em>CurrencyConversionController.java</em></li>
+<li>imports
+<ul>
+<li><code>import org.springframework.boot.web.client.RestTemplateBuilder;</code></li>
+</ul>
+</li>
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">  <span class="hljs-comment">// standard controller code</span>
+
+  <span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+  <span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+      <span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+
+    logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+
+    <span class="hljs-comment">// Standardize</span>
+    from = from.toUpperCase();
+    to = to.toUpperCase();
+
+    <span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+    uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+    uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+
+    <span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+    <span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = restTemplate.getForEntity(
+        <span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+        uriVariables);
+
+    <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+
+    logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+
+    <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from,
+        to, quantity, currencyConversionExchange.getConversionMultiples(),
+        quantity.multiply(currencyConversionExchange.getConversionMultiples()),
+        currencyConversionExchange.getEnvironment());
+
+    logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+
+    <span class="hljs-keyword">return</span> currencyConversion;
+  }
+
+  <span class="hljs-comment">// other APIs</span>
+</code></pre>
+</li>
+<li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment"># logging</span>
+<span class="hljs-attr">logging.pattern.level</span>=<span class="hljs-string">%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]</span>
+
+<span class="hljs-attr">logging.level.com.srvivek.sboot</span>=<span class="hljs-string">debug</span>
+<span class="hljs-comment">
+
+# Start: micrometer configuration</span>
+<span class="hljs-comment">
+# Add sampling configuration to define how much percentage of request will be sampled.</span>
+<span class="hljs-attr">management.tracing.sampling.probability</span>=<span class="hljs-string">1.0</span>
+<span class="hljs-comment">
+# End: micrometer configuration</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-docker-componse">3. Docker componse:</h2>
+<h3 id="project-ref-d5-docker-componse">Project ref: <em>d5-docker-componse</em></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>Docker Compose is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience.</li>
+<li>Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file.</li>
+<li>Compose works in all environments; production, staging, development, testing, as well as CI workflows.</li>
+<li>It also has commands for managing the whole lifecycle of your application:
+<ul>
+<li>Start, stop, and rebuild services</li>
+<li>View the status of running services</li>
+<li>Stream the log output of running services</li>
+<li>Run a one-off command on a service</li>
+</ul>
+</li>
+<li>The Compose file
+<ul>
+<li>The default path for a Compose file is <em><strong>compose.yaml</strong></em> (preferred) or <em><strong>compose.yml</strong></em> that is placed in the working directory.</li>
+<li>Compose also supports <em><strong>docker-compose.yaml</strong></em> and <em><strong>docker-compose.yml</strong></em> for backwards compatibility of earlier versions.
+<ul>
+<li>If both files exist, Compose prefers the canonical <em><strong>compose.yaml</strong></em>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Check and install docker-componse.</li>
+<li><em><strong>Step-1:</strong></em> Create <code>docker-compose.yaml</code>.
+<ul>
+<li>Don't use <code>tabs</code> for formatting/indentation, use only spaces.</li>
+<li>Add all service configs (image, port, mem. limit etc.)</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Run command <em><strong>docker-compose up</strong></em> to launch all services configured.
+<ul>
+<li>This command will look for the <em><strong>docker-compose.yaml</strong></em> in working directory.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>docker-ccompose.yaml</ins></strong><pre><code class="language-yaml">  <span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3.7&#x27;</span>
+
+  <span class="hljs-attr">services:</span>   
+    <span class="hljs-attr">naming-server:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/b6-naming-service:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8761:8761&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+    
+    <span class="hljs-attr">currency-exchange:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d2-zipkin-currency-exchange-service:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8000:8000&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">currency-conversion:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d3-zepkin-currency-conversion-service-openfeign:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8100:8100&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">api-gateway:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">srvivek/d4-zepkin-api-gateway-routes:0.0.1-SNAPSHOT</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;8765:8765&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">depends_on:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">naming-server</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-comment"># Properties - override defaults in appplication.properties</span>
+        <span class="hljs-attr">EUREKA.CLIENT.SERVICE-URL.DEFAULTZONE:</span> <span class="hljs-string">http://naming-server:8761/eureka</span>
+        <span class="hljs-attr">MANAGEMENT.ZIPKIN.TRACING.ENDPOINT:</span> <span class="hljs-string">http://zipkin-server:9411/api/v2/spans</span>
+
+    <span class="hljs-attr">zipkin-server:</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">openzipkin/zipkin</span>
+      <span class="hljs-attr">mem_limit:</span> <span class="hljs-string">800m</span>
+      <span class="hljs-attr">ports:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;9411:9411&quot;</span>
+      <span class="hljs-attr">networks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-string">currency-network</span>
+      <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span> <span class="hljs-comment">#Restart if there is a problem starting up</span>
+
+  <span class="hljs-attr">networks:</span>
+    <span class="hljs-attr">currency-network:</span>
+</code></pre>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://docs.docker.com/compose/gettingstarted/">https://docs.docker.com/compose/gettingstarted/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="----------------------------end----------------------------">--------------------------- End ---------------------------</h1>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>

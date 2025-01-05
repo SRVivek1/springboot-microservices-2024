@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>springboot-microservices-2024-&lbrack;v3&period;4&period;0&rbrack;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024-[v3.4.0]</h1>
+<hr>
+<h2 id="1-return-response-with-link-to-newly-created-resource">1. Return response with link to newly created resource</h2>
+<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Below required resources are available in Spring web dependency.</li>
+</ul>
+<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-bo	ot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span> 
+</code></pre>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><em><code>import org.springframework.web.servlet.support.ServletUriComponentsBuilder</code></em></li>
+</ul>
+</li>
+<li>Build URL to new Resource using current request.
+<ul>
+<li><em><code>ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId())   			.toUri();</code></em></li>
+</ul>
+</li>
+<li>Wrap new URL and response object in <em><code>ResponseEntity</code></em> and return the <em><code>ResponseEntity</code></em> object.
+<ul>
+<li><em><code>return ResponseEntity.created(location).body(savedUser);</code></em></li>
+</ul>
+</li>
+<li>Controller method<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> User user)</span> {
+
+		logger.debug(<span class="hljs-string">&quot;User to save : {}&quot;</span>, user);
+		<span class="hljs-type">User</span> <span class="hljs-variable">savedUser</span> <span class="hljs-operator">=</span> userDaoService.save(user);
+
+		<span class="hljs-type">URI</span> <span class="hljs-variable">location</span> <span class="hljs-operator">=</span> ServletUriComponentsBuilder.fromCurrentRequest().path(<span class="hljs-string">&quot;{id}&quot;</span>)
+			.buildAndExpand(savedUser.getId()).toUri();
+
+		<span class="hljs-keyword">return</span> ResponseEntity.created(location).body(savedUser);
+	}	
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-property-method-param-or-return-type-validation">2. Property, method param or Return type validation</h2>
+<h3 id="project-ref-a3-sboot-ms-validation">Project ref: <em>a3-sboot-ms-validation</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-validation<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.Valid;</code></li>
+</ul>
+</li>
+<li>
+<p>Annotate the method parameter for validation.</p>
+<pre><code class="language-java">	<span class="hljs-meta">@PostMapping(&quot;/users&quot;)</span>
+	<span class="hljs-keyword">public</span> ResponseEntity&lt;User&gt; <span class="hljs-title function_">createUser</span><span class="hljs-params">(<span class="hljs-meta">@Valid</span> <span class="hljs-meta">@RequestBody</span> User user)</span> {
+
+		logger.debug(<span class="hljs-string">&quot;User to save : {}&quot;</span>, user);
+
+		<span class="hljs-type">var</span> <span class="hljs-variable">savedUser</span> <span class="hljs-operator">=</span> userDaoService.save(user);
+
+		<span class="hljs-type">var</span> <span class="hljs-variable">location</span> <span class="hljs-operator">=</span> ServletUriComponentsBuilder.fromCurrentRequest().path(<span class="hljs-string">&quot;{id}&quot;</span>).buildAndExpand(savedUser.getId())
+				.toUri();
+		<span class="hljs-keyword">return</span> ResponseEntity.created(location).body(savedUser);
+	}
+</code></pre>
+</li>
+<li>
+<p>imports</p>
+<ul>
+<li><code>import jakarta.validation.constraints.Past;</code></li>
+<li><code>import jakarta.validation.constraints.Size;</code></li>
+</ul>
+</li>
+<li>
+<p>Add validation in the properties of the bean.</p>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">User</span> {
+
+		<span class="hljs-keyword">private</span> Integer id;
+
+		<span class="hljs-meta">@Size(min = 3, max = 20, message = &quot;Name must be more than 2 characters.&quot;)</span>
+		<span class="hljs-keyword">private</span> String name;
+
+		<span class="hljs-meta">@Past(message = &quot;Birth date should be in past.&quot;)</span>
+		<span class="hljs-meta">@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;)</span>
+		<span class="hljs-keyword">private</span> LocalDate birthDate;
+
+		<span class="hljs-comment">// constructors, setter-getters and other methods.</span>
+	}
+</code></pre>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>Spring internally usages <code>jakarta-validation</code> API.</li>
+<li>Check <code>jakarta.validation.constraints.*</code> for more validation classes.
+<ul>
+<li><code>@Valid</code> annotation:
+<ul>
+<li>Marks a property, method parameter or method return type for validation cascading.</li>
+<li>Constraints defined on the object and its properties are validated when the property, method parameter or method return type is validated.</li>
+</ul>
+</li>
+<li><code>@Size</code> annotation
+<ul>
+<li>Validates property value to match defined size constraints.</li>
+</ul>
+</li>
+<li><code>@Past</code> annotation
+<ul>
+<li>Validates date value for must be a past date.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-api-documentation-using-openapi-swagger-ui">3. API documentation using openAPI, swagger-ui</h2>
+<h3 id="project-ref-a4-sboot-ms-springdoc-swagger-openapi">Project ref: <em>a4-sboot-ms-springdoc-swagger-openapi</em></h3>
+<ul>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springdoc<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>springdoc-openapi-starter-webmvc-ui<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.7.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li><code>None</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Swagger URL:</ins></strong></p>
+<ul>
+<li><a href="http://localhost:8080/swagger-ui">http://localhost:8080/swagger-ui</a></li>
+<li><a href="http://localhost:8080/swagger-ui/index.html">http://localhost:8080/swagger-ui/index.html</a></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>No code change required to enable swagger documentation</code>.</li>
+<li>It's enabled by default if the ependency is present in <code>POM.xml</code></li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui</code></li>
+<li><code>https://springdoc.org/#getting-started</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-content-negotiation-for-response-parsing">4. Content negotiation for Response parsing</h2>
+<h3 id="project-ref-a5-sboot-ms-content-negotiation">Project ref: <em>a5-sboot-ms-content-negotiation</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Add following dependency in POM.xml<pre><code class="language-xml">	<span class="hljs-comment">&lt;!-- XML conversion --&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.fasterxml.jackson.dataformat<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jackson-dataformat-xml<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>If client requests for <code>Accept: application/xml</code> header.</li>
+<li>Spring willl internally check <code>jackson-dataformat-xml</code> API dependency, if found bean will be transformed to xml.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-internationalization-i18n">5. Internationalization (i18n)</h2>
+<h3 id="project-ref-a6-sboot-ms-content-i18n">Project ref: <em>a6-sboot-ms-content-i18n</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>Required API is available as part of spring-context dependency.</li>
+<li>This is imported with spring web dependency internally.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.context.MessageSource;</code></li>
+</ul>
+</li>
+<li>Autowire the MessageSource in required class.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HelloWorldI18n</span> {
+
+		<span class="hljs-keyword">private</span> MessageSource messageSource;
+
+		<span class="hljs-comment">// autowire (constructor injection) messageSource.</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">HelloWorldI18n</span><span class="hljs-params">(MessageSource messageSource)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.messageSource = messageSource;
+		}
+
+		<span class="hljs-meta">@GetMapping(&quot;/say-hello-i18n&quot;)</span>
+		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">sayHello</span><span class="hljs-params">()</span> {
+
+			<span class="hljs-type">var</span> <span class="hljs-variable">locale</span> <span class="hljs-operator">=</span> LocaleContextHolder.getLocale();
+
+			<span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.messageSource.getMessage(<span class="hljs-string">&quot;good.morning&quot;</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">&quot;Default - Good Morning&quot;</span>, locale);
+		}
+	}
+</code></pre>
+</li>
+<li>Create property files for different locale
+<ul>
+<li>File: <code>messages[-&lt;locale&gt;].properties</code></li>
+<li>Here's some examples:
+<ul>
+<li>Default: <code>messages.properties</code></li>
+<li>Spanish: <code>messages_es.properties</code></li>
+<li>German: <code>messages_ger.properties</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>Default message files name prefix is <code>messages</code> &amp; suffix is <code>.properties</code>.</li>
+<li>Spring reads the value of <code>Accept-Language</code> Header from <code>HTTP Request</code>and replaces it with <code>&lt;locale&gt;</code> when locating <code>messsages[-&lt;locale&gt;].properties</code> file.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-microservice-api-versioning">6. Microservice API Versioning</h2>
+<h3 id="project-ref-a7-sboot-ms-api-versioning">Project ref: <em>a7-sboot-ms-api-versioning</em></h3>
+<ul>
+<li><strong><ins>Maven / External dependency</ins></strong>
+<ul>
+<li>No dependency required.</li>
+<li>API versioning is HTTP architectural style.
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Common Java Beans Code</ins></strong>
+<ul>
+<li>Personv1.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV1</span> {
+
+		<span class="hljs-keyword">private</span> String name;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">PersonV1</span><span class="hljs-params">(String name)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.name = name;
+		}
+		<span class="hljs-comment">// getter-setters</span>
+	}
+</code></pre>
+</li>
+<li>Personv2.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonV2</span> {
+
+		<span class="hljs-keyword">private</span> Name name;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">PersonV2</span><span class="hljs-params">(Name name)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.name = name;
+		}
+		<span class="hljs-comment">// getter-setters</span>
+	}
+</code></pre>
+</li>
+<li>Name.java bean<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Name</span> {
+
+		<span class="hljs-keyword">private</span> String firstName;
+		<span class="hljs-keyword">private</span> String lastName;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">Name</span><span class="hljs-params">(String firstName, String lastName)</span> {
+			<span class="hljs-built_in">super</span>();
+			<span class="hljs-built_in">this</span>.firstName = firstName;
+			<span class="hljs-built_in">this</span>.lastName = lastName;
+		}
+		<span class="hljs-comment">// getters-setters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>URI Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a version number is appended in URL to create new URL version.</li>
+<li><strong>Twitter</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> <a href="https://developer.x.com/en/docs/x-ads-api/versioning">https://developer.x.com/en/docs/x-ads-api/versioning</a></li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Polluting URL</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UriVersioningPersonController</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/v1/person&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;URI Versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(&quot;/v2/person&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;URI&quot;</span>, <span class="hljs-string">&quot;Versioning V2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Request Param Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a request param is sent with API version number.</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Amazon</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Polluting URL</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RequestParamVersioningController</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/param&quot;, params = &quot;version=1&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Request Param versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/param&quot;, params = &quot;version=2&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Request Parama&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Custom Header Versioning</ins></strong>
+<ul>
+<li>In this versioning style, a custom HTTP header is sent with API version number.</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Microsoft</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Misuse of HTTP Headers</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomHeaderVersioning</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=1&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Custom Header Versioning v1&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/header&quot;, headers = &quot;X-API-VERSION=2&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Custom Header&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Content Negotiation (Media type) Versioning</ins></strong>
+<ul>
+<li>a.k.a <code>Content negotiation</code> or <code>Accept header</code> versioning.</li>
+<li>In this versioning style, a custome media type is sent in <code>Accept</code> HTTP header.</li>
+<li>Which API matches the header value request is forwarded to it.
+<ul>
+<li>e.g. <code>Accept: application/vnd.comp.app-v2+json</code></li>
+</ul>
+</li>
+<li>Base URL remains unchanged.</li>
+<li><strong>Github</strong> also follows same versoning strrateegy.
+<ul>
+<li><strong>Ref:</strong> https://</li>
+</ul>
+</li>
+<li><strong><ins>Drawback</ins></strong>
+<ul>
+<li>Misuse of HTTP Headers</li>
+</ul>
+</li>
+<li><strong><ins>Controller Code changes</ins></strong>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.web.bind.annotation.GetMapping;</code></li>
+</ul>
+</li>
+<li>Here's two versions of API defined.<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MediaTypeVersioning</span> {
+
+		<span class="hljs-comment">/**
+		* Version 1
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.comp.app-v1+json&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV1 <span class="hljs-title function_">getPersonV1</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV1</span>(<span class="hljs-string">&quot;Mediatype Versioning v1.&quot;</span>);
+		}
+
+		<span class="hljs-comment">/**
+		* Version 2
+		* <span class="hljs-doctag">@return</span>
+		*/</span>
+		<span class="hljs-meta">@GetMapping(path = &quot;/person/accept&quot;, produces = &quot;application/vnd.comp.app-v2+json&quot;)</span>
+		<span class="hljs-keyword">public</span> PersonV2 <span class="hljs-title function_">getPersonV2</span><span class="hljs-params">()</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PersonV2</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Name</span>(<span class="hljs-string">&quot;Media type&quot;</span>, <span class="hljs-string">&quot;Versioning v2&quot;</span>));
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="7-springboot-hateoas">7. SpringBoot HATEOAS</h2>
+<h3 id="project-ref-a8-sboot-ms-hateoas">Project ref: <em>a8-sboot-ms-hateoas</em></h3>
+<ul>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-hateoas<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.hateoas.EntityModel;</code></li>
+<li><code>import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;</code></li>
+</ul>
+</li>
+<li>Add validation in the properties of the bean.<pre><code class="language-java">	<span class="hljs-comment">/**
+	 * Retrieve the users.
+	 * <span class="hljs-doctag">@return</span>
+	 */</span>
+	<span class="hljs-meta">@GetMapping(path = &quot;/users/{id}&quot;, produces = {&quot;application/json&quot;, &quot;application/xml&quot;})</span>
+	<span class="hljs-keyword">public</span> EntityModel&lt;User&gt; <span class="hljs-title function_">retrieveUser</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> Integer id)</span> {
+		<span class="hljs-type">User</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> userDaoService.findById(id);
+
+		<span class="hljs-keyword">if</span> (user == <span class="hljs-literal">null</span>) {
+			<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UserNotFoundException</span>(String.format(<span class="hljs-string">&quot;No user exists with id : %s&quot;</span>, id));
+		}
+
+		<span class="hljs-comment">// Hateoas: Create link to method</span>
+		<span class="hljs-type">var</span> <span class="hljs-variable">link</span> <span class="hljs-operator">=</span> WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(<span class="hljs-built_in">this</span>.getClass()).retrieveAllUsers());
+
+		<span class="hljs-comment">// EntityModel object supports Model and allows to add links</span>
+		<span class="hljs-keyword">final</span> EntityModel&lt;User&gt; entityModel = EntityModel.of(user);
+		
+		<span class="hljs-comment">//Hateoas: Add link to Model response object.</span>
+		entityModel.add(link.withRel(<span class="hljs-string">&quot;all-users&quot;</span>));
+		
+		<span class="hljs-keyword">return</span> entityModel;
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li><code>Spring HATEOAS</code> provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC.</li>
+<li>The <code>core problem it tries to address</code> is link creation and representation assembly.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>https://spring.io/projects/spring-hateoas</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-static-content-filtering">8. Static content filtering</h2>
+<h3 id="project-ref-a9-sboot-ms-static-filtering">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Content filtering refers to removing the properties from Response bean when sending back to requestor.</li>
+<li>This feature is available in <code>jackson-annotations-x.x.jar</code>, which is added as part of <code>spring-boot-starter-web</code> dependency.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>We only need to update the Java Bean properties. No change required in controller.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.annotation.JsonIgnore;</code></li>
+<li><code>import com.fasterxml.jackson.annotation.JsonIgnoreProperties;</code></li>
+</ul>
+</li>
+<li>Annotate java properties to ignore while building the response.<pre><code class="language-java">	<span class="hljs-comment">/** Ignore all specified properties from the class.  */</span>
+	<span class="hljs-meta">@JsonIgnoreProperties(value = {&quot;property4&quot;, &quot;property6&quot;})</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SomeBean</span> {
+
+		<span class="hljs-keyword">private</span> String property1;
+		
+		<span class="hljs-comment">// Ignore this property</span>
+		<span class="hljs-meta">@JsonIgnore</span>
+		<span class="hljs-keyword">private</span> String property2;
+		<span class="hljs-keyword">private</span> String property3;
+		
+		<span class="hljs-comment">// @JsonIgnoreProperties - Ignore this</span>
+		<span class="hljs-keyword">private</span> String property4;
+		<span class="hljs-keyword">private</span> String property5;
+		
+		<span class="hljs-comment">// @JsonIgnoreProperties - Ignore this</span>
+		<span class="hljs-keyword">private</span> String property6;
+
+		<span class="hljs-comment">// constructors, setter-getters and utility methods</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>In this approach we're hardcoding that which properties should not be returned in response when the given bean is returned in response, irrespective of which API is using this.</li>
+<li>Hence, this is called <code>Static Filtering</code>.</li>
+<li><code>@JsonIgnore</code> annotation:
+<ul>
+<li>Marks the property, to be removed when building response from this bean.</li>
+</ul>
+</li>
+<li><code>@JsonIgnoreProperties</code> annotation
+<ul>
+<li>Marks a list of properties inside this class, to be removed when building response from this bean.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="9-dynamic-content-filtering">9. Dynamic content filtering</h2>
+<h3 id="project-ref-a9-sboot-ms-static-filtering-1">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Content filtering refers to removing the properties from Response bean when sending back to requestor.</li>
+<li>This feature is available in <code>jackson-annotations-x.x.jar</code>, which is added as part of <code>spring-boot-starter-web</code> dependency.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>Bean
+<ul>
+<li>Update the Java Bean class with the <code>filter name</code> create inside controller.</li>
+<li>All controller APIs should update the filter with same <code>filter name</code>.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.annotation.JsonFilter;</code></li>
+</ul>
+</li>
+<li>Annotate java properties to ignore while building the response.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">/** Dynamically exclude properties as per the specified filter set by the API. */</span>
+	<span class="hljs-meta">@JsonFilter(&quot;dyna-filter-for-somebean&quot;)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span> {
+
+		<span class="hljs-keyword">private</span> String field1;
+		<span class="hljs-keyword">private</span> String field2;
+		<span class="hljs-keyword">private</span> String field3;
+		<span class="hljs-keyword">private</span> String field4;
+		<span class="hljs-keyword">private</span> String field5;
+		<span class="hljs-keyword">private</span> String field6;
+
+		<span class="hljs-comment">// constructors, setter-getters and utility methods</span>
+	}
+</code></pre>
+</li>
+<li>Controller
+<ul>
+<li>Create instace of `` and mention the properties to be excluded and add it with a unique name in filter provider.</li>
+<li>imports
+<ul>
+<li><code>import com.fasterxml.jackson.databind.ser.FilterProvider;</code></li>
+<li><code>import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;</code></li>
+<li><code>import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;</code></li>
+<li><code>import com.srvivek.sboot.mservices.bean.SomeBeanDynamicFilter;</code></li>
+</ul>
+</li>
+<li>Create filter.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DynamicFilteringController</span> {
+
+		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering&quot;)</span>
+		<span class="hljs-keyword">public</span> MappingJacksonValue <span class="hljs-title function_">filtering</span><span class="hljs-params">()</span> {
+
+			<span class="hljs-comment">// Dynamic filtering</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field2&quot;</span>,
+					<span class="hljs-string">&quot;field4&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SimpleFilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>()
+					.addFilter(<span class="hljs-string">&quot;dyna-filter-for-somebean&quot;</span>, simpleBeanPropertyFilter);
+
+			<span class="hljs-comment">// Construct resposnse bean</span>
+			<span class="hljs-keyword">final</span> <span class="hljs-type">SomeBeanDynamicFilter</span> <span class="hljs-variable">SomeBeanDynamicFilter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>,
+					<span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>);
+			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilter);
+			mappingJacksonValue.setFilters(simpleFilterProvider);
+
+			<span class="hljs-keyword">return</span> mappingJacksonValue;
+		}
+
+		<span class="hljs-meta">@GetMapping(&quot;/dyna-filtering-list&quot;)</span>
+		<span class="hljs-keyword">public</span> MappingJacksonValue <span class="hljs-title function_">filteringList</span><span class="hljs-params">()</span> {
+
+			<span class="hljs-comment">// Dynamic filtering</span>
+			<span class="hljs-type">SimpleBeanPropertyFilter</span> <span class="hljs-variable">simpleBeanPropertyFilter</span> <span class="hljs-operator">=</span> SimpleBeanPropertyFilter.filterOutAllExcept(<span class="hljs-string">&quot;field1&quot;</span>,
+					<span class="hljs-string">&quot;field3&quot;</span>, <span class="hljs-string">&quot;field5&quot;</span>, <span class="hljs-string">&quot;field6&quot;</span>);
+			<span class="hljs-type">FilterProvider</span> <span class="hljs-variable">simpleFilterProvider</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleFilterProvider</span>().addFilter(<span class="hljs-string">&quot;dyna-filter-for-somebean&quot;</span>,
+					simpleBeanPropertyFilter);
+
+			<span class="hljs-comment">// Construct list of resposnse beans</span>
+			List&lt;SomeBeanDynamicFilter&gt; SomeBeanDynamicFilterList = Arrays.asList(
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-1&quot;</span>, <span class="hljs-string">&quot;Value-2&quot;</span>, <span class="hljs-string">&quot;Value-3&quot;</span>, <span class="hljs-string">&quot;Value-4&quot;</span>, <span class="hljs-string">&quot;Value-5&quot;</span>, <span class="hljs-string">&quot;Value-6&quot;</span>),
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-11&quot;</span>, <span class="hljs-string">&quot;Value-22&quot;</span>, <span class="hljs-string">&quot;Value-33&quot;</span>, <span class="hljs-string">&quot;Value-44&quot;</span>, <span class="hljs-string">&quot;Value-55&quot;</span>, <span class="hljs-string">&quot;Value-66&quot;</span>),
+					<span class="hljs-keyword">new</span> <span class="hljs-title class_">SomeBeanDynamicFilter</span>(<span class="hljs-string">&quot;Value-111&quot;</span>, <span class="hljs-string">&quot;Value-222&quot;</span>, <span class="hljs-string">&quot;Value-333&quot;</span>, <span class="hljs-string">&quot;Value-444&quot;</span>, <span class="hljs-string">&quot;Value-555&quot;</span>,
+							<span class="hljs-string">&quot;Value-666&quot;</span>));
+
+			<span class="hljs-keyword">final</span> <span class="hljs-type">MappingJacksonValue</span> <span class="hljs-variable">mappingJacksonValue</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MappingJacksonValue</span>(SomeBeanDynamicFilterList);
+			mappingJacksonValue.setFilters(simpleFilterProvider);
+
+			<span class="hljs-keyword">return</span> mappingJacksonValue;
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>In this approach we're dynamically marking the properties which should not be returned in response when the given bean is returned in response, for the API which is returring this bean.</li>
+<li>Hence, this is called <code>Dynamic Filtering</code>.</li>
+<li><code>@JsonFilter</code> annotation:
+<ul>
+<li>Defines a filter name, which should be evaluated and applied every time when object of this bean is returned in response.</li>
+<li>The given filter name <code>dyna-filter-for-somebean</code> is created and update in API method of controller class.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="10-exception--error-handling-custom-exceptions">10. Exception / Error Handling (Custom Exceptions)</h2>
+<h3 id="project-ref-a2-sboot-ms-social-media-app-1">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
+<ul>
+<li>
+<p><strong><ins>Purpose / Feature</ins></strong></p>
+<ul>
+<li>Spring boot provides mechanism to handle and customize the exceptions thrown by the applications.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Maven / External dependency</ins></strong></p>
+<ul>
+<li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Code changes</ins></strong></p>
+<ul>
+<li>Java Bean
+<ul>
+<li>Java Bean to standarized the error message returned to requestor/cient.</li>
+<li>ErrorDetails.java
+<ul>
+<li>imports
+<ul>
+<li><code>None</code></li>
+</ul>
+</li>
+<li>Class with required properties<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ErrorDetails</span> {
+
+		<span class="hljs-keyword">private</span> LocalDateTime timestamp;
+		<span class="hljs-keyword">private</span> String message;
+		<span class="hljs-keyword">private</span> String details;
+
+		<span class="hljs-comment">// Constructor, setter-getters</span>
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Custom Exception class
+<ul>
+<li>Create a custom exception class to determine the type of error that has occured.</li>
+<li>UserNotFoundException.java
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.http.HttpStatus;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ResponseStatus;</code></li>
+</ul>
+</li>
+<li>Override required constructors and can have fields if any info need to be stored.<pre><code class="language-java">	<span class="hljs-meta">@ResponseStatus(code = HttpStatus.NOT_FOUND)</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">UserNotFoundException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">RuntimeException</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> <span class="hljs-number">4882099180124262207L</span>;
+
+		<span class="hljs-keyword">public</span> <span class="hljs-title function_">UserNotFoundException</span><span class="hljs-params">(String message)</span> {
+			<span class="hljs-built_in">super</span>(message);
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Controller Advice class
+<ul>
+<li>Create a custom Controller advice class to determine the type of error that has occured.</li>
+<li>UserNotFoundException.java
+<ul>
+<li>imports
+<ul>
+<li><code>import org.springframework.core.annotation.Order;</code></li>
+<li><code>import org.springframework.http.HttpStatus;</code></li>
+<li><code>import org.springframework.http.ResponseEntity;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ControllerAdvice;</code></li>
+<li><code>import org.springframework.web.bind.annotation.ExceptionHandler;</code></li>
+<li><code>import org.springframework.web.bind.annotation.RestControllerAdvice;</code></li>
+<li><code>import org.springframework.web.context.request.WebRequest;</code></li>
+<li><code>import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;</code></li>
+<li><code>import jakarta.annotation.Priority;</code></li>
+</ul>
+</li>
+<li>Override required required method and process the exception.<pre><code class="language-java">	<span class="hljs-meta">@ControllerAdvice</span>
+	<span class="hljs-comment">//@ControllerAdvice(basePackages = &quot;com.srvivek.x.y.z&quot;) //for specific package</span>
+	<span class="hljs-comment">//@Order(value = 1) // for defining ordering</span>
+	<span class="hljs-comment">//@Priority(value = 1) // for defining ordering</span>
+	<span class="hljs-comment">//@RestControllerAdvice(basePackages = &quot;com.srvivek.x.y.z&quot;) // @ControllerAdvice + @ResponseBody</span>
+	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomizedResponseEntityExceptionHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ResponseEntityExceptionHandler</span> {
+
+		<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(CustomizedResponseEntityExceptionHandler.class);
+
+		<span class="hljs-comment">/**
+		* Generic exception handling.
+		* <span class="hljs-doctag">@param</span> ex
+		* <span class="hljs-doctag">@param</span> request
+		* <span class="hljs-doctag">@return</span>
+		* <span class="hljs-doctag">@throws</span> Exception
+		*/</span>
+		<span class="hljs-meta">@ExceptionHandler(exception = Exception.class)</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> ResponseEntity&lt;ErrorDetails&gt; <span class="hljs-title function_">handleAllException</span><span class="hljs-params">(Exception ex, WebRequest request)</span> <span class="hljs-keyword">throws</span> Exception {
+
+			logger.error(<span class="hljs-string">&quot;Error stacktrace: {}&quot;</span>, ex);
+
+			<span class="hljs-type">ErrorDetails</span> <span class="hljs-variable">errorDetails</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ErrorDetails</span>(LocalDateTime.now(), ex.getMessage(),
+					request.getDescription(<span class="hljs-literal">false</span>));
+
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;ErrorDetails&gt;(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		<span class="hljs-comment">/**
+		* Return HTTP 404 for UserNotFoundException.
+		* <span class="hljs-doctag">@param</span> ex
+		* <span class="hljs-doctag">@param</span> request
+		* <span class="hljs-doctag">@return</span>
+		* <span class="hljs-doctag">@throws</span> Exception
+		*/</span>
+		<span class="hljs-meta">@ExceptionHandler(exception = UserNotFoundException.class)</span>
+		<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> ResponseEntity&lt;ErrorDetails&gt; <span class="hljs-title function_">handleUserNotFoundException</span><span class="hljs-params">(Exception ex, WebRequest request)</span>
+				<span class="hljs-keyword">throws</span> Exception {
+
+			logger.error(<span class="hljs-string">&quot;Error stacktrace: {}&quot;</span>, ex);
+
+			<span class="hljs-type">ErrorDetails</span> <span class="hljs-variable">errorDetails</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ErrorDetails</span>(LocalDateTime.now(), ex.getMessage(),
+					request.getDescription(<span class="hljs-literal">false</span>));
+
+			<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResponseEntity</span>&lt;ErrorDetails&gt;(errorDetails, HttpStatus.NOT_FOUND);
+		}
+	}
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>We can define controller advice for specific package.</li>
+<li>While handling exceptions, also log the error explicitly or else it will not be logged in log files.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><code>TBU</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="a11-sboot-ms-hal-explorer-todo">a11-sboot-ms-hal-explorer [<em><strong>TODO</strong></em>]</h2>
+<ul>
+<li>Dependency</li>
+</ul>
+<pre><code>		&lt;!-- Spring boot HAL explorer --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.data&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-data-rest-hal-explorer&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>Default URL</li>
+</ul>
+<pre><code>		- http://localhost:8080/explorer
+		- http://localhost:8080/explorer/index.html#
+</code></pre>
+<hr>
+<p>##a13-sboot-ms-h2-jpa [<em><strong>TODO</strong></em>]</p>
+<p>##a13-sboot-ms-mysql-jpa [<em><strong>TODO</strong></em>]</p>
+<ul>
+<li>Launch MySQL as Docker container</li>
+</ul>
+<pre><code>		docker run --detach --env MYSQL_ROOT_PASSWORD=dummypassword --env MYSQL_USER=social-media-user --env MYSQL_PASSWORD=dummypassword --env MYSQL_DATABASE=social-media-database --name mysql --publish 3306:3306 mysql:8-oracle
+
+</code></pre>
+<ul>
+<li>mysqlsh commands</li>
+</ul>
+<pre><code>		mysqlsh
+		\connect social-media-user@localhost:3306
+		\sql
+		use social-media-database
+		select * from user_details;
+		select * from post;
+		\quit
+</code></pre>
+<ul>
+<li>/pom.xml Modified</li>
+</ul>
+<pre><code>		&lt;!-- Use this for Spring Boot 3.1 and higher --&gt;
+		&lt;dependency&gt;
+		    &lt;groupId&gt;com.mysql&lt;/groupId&gt;
+		    &lt;artifactId&gt;mysql-connector-j&lt;/artifactId&gt;
+		&lt;/dependency&gt; 
+		 
+		&lt;!-- Use this if you are using Spring Boot 3.0 or lower
+		    &lt;dependency&gt;
+		        &lt;groupId&gt;mysql&lt;/groupId&gt;
+		        &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+		    &lt;/dependency&gt; 
+		--&gt;
+</code></pre>
+<ul>
+<li>/src/main/resources/application.properties</li>
+</ul>
+<pre><code>		#spring.datasource.url=jdbc:h2:mem:testdb
+		spring.jpa.show-sql=true
+		spring.datasource.url=jdbc:mysql://localhost:3306/social-media-database
+		spring.datasource.username=social-media-user
+		spring.datasource.password=dummypassword
+		spring.jpa.hibernate.ddl-auto=update
+		spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+</code></pre>
+<p>##a13-sboot-ms-mysql-jpa-JDBC-template [<em><strong>TODO</strong></em>]</p>
+<p>##a14-sboot-sc-basic-authentication [<em><strong>TODO</strong></em>]</p>
+<ul>
+<li>Dependency</li>
+</ul>
+<pre><code>		&lt;!-- Spring Security --&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+</code></pre>
+<ul>
+<li>
+<p>Note: If facing any issue while starting the application, try following
+- Stop the server.
+- Update maven project (Alt + f5).
+- Start the server.</p>
+</li>
+<li>
+<p>Default user is 'user'.</p>
+</li>
+<li>
+<p>Get auto generated password from log.</p>
+<ul>
+<li>Search in logs for &quot;Using generated security password: &quot; text to get the auto generated password.</li>
+</ul>
+</li>
+<li>
+<p>Configuring user and password in application properties</p>
+</li>
+</ul>
+<pre><code>		spring.security.user.name=vivek
+		spring.security.user.password=welcome
+</code></pre>
+<ul>
+<li>Customizing default authentication
+<ul>
+<li>Create a Configuration class to override default authetication</li>
+</ul>
+</li>
+</ul>
+<pre><code>		import org.springframework.context.annotation.Bean;
+		import org.springframework.context.annotation.Configuration;
+		import org.springframework.security.config.Customizer;
+		import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+		import org.springframework.security.web.SecurityFilterChain;
+		
+		@Configuration
+		public class SpringSecurityConfiguration {
+		
+			@Bean
+			SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+		
+				/* 
+				 * All requests must be authorized.
+				 * 
+				 * Else return HTTP 403, it doesn't prompt for user creds.
+				 */
+				httpSecurity.authorizeHttpRequests(
+						authorizationManagerRequestMatcherRegistryCustomizer -&gt; authorizationManagerRequestMatcherRegistryCustomizer
+								.anyRequest().authenticated());
+		
+				/* 
+				 * Prompt for authentication if request is not authorized.
+				 * 
+				 * Using default customizer
+				 */
+				httpSecurity.httpBasic(Customizer.withDefaults());
+		
+				/*
+				 * Disabling CSRF as it may cause issue with HTTP methods - POST &amp; PUT.
+				 * 
+				 * if enabled, Keep prompting for user credentials for post request.
+				 */
+				httpSecurity.csrf(csrf -&gt; csrf.disable());
+		
+				return httpSecurity.build();
+			}
+		}
+
+</code></pre>
+
+            
+            
+        </body>
+        </html>

@@ -1007,10 +1007,26 @@
 <li>
 <p><strong><ins>Steps</ins></strong></p>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
-<li><em><strong>Step-2:</strong></em> Add eureka properties in <code>application.propeties</code>.</li>
-<li><em><strong>Step-3:</strong></em> Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
-<li><em><strong>Step-4:</strong></em> Restart your service and verify in eureka server that your micro-service is regitered.</li>
+<li><em><strong>Step-1:</strong></em>
+<ul>
+<li>Add <code>spring-cloud-starter-loadbalancer</code> dependency in POM.xml.</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em>
+<ul>
+<li>Add eureka properties in <code>application.propeties</code>.</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em>
+<ul>
+<li>Update the feign client <em><strong>@FeignClient</strong></em> <code>annotation</code> and remove <code>url</code> property.</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em>
+<ul>
+<li>Restart your service and verify in eureka server that your micro-service is regitered.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>
@@ -1040,7 +1056,6 @@
 	<span class="hljs-comment">/* Find service details from name server using service name. */</span>
 	<span class="hljs-meta">@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</span> 
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">CurrencyExchangeProxy</span> {
-
 		<span class="hljs-comment">/**
 		* Method as defined in the host service.
 		* <span class="hljs-doctag">@param</span> from
@@ -1077,7 +1092,6 @@
 <span class="hljs-comment">
 	# End: Eureka client config</span>
 <span class="hljs-comment">
-
 	# Start: Spring Load Balancer</span>
 <span class="hljs-comment">
 	# Enable load balancer.</span>
@@ -1088,7 +1102,6 @@
 <span class="hljs-comment">
 	# End: Spring Load Balancer</span>
 <span class="hljs-comment">
-
 	# Start: Cloud config client</span>
 <span class="hljs-comment">
 	# by default it&#x27;s enabled</span>
@@ -1108,7 +1121,7 @@
 </li>
 </ul>
 <blockquote>
-<p>Note:
+<p><strong>Note:</strong>
 With service name it finds the server details from <code>Eureka Server</code>.
 <code>spring-load-balancer</code> is mandatory dependency with feign client.</p>
 </blockquote>
