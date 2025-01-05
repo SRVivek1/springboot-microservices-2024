@@ -44,6 +44,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-config-server</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - B2SbootCloudConfigServerApplication.java main app.
     - imports
@@ -106,12 +107,11 @@
   - `@EnableConfigServer` annotation:
     - Help enable and configure Config. Server artifacts.
 
-
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_server)
-
 ---
+
 ## 02. Develop/Enable cloud config client 
 ### Project ref: *b1-limits-service*
 - **<ins>Purpose / Feature</ins>**
@@ -138,6 +138,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - Create a `configurationProperties` class.
     - imports
@@ -219,15 +220,13 @@
 
 		# End: Cloud config client
 
-
 		# Start: local service configuration
 		limits-service.minimum=20
 		limits-service.maximum=21
 
 		app-config.minimum=10
 		app-config.maximum=11
-		# End: local service configuration
-	
+		# End: local service configuration	
 	```
 - **<ins>Notes:</ins>**
   - Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. 
@@ -246,11 +245,9 @@
     - Due to this you may see multiple requests being made to the Spring Cloud Config Server to fetch configuration. 
     - This is normal and is a side effect of how Spring Boot loads configuration when using `spring.config.import`.
 
-
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
   - [https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/#_spring_cloud_config_client)
-
 ---
 
 ## 3. RestTemplate: Connect to other mircoservice
@@ -280,6 +277,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+	```
 - **<ins>Code / Config changes</ins>**
   - **Configuration:** *RestTemplateConfiguration.java*
     - imports
@@ -339,9 +337,10 @@
     			}
     		}
 	```
-  - imports
-    - `import java.math.BigDecimal;`
-  - Annotate the method parameter for validation.
+  - **Response Bean:** *CurrencyConversion.java*
+    - imports
+      - `import java.math.BigDecimal;`
+    - Annotate the method parameter for validation.
 	```java
 		public class CurrencyConversion {
 
@@ -360,7 +359,6 @@
 
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html)
-
 ---
 
 ## 4. OpenFeign client: Connect to other mircoservice
@@ -368,6 +366,16 @@
 - **<ins>Purpose / Feature</ins>**
   - Easy way to make rest service calls. 
   - Removes bioler plate code need to be written while using `RestTemplate` to invoke a rest service.
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Microservice project with Rest API integration
+  - ***Step-1:*** Enable feign clients on SpringBoot main app using `@EnableFeignClients`.
+  - ***Step-2:*** Create an Interface and annotate it with `@FeignClient` and define a method signature as in target rest service.
+    - `@FeignClient(name = "b3-currency-exchange-service")`
+    - `@FeignClient(name = "b3-currency-exchange-service", url = "localhost:8000")`
+  - ***Step-2:*** Create an reference object of Interface in controller / service and `@Autowired` it.
+    - `private CurrencyExchangeProxy currencyExchangeProxy;`
+  - ***Step-3:*** Initate rest API call using *proxy* instance.
+    - `final CurrencyConversion currencyConversionExchange = currencyExchangeProxy.retrieveExchangeRateFromDatabase(from, to);`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -375,24 +383,24 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
-
-- **<ins>Code changes</ins>**
-  - Application: Enable feign clients using ***@EnableFeignClients***.
-    - Scans for interfaces that declare they are feign clients `(via org.springframework.cloud.openfeign.FeignClient @FeignClient)`. 
-    - Configures component scanning directives for use with `org.springframework.context.annotation.Configuration @Configuration` classes.
-    -  imports
-       - `import org.springframework.cloud.openfeign.EnableFeignClients;`
-    - Annotate the SpringBoot application to enable feign clients.
-	```java
-		@EnableFeignClients  // Enables feign clients in application
-		@SpringBootApplication
-		public class B4CurrencyConversionServiceApplication {
-
-			public static void main(String[] args) {
-				SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
-			}
-		}
 	```
+- **<ins>Code changes</ins>**
+  - **Application:** 
+    - Enable feign clients using ***@EnableFeignClients***.
+      - Scans for interfaces that declare they are feign clients `(via org.springframework.cloud.openfeign.FeignClient @FeignClient)`. 
+      - Configures component scanning directives for use with `org.springframework.context.annotation.Configuration @Configuration` classes.
+      -  imports
+        - `import org.springframework.cloud.openfeign.EnableFeignClients;`
+      - Annotate the SpringBoot application to enable feign clients.
+		```java
+			@EnableFeignClients  // Enables feign clients in application
+			@SpringBootApplication
+			public class B4CurrencyConversionServiceApplication {
+				public static void main(String[] args) {
+					SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
+				}
+			}
+		```
   - Response java bean ***CurrencyConversion.java***.
     - This class must have all the properties expecting from `currency-exchange` service, to support auto population of response data. 
     -  imports
@@ -400,7 +408,6 @@
     - Annotate the SpringBoot application to enable feign clients.
 	```java
 		public class CurrencyConversion {
-
 			private Long id;
 			private String from;
 			private String to;
@@ -408,11 +415,9 @@
 			private BigDecimal quantity;
 			private BigDecimal totalCalculatedAmount;
 			private String environment;
-
 			// constructors, setter-getters.
 		}
 	```
-
   - Create an feign client interface ***CurrencyExchangeProxy.java***
     -  imports
        - `import org.springframework.cloud.openfeign.FeignClient;`
@@ -434,7 +439,7 @@
 	- Controller/Service to use feign client interface.
     -  imports
        - `import org.springframework.cloud.openfeign.FeignClient;`
-    - Add validation in the properties of the bean.
+    - Use *proxy* class to call rest service.
 	```java
 		@RestController
 		public class CurrencyConversionController {
@@ -484,7 +489,6 @@
 - **<ins>References:</ins>**
   - [https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html](https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-feign.html)
   - [https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/](https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/)
-
 ---
 
 ## 5. Service Registry / Naming server : Eureka naming server

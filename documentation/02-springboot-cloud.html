@@ -476,15 +476,13 @@
 <span class="hljs-comment">
 	# End: Cloud config client</span>
 <span class="hljs-comment">
-
 	# Start: local service configuration</span>
 	<span class="hljs-attr">limits-service.minimum</span>=<span class="hljs-string">20</span>
 	<span class="hljs-attr">limits-service.maximum</span>=<span class="hljs-string">21</span>
 
 	<span class="hljs-attr">app-config.minimum</span>=<span class="hljs-string">10</span>
 	<span class="hljs-attr">app-config.maximum</span>=<span class="hljs-string">11</span>
-<span class="hljs-comment">	# End: local service configuration</span>
-
+<span class="hljs-comment">	# End: local service configuration	</span>
 </code></pre>
 </li>
 </ul>
@@ -646,12 +644,16 @@
 </ul>
 <pre><code></code></pre>
 </li>
+<li><strong>Response Bean:</strong> <em>CurrencyConversion.java</em>
+<ul>
 <li>imports
 <ul>
 <li><code>import java.math.BigDecimal;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
+<li>Annotate the method parameter for validation.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
 
 		<span class="hljs-keyword">private</span> Long id;
 		<span class="hljs-keyword">private</span> String from;
@@ -682,52 +684,68 @@
 <h2 id="4-openfeign-client-connect-to-other-mircoservice">4. OpenFeign client: Connect to other mircoservice</h2>
 <h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
-<li>
-<p><strong><ins>Purpose / Feature</ins></strong></p>
+<li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>Easy way to make rest service calls.</li>
 <li>Removes bioler plate code need to be written while using <code>RestTemplate</code> to invoke a rest service.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Microservice project with Rest API integration</li>
+<li><em><strong>Step-1:</strong></em> Enable feign clients on SpringBoot main app using <code>@EnableFeignClients</code>.</li>
+<li><em><strong>Step-2:</strong></em> Create an Interface and annotate it with <code>@FeignClient</code> and define a method signature as in target rest service.
+<ul>
+<li><code>@FeignClient(name = &quot;b3-currency-exchange-service&quot;)</code></li>
+<li><code>@FeignClient(name = &quot;b3-currency-exchange-service&quot;, url = &quot;localhost:8000&quot;)</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create an reference object of Interface in controller / service and <code>@Autowired</code> it.
+<ul>
+<li><code>private CurrencyExchangeProxy currencyExchangeProxy;</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Initate rest API call using <em>proxy</em> instance.
+<ul>
+<li><code>final CurrencyConversion currencyConversionExchange = currencyExchangeProxy.retrieveExchangeRateFromDatabase(from, to);</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
 	<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
-
 </code></pre>
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Code changes</ins></strong></p>
+<li><strong><ins>Code changes</ins></strong>
 <ul>
-<li>
-<p>Application: Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.</p>
+<li><strong>Application:</strong>
+<ul>
+<li>Enable feign clients using <em><strong>@EnableFeignClients</strong></em>.
 <ul>
 <li>Scans for interfaces that declare they are feign clients <code>(via org.springframework.cloud.openfeign.FeignClient @FeignClient)</code>.</li>
 <li>Configures component scanning directives for use with <code>org.springframework.context.annotation.Configuration @Configuration</code> classes.</li>
-<li>imports
-<ul>
+<li>imports</li>
 <li><code>import org.springframework.cloud.openfeign.EnableFeignClients;</code></li>
-</ul>
-</li>
-<li>Annotate the SpringBoot application to enable feign clients.</li>
-</ul>
-<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
+<li>Annotate the SpringBoot application to enable feign clients.<pre><code class="language-java">	<span class="hljs-meta">@EnableFeignClients</span>  <span class="hljs-comment">// Enables feign clients in application</span>
 	<span class="hljs-meta">@SpringBootApplication</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B4CurrencyConversionServiceApplication</span> {
-
 		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
 			SpringApplication.run(B4CurrencyConversionServiceApplication.class, args);
 		}
 	}
 </code></pre>
 </li>
-<li>
-<p>Response java bean <em><strong>CurrencyConversion.java</strong></em>.</p>
+</ul>
+</li>
+</ul>
+</li>
+<li>Response java bean <em><strong>CurrencyConversion.java</strong></em>.
 <ul>
 <li>This class must have all the properties expecting from <code>currency-exchange</code> service, to support auto population of response data.</li>
 <li>imports
@@ -738,7 +756,6 @@
 <li>Annotate the SpringBoot application to enable feign clients.</li>
 </ul>
 <pre><code class="language-java">	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversion</span> {
-
 		<span class="hljs-keyword">private</span> Long id;
 		<span class="hljs-keyword">private</span> String from;
 		<span class="hljs-keyword">private</span> String to;
@@ -746,13 +763,11 @@
 		<span class="hljs-keyword">private</span> BigDecimal quantity;
 		<span class="hljs-keyword">private</span> BigDecimal totalCalculatedAmount;
 		<span class="hljs-keyword">private</span> String environment;
-
 		<span class="hljs-comment">// constructors, setter-getters.</span>
 	}
 </code></pre>
 </li>
-<li>
-<p>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em></p>
+<li>Create an feign client interface <em><strong>CurrencyExchangeProxy.java</strong></em>
 <ul>
 <li>imports
 <ul>
