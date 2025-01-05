@@ -1,5 +1,5 @@
 ## XX. Property, method param or Return type validation
-### Project ref: *xx-xxxx-xx-xxxx*
+### Project ref: [xx-xxxx-xx-xxxx](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/)
 - **<ins>Purpose / Feature</ins>**
   - This is xyz feature.
 - **<ins>Steps</ins>**
