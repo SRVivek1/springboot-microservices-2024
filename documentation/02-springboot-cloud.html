@@ -796,7 +796,7 @@
 <li><code>import org.springframework.cloud.openfeign.FeignClient;</code></li>
 </ul>
 </li>
-<li>Add validation in the properties of the bean.</li>
+<li>Use <em>proxy</em> class to call rest service.</li>
 </ul>
 <pre><code class="language-java">	<span class="hljs-meta">@RestController</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CurrencyConversionController</span> {
@@ -866,6 +866,19 @@
 <li>Service is available at <code>/</code> context. <a href="http://localhost:8761/">http://localhost:8761/</a></li>
 </ul>
 </li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Step-1:</strong></em> Create a new SpringBoot project.</li>
+<li><em><strong>Step-2:</strong></em> <em>POM.xml:</em> Add dependency of <code>spring-cloud-starter-netflix-eureka-server</code>.</li>
+<li><em><strong>Step-3:</strong></em> Add <em>@EnableEurekaServer</em> annotation in main app to enable eureka on this project.</li>
+<li><em><strong>Step-4:</strong></em> Add Eureka config in <code>application.properties</code>
+<ul>
+<li>Restricts to register it self to eureka: <code>eureka.client.register-with-eureka=false</code></li>
+<li>Do not fetch registry info from eureka: <code>eureka.client.fetch-registry=false</code></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
@@ -929,21 +942,30 @@
 <h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
 <h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
 <ul>
-<li>
-<p><strong><ins>Purpose / Feature</ins></strong></p>
+<li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>Register's the micro-service to Name server.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Steps</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
 <ul>
-<li><em><strong>Step-1:</strong></em> Add Eureka client in POM.xml</li>
-<li><em><strong>Step-2:</strong></em> Configure eureka server URI in application.properties</li>
+<li><em><strong>Step-1:</strong></em>
+<ul>
+<li><em>POM.xml</em> Add Eureka client - <em>spring-cloud-netflix-eureka-client</em>.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><em><strong>Step-2:</strong></em>
+<ul>
+<li>Configure eureka server URI in <em>application.properties</em>
+<ul>
+<li><code>eureka.client.service-url.defaultZone=http://localhost:8761/eureka</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Required dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
@@ -953,8 +975,7 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Config changes</ins></strong></p>
+<li><strong><ins>Config changes</ins></strong>
 <ul>
 <li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment">	# Start: Eureka client config</span>
 <span class="hljs-comment">

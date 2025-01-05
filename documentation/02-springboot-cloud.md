@@ -497,6 +497,13 @@
   - It's an application that contains information about all micro services including the name of the service, port, and IP address. 
   - Each microservice has to register itself with the Eureka Server.
   - Service is available at `/` context. [http://localhost:8761/](http://localhost:8761/) 
+- **<ins>Steps</ins>**
+  - ***Step-1:*** Create a new SpringBoot project.
+  - ***Step-2:*** *POM.xml:* Add dependency of `spring-cloud-starter-netflix-eureka-server`.
+  - ***Step-3:*** Add *@EnableEurekaServer* annotation in main app to enable eureka on this project.
+  - ***Step-4:*** Add Eureka config in `application.properties`
+    - Restricts to register it self to eureka: `eureka.client.register-with-eureka=false`
+    - Do not fetch registry info from eureka: `eureka.client.fetch-registry=false`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -504,6 +511,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
+	```
 - **<ins>Code changes</ins>**
   - **Controller:** *AbcController.java*
     - imports
@@ -549,9 +557,11 @@
 - **<ins>Purpose / Feature</ins>**
   - Register's the micro-service to Name server.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Add Eureka client in POM.xml
-  - ***Step-2:*** Configure eureka server URI in application.properties
-   
+  - ***Step-1:*** 
+    - *POM.xml* Add Eureka client - *spring-cloud-netflix-eureka-client*.
+  - ***Step-2:*** 
+    - Configure eureka server URI in *application.properties*
+      - `eureka.client.service-url.defaultZone=http://localhost:8761/eureka`
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -559,6 +569,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-netflix-eureka-client</artifactId>
 		</dependency>
+	```
 - **<ins>Config changes</ins>**
   - **Application Config:** *application.properties*
 	```properties
@@ -572,20 +583,21 @@
 
 		# End: Eureka client config
 	```
-
 > Note: If `Eureka client` dependency is present in `POM.xml`, spring will automatically try to register this service to Naming server by looking for `Eureka Server` on it's default `Eureka port - 8761`.
-
 ---
-
 ## 7. Client side Load Balancing microservices
 ### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
-  - ***Step-1:*** Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
-  - ***Step-2:*** Add eureka properties in `application.propeties`.
-  - ***Step-3:*** Update the feign client ***@FeignClient*** `annotation` and remove `url` property.
-  - ***Step-4:*** Restart your service and verify in eureka server that your micro-service is regitered.
+  - ***Step-1:*** 
+    - Add `spring-cloud-starter-loadbalancer` dependency in POM.xml.
+  - ***Step-2:*** 
+    - Add eureka properties in `application.propeties`.
+  - ***Step-3:*** 
+    - Update the feign client ***@FeignClient*** `annotation` and remove `url` property.
+  - ***Step-4:*** 
+    - Restart your service and verify in eureka server that your micro-service is regitered.
 - **<ins>Maven / External dependency</ins>**
   - Required dependency.
  	```xml
@@ -593,6 +605,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
 		</dependency>
+	```
 - **<ins>Code / Config changes</ins>**
   - **Feign Client:** *AbcController.java*
     - imports
@@ -603,7 +616,6 @@
 		/* Find service details from name server using service name. */
 		@FeignClient(name = "b3-currency-exchange-service") 
 		public interface CurrencyExchangeProxy {
-
 			/**
 			* Method as defined in the host service.
 			* @param from
@@ -636,7 +648,6 @@
 
 		# End: Eureka client config
 
-
 		# Start: Spring Load Balancer
 
 		# Enable load balancer.
@@ -646,7 +657,6 @@
 		spring.cloud.loadbalancer.retry.enabled=true
 
 		# End: Spring Load Balancer
-
 
 		# Start: Cloud config client
 
@@ -665,14 +675,12 @@
 		# End: Cloud config client
 	```
 	
-> Note: 
+> **Note:**
 > With service name it finds the server details from `Eureka Server`.
 > `spring-load-balancer` is mandatory dependency with feign client.
 
 - **<ins>References:</ins>**
   - [https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html](https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html)
-
-
 ---
 
 ## 8. API Gateway
