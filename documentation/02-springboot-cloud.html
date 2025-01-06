@@ -192,14 +192,14 @@
 </tbody>
 </table>
 <hr>
-<h2 id="01-develop-cloud-config-server">01. Develop cloud config server</h2>
-<h3 id="project-ref-b2-sboot-cloud-config-server">Project ref: <em>b2-sboot-cloud-config-server</em></h3>
+<h2 id="01-springboot-cloud-config-server">01. SpringBoot cloud config server</h2>
+<h3 id="project-ref-b2-sboot-cloud-config-server">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b2-sboot-cloud-config-server">b2-sboot-cloud-config-server</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
 <ul>
-<li>Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system.</li>
-<li>With the Config Server, you have a central place to manage external properties for applications across all environments.</li>
+<li>Spring Cloud Config provides server-side and client-side support to externalize application configuration in a distributed system.</li>
+<li>With the Config Server, we have a central place to manage external properties / configuration for all applications across all environments.</li>
 </ul>
 </li>
 <li>
@@ -207,26 +207,30 @@
 <ul>
 <li><em><strong>Step-1:</strong></em> Git Repo setup
 <ul>
-<li>Create a new git repo (local or github)</li>
-<li>Add required properties files using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code></li>
+<li>Create a new git repo either a local or create a reposirty on <a href="http://github.com">Github.com</a>
+<ul>
+<li><strong>Local git initialization:</strong> <em>git init</em></li>
+</ul>
+</li>
+<li>Add required properties files using microservice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code></li>
 </ul>
 </li>
 <li><em><strong>Step-2:</strong></em> Create a new SpringBoot project.
 <ul>
-<li>Add dependency <code>spring-cloud-config-server</code>.</li>
+<li>Add dependency <code>spring-cloud-config-server</code> in <em>pom.xml</em>.</li>
 </ul>
 </li>
-<li><em><strong>Step-3:</strong></em> Enable as Config Server
+<li><em><strong>Step-3:</strong></em> Enable as Config Server by annotation config.
 <ul>
-<li>Add <code>@EnableConfigServer</code> annotation to enable application as config server.</li>
+<li>Add <code>@EnableConfigServer</code> annotation on <em>SpringBoot main App</em> to enable application as config server.</li>
 </ul>
 </li>
-<li><em><strong>Step-4:</strong></em> Configure git repo URL.
+<li><em><strong>Step-4:</strong></em> Configure git repo URL in <em>application.properties</em>.
 <ul>
-<li>Add <code>spring.cloud.config.server.git.uri</code> in <code>application.properties</code></li>
+<li>Add <code>spring.cloud.config.server.git.uri=https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</code></li>
 </ul>
 </li>
-<li><em><strong>Step-5:</strong></em> Git URLs
+<li><em><strong>Step-5:</strong></em> Git URLs for different platforms
 <ul>
 <li><strong>Linux:</strong> <em>file:///path/to/git/directory</em></li>
 <li><strong>Windows:</strong> <em>file:///c:/path/to/git/directory</em></li>
@@ -249,26 +253,24 @@
 <li>
 <p><strong><ins>Code changes</ins></strong></p>
 <ul>
-<li>B2SbootCloudConfigServerApplication.java main app.
+<li><strong>B2SbootCloudConfigServerApplication.java</strong> main app.
 <ul>
 <li>imports
 <ul>
 <li><code>import org.springframework.cloud.config.server.EnableConfigServer;</code></li>
-<li>Config server is enabled by adding annotation on main app.<pre><code class="language-java">	<span class="hljs-comment">/* Enable config server. */</span>
+</ul>
+</li>
+<li>Config server is enabled by adding annotation on main app.</li>
+</ul>
+<pre><code class="language-java">	<span class="hljs-comment">/* Enable config server. */</span>
 	<span class="hljs-meta">@EnableConfigServer</span> 
 	<span class="hljs-meta">@SpringBootApplication</span>
 	<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">B2SbootCloudConfigServerApplication</span> {
-
 		<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
 			SpringApplication.run(B2SbootCloudConfigServerApplication.class, args);
 		}
-
 	}
 </code></pre>
-</li>
-</ul>
-</li>
-</ul>
 </li>
 <li><strong>application.properties</strong><pre><code class="language-properties">	<span class="hljs-attr">spring.application.name</span>=<span class="hljs-string">b2-sboot-cloud-config-server</span>
 <span class="hljs-comment">
@@ -281,30 +283,39 @@
 	<span class="hljs-attr">spring.cloud.config.server.git.uri</span>=<span class="hljs-string">https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git</span>
 <span class="hljs-comment">
 	# local git</span>
-<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///home/srvivek/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///path/to/git/spring-cloud-config-server-git-repo</span>
 <span class="hljs-comment">
 	# windows</span>
-<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///c:/wrkspace/spring-cloud-config-server-git-repo</span>
+<span class="hljs-comment">	#spring.cloud.config.server.git.uri=file:///c:/path/to/git/spring-cloud-config-server-git-repo</span>
 <span class="hljs-comment">
 	# End: Git repo config</span>
 </code></pre>
 </li>
 <li><strong>Git repo</strong>
 <ul>
-<li>In git repo, create propertie file using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code> in the base directory.<pre><code class="language-properties">	<span class="hljs-attr">./limits-service-prod.properties</span>
-	<span class="hljs-attr">./limits-service-dev.properties</span>
+<li>In git repo, create propertie file using microervice name - <code>&lt;microservice-name&gt;[-&lt;env&gt;].properties</code> in the base directory.<pre><code class="language-properties"><span class="hljs-comment">	# limits-service properties for differnt environments</span>
 	<span class="hljs-attr">./limits-service.properties</span>
+	<span class="hljs-attr">./limits-service-dev.properties</span>
 	<span class="hljs-attr">./limits-service-qa.properties</span>
+	<span class="hljs-attr">./limits-service-prod.properties</span>
+<span class="hljs-comment">
+	# currency-exchange-service default property</span>
 	<span class="hljs-attr">./currency-exchange-service.properties</span>
-
 </code></pre>
 </li>
-<li>Content<pre><code class="language-properties">	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.minimum=8</span>
+<li>Content of the properties<pre><code class="language-properties"><span class="hljs-comment">	# properties in limit-service default properties</span>
+	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.minimum=8</span>
 	<span class="hljs-attr">limits-service.properties</span>:<span class="hljs-string">limits-service.maximum=888</span>
+<span class="hljs-comment">	
+	# properties in limit-service DEV properties</span>
 	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.minimum=1</span>
 	<span class="hljs-attr">limits-service-dev.properties</span>:<span class="hljs-string">limits-service.maximum=111</span>
+<span class="hljs-comment">
+	# properties in limit-service QA properties</span>
 	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.minimum=3</span>
 	<span class="hljs-attr">limits-service-qa.properties</span>:<span class="hljs-string">limits-service.maximum=333</span>
+<span class="hljs-comment">	
+	# properties in limit-service PROD properties</span>
 	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.minimum=6</span>
 	<span class="hljs-attr">limits-service-prod.properties</span>:<span class="hljs-string">limits-service.maximum=666</span>
 </code></pre>
@@ -333,7 +344,7 @@
 </ul>
 <hr>
 <h2 id="02-developenable-cloud-config-client">02. Develop/Enable cloud config client</h2>
-<h3 id="project-ref-b1-limits-service">Project ref: <em>b1-limits-service</em></h3>
+<h3 id="project-ref-b1-limits-service">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b1-limits-service">b1-limits-service</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
@@ -519,7 +530,7 @@
 </ul>
 <hr>
 <h2 id="3-resttemplate-connect-to-other-mircoservice">3. RestTemplate: Connect to other mircoservice</h2>
-<h3 id="project-ref-b4-currency-conversion-service">Project ref: <em>b4-currency-conversion-service</em></h3>
+<h3 id="project-ref-b4-currency-conversion-service">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b4-currency-conversion-service">b4-currency-conversion-service</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -682,7 +693,7 @@
 </ul>
 <hr>
 <h2 id="4-openfeign-client-connect-to-other-mircoservice">4. OpenFeign client: Connect to other mircoservice</h2>
-<h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <em>b5-currency-conversion-service-openfeign</em></h3>
+<h3 id="project-ref-b5-currency-conversion-service-openfeign">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign">b5-currency-conversion-service-openfeign</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -857,7 +868,7 @@
 </ul>
 <hr>
 <h2 id="5-service-registry--naming-server--eureka-naming-server">5. Service Registry / Naming server : Eureka naming server</h2>
-<h3 id="project-ref-b6-naming-service">Project ref: <em>b6-naming-service</em></h3>
+<h3 id="project-ref-b6-naming-service">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b6-naming-service">b6-naming-service</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -940,7 +951,7 @@
 </ul>
 <hr>
 <h2 id="6-eureka-naming-server-client-configuration">6. Eureka Naming server client configuration</h2>
-<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b3-currency-exchange-service">b3-currency-exchange-service</a> &amp; <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign">b5-currency-conversion-service-openfeign</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -996,7 +1007,7 @@
 </blockquote>
 <hr>
 <h2 id="7-client-side-load-balancing-microservices">7. Client side Load Balancing microservices</h2>
-<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <em>b3-currency-exchange-service</em> &amp; <em>b5-currency-conversion-service-openfeign</em></h3>
+<h3 id="project-ref-b3-currency-exchange-service--b5-currency-conversion-service-openfeign-1">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b3-currency-exchange-service">b3-currency-exchange-service</a> &amp; <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign">b5-currency-conversion-service-openfeign</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
@@ -1134,7 +1145,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="8-api-gateway">8. API Gateway</h2>
-<h3 id="project-ref-b7-api-gateway">Project ref: <em>b7-api-gateway</em></h3>
+<h3 id="project-ref-b7-api-gateway">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b7-api-gateway">b7-api-gateway</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -1249,7 +1260,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="9-routes-with-spring-cloud-gateway">9. Routes with spring cloud gateway</h2>
-<h3 id="project-ref-b8-api-gateway-routes">Project ref: <em>b8-api-gateway-routes</em></h3>
+<h3 id="project-ref-b8-api-gateway-routes">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b8-api-gateway-routes">b8-api-gateway-routes</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -1419,7 +1430,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="10-api-gateway--global-filter">10. API Gateway : Global filter</h2>
-<h3 id="project-ref-b8-api-gateway-routes-1">Project ref: <em>b8-api-gateway-routes</em></h3>
+<h3 id="project-ref-b8-api-gateway-routes-1">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b8-api-gateway-routes">b8-api-gateway-routes</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -1489,7 +1500,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="11-using-resilience4j---retry">11. Using Resilience4j - retry</h2>
-<h3 id="project-ref-b9-curcuit-breacker">Project ref: <em>b9-curcuit-breacker</em></h3>
+<h3 id="project-ref-b9-curcuit-breacker">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker">b9-curcuit-breacker</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -1699,7 +1710,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="12-using-resilience4j---circuit-breaker">12. Using Resilience4j - circuit breaker</h2>
-<h3 id="project-ref-b9-curcuit-breacker-1">Project ref: <em>b9-curcuit-breacker</em></h3>
+<h3 id="project-ref-b9-curcuit-breacker-1">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker">b9-curcuit-breacker</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -1869,7 +1880,7 @@ With service name it finds the server details from <code>Eureka Server</code>.
 </ul>
 <hr>
 <h2 id="13-using-resilience4j---api-advance-configuration">13. Using Resilience4j - API advance configuration</h2>
-<h3 id="project-ref-b9-curcuit-breacker-2">Project ref: <em>b9-curcuit-breacker</em></h3>
+<h3 id="project-ref-b9-curcuit-breacker-2">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker">b9-curcuit-breacker</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
