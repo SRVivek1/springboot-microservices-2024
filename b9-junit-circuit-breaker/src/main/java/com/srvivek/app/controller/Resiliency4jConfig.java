@@ -29,7 +29,7 @@ public class Resiliency4jConfig {
 				.failureRateThreshold(70)
 
 				// 2. Set the duration the circuit will remain in the open state (5 minutes).
-				.waitDurationInOpenState(Duration.ofMinutes(5))
+				.waitDurationInOpenState(Duration.ofMinutes(2))
 
 				// 3. Set the minimum number of calls required before the circuit breaker can
 				// calculate
