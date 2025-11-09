@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.srvivek.app.exception.InvalidNameException;
 import com.srvivek.app.service.UserService;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+
 
 @SpringBootTest
 public class UserServiceCircuitBreakerTest {
@@ -33,7 +35,7 @@ public class UserServiceCircuitBreakerTest {
 
     @Test
     void validName_whenCircuitClosed_returnsName() {
-        String name = userService.name("Alice");
+        String name = userService.name("Alice"); 
         assertEquals("Alice", name);
         // Circuit should remain closed for a successful call
         assertEquals(CircuitBreaker.State.CLOSED, cb.getState());
@@ -43,13 +45,16 @@ public class UserServiceCircuitBreakerTest {
     void repeatedFailures_openCircuit_and_useFallback() {
         // Make four failing calls. Config requires minimumNumberOfCalls=4,
         // failureRateThreshold=70 -> 4 failures = 100% -> circuit opens.
-        for (int i = 0; i < 4; i++) {
+        for (int i = 123; i < 131; i++) {
+        	
             // invalid names cause InvalidNameException inside UserService
-            assertThrows(RuntimeException.class, () -> userService.name("123"));
+        	// But not throwing exception but returning fallback method response
+        	assertEquals("Guest", userService.name("123"));
+            //assertThrows(InvalidNameException.class, () -> userService.name("123"));
         }
 
         // After the failures, circuit should be OPEN
-        org.junit.jupiter.api.Assertions.assertEquals(CircuitBreaker.State.OPEN, cb.getState());
+        assertEquals(CircuitBreaker.State.OPEN, cb.getState());
 
         // Now, even for a valid name, the fallback should be executed and return "Guest"
         String result = userService.name("Bob");

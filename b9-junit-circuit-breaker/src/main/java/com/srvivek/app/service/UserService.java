@@ -29,6 +29,8 @@ public class UserService {
 	
 	public String guestName(String str, Throwable t) {
 		log.info("Circuit breaker is open, fallback to default method.");
+		log.info("String - " + str);
+		log.info("Throwable - " + t.getMessage());
 		
 		return "Guest";
 	}
