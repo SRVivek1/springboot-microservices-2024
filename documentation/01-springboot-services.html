@@ -2,7 +2,7 @@
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>springboot-microservices-2024-&lbrack;v3&period;4&period;0&rbrack;</title>
+            <title>springboot Basics &lbrack;v3&period;4&period;0&rbrack;</title>
             <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -136,10 +136,9 @@
         
         </head>
         <body class="vscode-body vscode-light">
-            <h1 id="springboot-microservices-2024-v340">springboot-microservices-2024-[v3.4.0]</h1>
-<hr>
+            <h1 id="springboot-basics-v340">springboot Basics [v3.4.0]</h1>
 <h2 id="1-return-response-with-link-to-newly-created-resource">1. Return response with link to newly created resource</h2>
-<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
+<h3 id="project-ref-a2-sboot-ms-social-media-app">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a2-sboot-ms-social-media-app">a2-sboot-ms-social-media-app</a></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
@@ -160,7 +159,7 @@
 </li>
 <li>Build URL to new Resource using current request.
 <ul>
-<li><em><code>ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId())   			.toUri();</code></em></li>
+<li><em><code>ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;{id}&quot;).buildAndExpand(savedUser.getId()).toUri();</code></em></li>
 </ul>
 </li>
 <li>Wrap new URL and response object in <em><code>ResponseEntity</code></em> and return the <em><code>ResponseEntity</code></em> object.
@@ -178,7 +177,7 @@
 			.buildAndExpand(savedUser.getId()).toUri();
 
 		<span class="hljs-keyword">return</span> ResponseEntity.created(location).body(savedUser);
-	}	
+	}
 </code></pre>
 </li>
 </ul>
@@ -186,7 +185,7 @@
 </ul>
 <hr>
 <h2 id="2-property-method-param-or-return-type-validation">2. Property, method param or Return type validation</h2>
-<h3 id="project-ref-a3-sboot-ms-validation">Project ref: <em>a3-sboot-ms-validation</em></h3>
+<h3 id="project-ref-a3-sboot-ms-validation">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a3-sboot-ms-validation">a3-sboot-ms-validation</a></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
@@ -276,10 +275,9 @@
 </ul>
 <hr>
 <h2 id="3-api-documentation-using-openapi-swagger-ui">3. API documentation using openAPI, swagger-ui</h2>
-<h3 id="project-ref-a4-sboot-ms-springdoc-swagger-openapi">Project ref: <em>a4-sboot-ms-springdoc-swagger-openapi</em></h3>
+<h3 id="project-ref-a4-sboot-ms-springdoc-swagger-openapi">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a4-sboot-ms-springdoc-swagger-openapi">a4-sboot-ms-springdoc-swagger-openapi</a></h3>
 <ul>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springdoc<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
@@ -290,28 +288,24 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Code changes</ins></strong></p>
+<li><strong><ins>Code changes</ins></strong>
 <ul>
 <li><code>None</code>.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Swagger URL:</ins></strong></p>
+<li><strong><ins>Swagger URL:</ins></strong>
 <ul>
 <li><a href="http://localhost:8080/swagger-ui">http://localhost:8080/swagger-ui</a></li>
 <li><a href="http://localhost:8080/swagger-ui/index.html">http://localhost:8080/swagger-ui/index.html</a></li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Notes:</ins></strong></p>
+<li><strong><ins>Notes:</ins></strong>
 <ul>
 <li><code>No code change required to enable swagger documentation</code>.</li>
 <li>It's enabled by default if the ependency is present in <code>POM.xml</code></li>
 </ul>
 </li>
-<li>
-<p><strong><ins>References:</ins></strong></p>
+<li><strong><ins>References:</ins></strong>
 <ul>
 <li><code>https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui</code></li>
 <li><code>https://springdoc.org/#getting-started</code></li>
@@ -320,7 +314,7 @@
 </ul>
 <hr>
 <h2 id="4-content-negotiation-for-response-parsing">4. Content negotiation for Response parsing</h2>
-<h3 id="project-ref-a5-sboot-ms-content-negotiation">Project ref: <em>a5-sboot-ms-content-negotiation</em></h3>
+<h3 id="project-ref-a5-sboot-ms-content-negotiation">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a5-sboot-ms-content-negotiation">a5-sboot-ms-content-negotiation</a></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
@@ -347,7 +341,7 @@
 </ul>
 <hr>
 <h2 id="5-internationalization-i18n">5. Internationalization (i18n)</h2>
-<h3 id="project-ref-a6-sboot-ms-content-i18n">Project ref: <em>a6-sboot-ms-content-i18n</em></h3>
+<h3 id="project-ref-a6-sboot-ms-content-i18n">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a6-sboot-ms-content-i18n">a6-sboot-ms-content-i18n</a></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
@@ -411,7 +405,7 @@
 </ul>
 <hr>
 <h2 id="6-microservice-api-versioning">6. Microservice API Versioning</h2>
-<h3 id="project-ref-a7-sboot-ms-api-versioning">Project ref: <em>a7-sboot-ms-api-versioning</em></h3>
+<h3 id="project-ref-a7-sboot-ms-api-versioning">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a7-sboot-ms-api-versioning">a7-sboot-ms-api-versioning</a></h3>
 <ul>
 <li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
@@ -518,12 +512,12 @@
 <li>Base URL remains unchanged.</li>
 <li><strong>Amazon</strong> also follows same versoning strrateegy.
 <ul>
-<li><strong>Ref:</strong> https://</li>
+<li><strong>Ref:</strong> <em>https://</em></li>
 </ul>
 </li>
 <li><strong><ins>Drawback</ins></strong>
 <ul>
-<li>Polluting URL</li>
+<li><em>Polluting URL</em></li>
 </ul>
 </li>
 <li><strong><ins>Controller Code changes</ins></strong>
@@ -620,7 +614,7 @@
 <li>Base URL remains unchanged.</li>
 <li><strong>Github</strong> also follows same versoning strrateegy.
 <ul>
-<li><strong>Ref:</strong> https://</li>
+<li><strong>Ref:</strong> <em>https://</em></li>
 </ul>
 </li>
 <li><strong><ins>Drawback</ins></strong>
@@ -659,16 +653,16 @@
 </code></pre>
 </li>
 </ul>
+<pre><code></code></pre>
 </li>
 </ul>
 </li>
 </ul>
 <hr>
 <h2 id="7-springboot-hateoas">7. SpringBoot HATEOAS</h2>
-<h3 id="project-ref-a8-sboot-ms-hateoas">Project ref: <em>a8-sboot-ms-hateoas</em></h3>
+<h3 id="project-ref-a8-sboot-ms-hateoas">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a8-sboot-ms-hateoas">a8-sboot-ms-hateoas</a></h3>
 <ul>
-<li>
-<p><strong><ins>Maven / External dependency</ins></strong></p>
+<li><strong><ins>Maven / External dependency</ins></strong>
 <ul>
 <li>Add spring validation dependency.<pre><code class="language-xml">	<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
 		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
@@ -678,8 +672,7 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Code changes</ins></strong></p>
+<li><strong><ins>Code changes</ins></strong>
 <ul>
 <li>imports
 <ul>
@@ -714,15 +707,13 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Notes:</ins></strong></p>
+<li><strong><ins>Notes:</ins></strong>
 <ul>
 <li><code>Spring HATEOAS</code> provides some APIs to ease creating REST representations that follow the HATEOAS principle when working with Spring and especially Spring MVC.</li>
 <li>The <code>core problem it tries to address</code> is link creation and representation assembly.</li>
 </ul>
 </li>
-<li>
-<p><strong><ins>References:</ins></strong></p>
+<li><strong><ins>References:</ins></strong>
 <ul>
 <li><code>https://spring.io/projects/spring-hateoas</code></li>
 </ul>
@@ -730,7 +721,7 @@
 </ul>
 <hr>
 <h2 id="8-static-content-filtering">8. Static content filtering</h2>
-<h3 id="project-ref-a9-sboot-ms-static-filtering">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<h3 id="project-ref-a9-sboot-ms-static-filtering">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
@@ -810,7 +801,7 @@
 </ul>
 <hr>
 <h2 id="9-dynamic-content-filtering">9. Dynamic content filtering</h2>
-<h3 id="project-ref-a9-sboot-ms-static-filtering-1">Project ref: <em>a9-sboot-ms-static-filtering</em></h3>
+<h3 id="project-ref-a9-sboot-ms-static-filtering-1">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a9-sboot-ms-static-filtering">a9-sboot-ms-static-filtering</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>
@@ -942,7 +933,7 @@
 </ul>
 <hr>
 <h2 id="10-exception--error-handling-custom-exceptions">10. Exception / Error Handling (Custom Exceptions)</h2>
-<h3 id="project-ref-a2-sboot-ms-social-media-app-1">Project ref: <em>a2-sboot-ms-social-media-app</em></h3>
+<h3 id="project-ref-a2-sboot-ms-social-media-app-1">Project ref: <a href="https://github.com/SRVivek1/springboot-microservices-2024/tree/main/a2-sboot-ms-social-media-app">a2-sboot-ms-social-media-app</a></h3>
 <ul>
 <li>
 <p><strong><ins>Purpose / Feature</ins></strong></p>

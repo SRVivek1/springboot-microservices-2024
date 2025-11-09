@@ -176,25 +176,29 @@
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
 <li>Zipkin⁠ is a distributed tracing system.</li>
-<li>It helps gather timing data needed to troubleshoot latency problems in service architectures.</li>
-<li>Features include both the collection and lookup of this data.</li>
-<li>If you have a trace ID in a log file, you can jump directly to it. Otherwise, you can query based on attributes such as service, operation name, tags and duration. Some interesting data will be summarized for you, such as the percentage of time spent in a service, and whether or not operations failed.</li>
+<li>It helps gather timing data needed to troubleshoot latency problems in service architectures. Features include both the collection and lookup of this data.</li>
+<li>If you have a trace ID in a log file, we can jump directly to it. Otherwise, we can query based on attributes such as service, operation name, tags and duration. Some interesting data will be summarized for you, such as the percentage of time spent in a service, and whether or not operations failed.</li>
 <li>Each of the <code>microservice</code> send the tracing info to the zipkin tracing server. Zipkin store the information in database and provides UI.</li>
 <li>Dependencies:
 <ul>
 <li>Micrometer:
 <ul>
 <li>Bridges the Micrometer Observation API to OpenTelemetry.</li>
-<li>Hamdles logs, traces &amp; matrics.</li>
+<li>Handles logs, traces &amp; matrics.</li>
 </ul>
 </li>
 <li>OpenTelemetry:
 <ul>
 <li>Reports traces to Zipkin.</li>
-<li>Hamdles logs, traces &amp; matrics.</li>
+<li>Handles logs, traces &amp; matrics.</li>
 </ul>
 </li>
-<li>OpenZipkin brave:</li>
+<li>OpenZipkin brave:
+<ul>
+<li>Intercepts production requests, gathers timing data, and propagates trace contexts.</li>
+<li>Primary objective is to facilitate the correlation of timing data within distributed systems, enabling efficient troubleshooting for latency issues.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -202,7 +206,7 @@
 <li><strong><ins>Steps</ins></strong>
 <ul>
 <li><em><strong>Project Setup:</strong></em> Docker must be installed and running.</li>
-<li><em><strong>Step-1:</strong></em> Pull zepkin image from docker hub and create container.
+<li><em><strong>Step-1:</strong></em> Pull zipkin server image from docker hub and create container.
 <ul>
 <li><em><strong>docker run -d -p 9411:9411 openzipkin/zipkin</strong></em></li>
 </ul>
@@ -212,28 +216,15 @@
 </li>
 </ul>
 <blockquote>
-<p>Note: We can also create spring boot app with zepkin serevr.</p>
+<p>Note: We can also develop spring boot app with zipkin serevr intead of using Zipking docker image.</p>
 </blockquote>
 <ul>
-<li>
-<p><strong><ins>Notes:</ins></strong></p>
-<ul>
-<li>Some important key point / takeaway note.</li>
-<li>Some takeaway:
-<ul>
-<li>Sub topic takeaway.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p><strong><ins>References:</ins></strong></p>
+<li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://docs.spring.io/spring-boot/reference/actuator/tracing.html">https://docs.spring.io/spring-boot/reference/actuator/tracing.html</a></li>
 <li><a href="https://www.baeldung.com/tracing-services-with-zipkin">https://www.baeldung.com/tracing-services-with-zipkin</a></li>
 <li><a href="https://spring.io/projects/spring-cloud-sleuth">https://spring.io/projects/spring-cloud-sleuth</a></li>
 <li><a href="https://docs.micrometer.io/tracing/reference/1.4">https://docs.micrometer.io/tracing/reference/1.4</a></li>
-<li></li>
 </ul>
 </li>
 </ul>
@@ -271,11 +262,12 @@
 <li><em><strong>Project Setup:</strong></em> An existing microservice / create one.</li>
 <li><em><strong>Step-1:</strong></em> pom.xml: Add micrometer, micrometer tracing bridge &amp; opentelemetry dependencies.
 <ul>
-<li>Micrometer: Assigns ID to request, which remains same when other microservices are called in the same request.
+<li><strong>Micrometer:</strong> Assigns an ID to the request, which remains same in all microservices requests called in that specific request chain.
 <ul>
-<li>E.g. Req. 1: currency-conversion-service --&gt; currency-exchange-service</li>
+<li><em>e.g. Req. 1:</em> currency-conversion-service --&gt; currency-exchange-service</li>
 </ul>
 </li>
+<li><strong>feign-micrometer:</strong> Add dependency to pom.xml, to trace requests made using <code>feign</code> clients. By default requests made using feign clients are not traced.</li>
 </ul>
 </li>
 <li><em><strong>Step-2:</strong></em> Add sampling configuration to define how much percentage of request will be sampled.
@@ -284,11 +276,14 @@
 <li><code>logging.pattern.level=%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}] #SB3</code></li>
 </ul>
 </li>
-<li>Add <code>feign-micrometer</code> dependency to pom.xml, to trace requests made using <code>feign</code> client. By default it's not traced.</li>
+<li><em><strong>Step-3:</strong></em> Build RestTemplate instance using Builder class.
+<ul>
 <li>Build <code>RestTemplate</code> using <code>RestTemplateBuilder</code> to enable tracing of requests.
 <ul>
-<li>If <code>new RestTemplate()</code> is used, it will not be traced.</li>
+<li>RestTemplate instance created using constructor <code>new RestTemplate()</code> will not be traced.</li>
 <li>So, cretae a config class and return a Bean of <code>RestTemplate</code> and autowire in controller.</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -296,40 +291,39 @@
 <li>
 <p><strong><ins>Maven / External dependency</ins></strong></p>
 <ul>
-<li>Required dependency.<pre><code class="language-xml">	<span class="hljs-comment">&lt;!-- SB3 :  Micrometer 
-        &gt; OpenTelemetry 
-        &gt; Zipkin 
-  --&gt;</span>
+<li>Required dependency.<pre><code class="language-xml">    <span class="hljs-comment">&lt;!-- SB3 :  Micrometer 
+          &gt; OpenTelemetry 
+          &gt; Zipkin 
+    --&gt;</span>
 
-  <span class="hljs-comment">&lt;!-- Micrometer - Vendor-neutral application observability facade. 
-      Instrument your JVM-based application code without vendor lock-in.  
-      Observation (Metrics &amp; Logs) + Tracing.
-  --&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-observation<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Micrometer - Vendor-neutral application observability facade. 
+        Instrument your JVM-based application code without vendor lock-in.  
+        Observation (Metrics &amp; Logs) + Tracing.
+    --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-observation<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 
-  <span class="hljs-comment">&lt;!-- Open Telemetry
-      - Open Telemetry as Bridge (RECOMMENDED)
-      - Simplified Observability (metrics, logs, and traces) --&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-tracing-bridge-otel<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- Open Telemetry
+        - Open Telemetry as Bridge (RECOMMENDED)
+        - Simplified Observability (metrics, logs, and traces) --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>micrometer-tracing-bridge-otel<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 
-  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.opentelemetry<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>opentelemetry-exporter-zipkin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.opentelemetry<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>opentelemetry-exporter-zipkin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 
-  <span class="hljs-comment">&lt;!-- requres where feign client is getting used. --&gt;</span>
-  <span class="hljs-comment">&lt;!-- Enables tracing of REST API calls made using Feign - SB-V3 ONLY--&gt;</span>
-  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>feign-micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
-  
+    <span class="hljs-comment">&lt;!-- requres where feign client is getting used. --&gt;</span>
+    <span class="hljs-comment">&lt;!-- Enables tracing of REST API calls made using Feign - SB-V3 ONLY--&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>io.github.openfeign<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>feign-micrometer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
 </li>
 </ul>
@@ -344,74 +338,72 @@
 <li><code>import org.springframework.boot.web.client.RestTemplateBuilder;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.</li>
-</ul>
-<pre><code class="language-java">  <span class="hljs-meta">@Configuration</span>
-  <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestTemplateConfiguration</span> {
+<li>Create bean of RestTemplate in configuration class.<pre><code class="language-java">    <span class="hljs-meta">@Configuration</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestTemplateConfiguration</span> {
 
-    <span class="hljs-meta">@Bean</span>
-    RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">(RestTemplateBuilder builder)</span> {
-      <span class="hljs-keyword">return</span> builder.build();
+      <span class="hljs-meta">@Bean</span>
+      RestTemplate <span class="hljs-title function_">restTemplate</span><span class="hljs-params">(RestTemplateBuilder builder)</span> {
+        <span class="hljs-keyword">return</span> builder.build();
+      }
     }
-  }
 </code></pre>
+</li>
+</ul>
+</li>
+<li><strong>Controller:</strong> <em>CurrencyConversionController.java</em>
 <ul>
-<li><strong>Controller:</strong> <em>CurrencyConversionController.java</em></li>
 <li>imports
 <ul>
 <li><code>import org.springframework.boot.web.client.RestTemplateBuilder;</code></li>
 </ul>
 </li>
-<li>Annotate the method parameter for validation.</li>
-</ul>
-<pre><code class="language-java">  <span class="hljs-comment">// standard controller code</span>
+<li>Use autowired RestTemplate instance to consume services.<pre><code class="language-java">    <span class="hljs-comment">// standard controller code</span>
 
-  <span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
-  <span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
-      <span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
+    <span class="hljs-meta">@GetMapping(&quot;/currency-conversion/from/{from}/to/{to}/quantity/{quantity}&quot;)</span>
+    <span class="hljs-keyword">public</span> CurrencyConversion <span class="hljs-title function_">calculateCurrencyConversion</span><span class="hljs-params">(<span class="hljs-meta">@PathVariable</span> String from, <span class="hljs-meta">@PathVariable</span> String to,
+        <span class="hljs-meta">@PathVariable</span> BigDecimal quantity)</span> {
 
-    logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
+      logger.info(<span class="hljs-string">&quot;Executing CurrencyConversionController.calculateCurrencyConversion(..) API.&quot;</span>);
 
-    <span class="hljs-comment">// Standardize</span>
-    from = from.toUpperCase();
-    to = to.toUpperCase();
+      <span class="hljs-comment">// Standardize</span>
+      from = from.toUpperCase();
+      to = to.toUpperCase();
 
-    <span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
-    uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
-    uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
+      <span class="hljs-keyword">final</span> Map&lt;String, String&gt; uriVariables = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+      uriVariables.put(<span class="hljs-string">&quot;from&quot;</span>, from);
+      uriVariables.put(<span class="hljs-string">&quot;to&quot;</span>, to);
 
-    <span class="hljs-comment">// Send request to Currency exchange micro-service</span>
-    <span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = restTemplate.getForEntity(
-        <span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
-        uriVariables);
+      <span class="hljs-comment">// Send request to Currency exchange micro-service</span>
+      <span class="hljs-keyword">final</span> ResponseEntity&lt;CurrencyConversion&gt; response = restTemplate.getForEntity(
+          <span class="hljs-string">&quot;http://localhost:8000/jpa/currency-exchange/from/{from}/to/{to}&quot;</span>, CurrencyConversion.class,
+          uriVariables);
 
-    <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
+      <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversionExchange</span> <span class="hljs-operator">=</span> response.getBody();
 
-    logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
+      logger.debug(<span class="hljs-string">&quot;Response from currency-exchange : {}&quot;</span>, currencyConversionExchange);
 
-    <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from,
-        to, quantity, currencyConversionExchange.getConversionMultiples(),
-        quantity.multiply(currencyConversionExchange.getConversionMultiples()),
-        currencyConversionExchange.getEnvironment());
+      <span class="hljs-keyword">final</span> <span class="hljs-type">CurrencyConversion</span> <span class="hljs-variable">currencyConversion</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CurrencyConversion</span>(currencyConversionExchange.getId(), from,
+          to, quantity, currencyConversionExchange.getConversionMultiples(),
+          quantity.multiply(currencyConversionExchange.getConversionMultiples()),
+          currencyConversionExchange.getEnvironment());
 
-    logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
+      logger.debug(<span class="hljs-string">&quot;Response returned : {}&quot;</span>, currencyConversionExchange);
 
-    <span class="hljs-keyword">return</span> currencyConversion;
-  }
-
-  <span class="hljs-comment">// other APIs</span>
+      <span class="hljs-keyword">return</span> currencyConversion;
+    }
+    <span class="hljs-comment">// other APIs</span>
 </code></pre>
+</li>
+</ul>
 </li>
 <li><strong>Application Config:</strong> <em>application.properties</em><pre><code class="language-properties"><span class="hljs-comment"># logging</span>
 <span class="hljs-attr">logging.pattern.level</span>=<span class="hljs-string">%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]</span>
-
 <span class="hljs-attr">logging.level.com.srvivek.sboot</span>=<span class="hljs-string">debug</span>
 <span class="hljs-comment">
-
 # Start: micrometer configuration</span>
 <span class="hljs-comment">
 # Add sampling configuration to define how much percentage of request will be sampled.</span>
-<span class="hljs-attr">management.tracing.sampling.probability</span>=<span class="hljs-string">1.0</span>
+<span class="hljs-attr">management.tracing.sampling.probability</span>=<span class="hljs-string">1.0  # 100%</span>
 <span class="hljs-comment">
 # End: micrometer configuration</span>
 </code></pre>
@@ -420,7 +412,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="3-docker-componse">3. Docker componse:</h2>
+<h2 id="3-docker-componse-maintain-microservices-in-docker">3. Docker componse: Maintain microservices in Docker</h2>
 <h3 id="project-ref-d5-docker-componse">Project ref: <em>d5-docker-componse</em></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
@@ -450,7 +442,11 @@
 </li>
 <li><strong><ins>Steps</ins></strong>
 <ul>
-<li><em><strong>Project Setup:</strong></em> Check and install docker-componse.</li>
+<li><em><strong>Project Setup:</strong></em> Check and install docker-componse.
+<ul>
+<li><strong>Linux:</strong> <em>sudo curl -SL <a href="https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-linux-x86_64">https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-linux-x86_64</a> -o /usr/local/bin/docker-compose</em></li>
+</ul>
+</li>
 <li><em><strong>Step-1:</strong></em> Create <code>docker-compose.yaml</code>.
 <ul>
 <li>Don't use <code>tabs</code> for formatting/indentation, use only spaces.</li>

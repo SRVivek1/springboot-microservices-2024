@@ -18,22 +18,23 @@
 
 ---
 
-## 01. Develop cloud config server
-### Project ref: *b2-sboot-cloud-config-server*
+## 01. SpringBoot cloud config server
+### Project ref: [b2-sboot-cloud-config-server](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b2-sboot-cloud-config-server)
 - **<ins>Purpose / Feature</ins>**
-  - Spring Cloud Config provides server-side and client-side support for externalized configuration in a distributed system. 
-  - With the Config Server, you have a central place to manage external properties for applications across all environments. 
+  - Spring Cloud Config provides server-side and client-side support to externalize application configuration in a distributed system. 
+  - With the Config Server, we have a central place to manage external properties / configuration for all applications across all environments. 
 - **<ins>Steps</ins>**
   - ***Step-1:*** Git Repo setup
-    - Create a new git repo (local or github)
-    - Add required properties files using microervice name - `<microservice-name>[-<env>].properties`
+    - Create a new git repo either a local or create a reposirty on [Github.com](http://github.com)
+      - **Local git initialization:** *git init*
+    - Add required properties files using microservice name - `<microservice-name>[-<env>].properties`
   - ***Step-2:*** Create a new SpringBoot project.
-    - Add dependency `spring-cloud-config-server`.
-  - ***Step-3:*** Enable as Config Server
-    - Add `@EnableConfigServer` annotation to enable application as config server.
-  - ***Step-4:*** Configure git repo URL.
-    - Add `spring.cloud.config.server.git.uri` in `application.properties`
-  - ***Step-5:*** Git URLs
+    - Add dependency `spring-cloud-config-server` in *pom.xml*.
+  - ***Step-3:*** Enable as Config Server by annotation config.
+    - Add `@EnableConfigServer` annotation on *SpringBoot main App* to enable application as config server.
+  - ***Step-4:*** Configure git repo URL in *application.properties*.
+    - Add `spring.cloud.config.server.git.uri=https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git`
+  - ***Step-5:*** Git URLs for different platforms
     - **Linux:** *file:///path/to/git/directory*
     - **Windows:** *file:///c:/path/to/git/directory*
     - **Github:** *https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git*
@@ -46,22 +47,20 @@
 		</dependency>
 	```
 - **<ins>Code changes</ins>**
-  - B2SbootCloudConfigServerApplication.java main app.
+  - **B2SbootCloudConfigServerApplication.java** main app.
     - imports
       - `import org.springframework.cloud.config.server.EnableConfigServer;`
-      - Config server is enabled by adding annotation on main app.
-    	```java
-    		/* Enable config server. */
-			@EnableConfigServer 
-			@SpringBootApplication
-			public class B2SbootCloudConfigServerApplication {
-
-				public static void main(String[] args) {
-					SpringApplication.run(B2SbootCloudConfigServerApplication.class, args);
-				}
-
+    - Config server is enabled by adding annotation on main app.
+    ```java
+    	/* Enable config server. */
+		@EnableConfigServer 
+		@SpringBootApplication
+		public class B2SbootCloudConfigServerApplication {
+			public static void main(String[] args) {
+				SpringApplication.run(B2SbootCloudConfigServerApplication.class, args);
 			}
-    	```
+		}
+   	```
   - **application.properties**
     ```properties
 		spring.application.name=b2-sboot-cloud-config-server
@@ -75,31 +74,40 @@
 		spring.cloud.config.server.git.uri=https://github.com/SRVivek1/spring-cloud-config-server-git-repo.git
 
 		# local git
-		#spring.cloud.config.server.git.uri=file:///home/srvivek/wrkspace/spring-cloud-config-server-git-repo
+		#spring.cloud.config.server.git.uri=file:///path/to/git/spring-cloud-config-server-git-repo
 
 		# windows
-		#spring.cloud.config.server.git.uri=file:///c:/wrkspace/spring-cloud-config-server-git-repo
+		#spring.cloud.config.server.git.uri=file:///c:/path/to/git/spring-cloud-config-server-git-repo
 
 		# End: Git repo config
 	```
   - **Git repo**
     - In git repo, create propertie file using microervice name - `<microservice-name>[-<env>].properties` in the base directory.
 		```properties
-			./limits-service-prod.properties
-			./limits-service-dev.properties
+			# limits-service properties for differnt environments
 			./limits-service.properties
+			./limits-service-dev.properties
 			./limits-service-qa.properties
-			./currency-exchange-service.properties
+			./limits-service-prod.properties
 
+			# currency-exchange-service default property
+			./currency-exchange-service.properties
 		```
-	- Content
+	- Content of the properties
 		```properties
+			# properties in limit-service default properties
 			limits-service.properties:limits-service.minimum=8
 			limits-service.properties:limits-service.maximum=888
+			
+			# properties in limit-service DEV properties
 			limits-service-dev.properties:limits-service.minimum=1
 			limits-service-dev.properties:limits-service.maximum=111
+
+			# properties in limit-service QA properties
 			limits-service-qa.properties:limits-service.minimum=3
 			limits-service-qa.properties:limits-service.maximum=333
+			
+			# properties in limit-service PROD properties
 			limits-service-prod.properties:limits-service.minimum=6
 			limits-service-prod.properties:limits-service.maximum=666
 		```
@@ -113,7 +121,7 @@
 ---
 
 ## 02. Develop/Enable cloud config client 
-### Project ref: *b1-limits-service*
+### Project ref: [b1-limits-service](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b1-limits-service)
 - **<ins>Purpose / Feature</ins>**
   - A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer). 
   - It also picks up some additional useful features related to Environment change events.
@@ -251,7 +259,7 @@
 ---
 
 ## 3. RestTemplate: Connect to other mircoservice
-### Project ref: *b4-currency-conversion-service*
+### Project ref: [b4-currency-conversion-service](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b4-currency-conversion-service)
 - **<ins>Purpose / Feature</ins>**
   - A synchronous client to perform HTTP requests, exposing a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others. 
   - RestTemplate offers templates for common scenarios by HTTP method, in addition to the generalized exchange and execute methods that support less frequent cases.
@@ -362,7 +370,7 @@
 ---
 
 ## 4. OpenFeign client: Connect to other mircoservice
-### Project ref: *b5-currency-conversion-service-openfeign*
+### Project ref: [b5-currency-conversion-service-openfeign](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign)
 - **<ins>Purpose / Feature</ins>**
   - Easy way to make rest service calls. 
   - Removes bioler plate code need to be written while using `RestTemplate` to invoke a rest service.
@@ -492,7 +500,7 @@
 ---
 
 ## 5. Service Registry / Naming server : Eureka naming server
-### Project ref: *b6-naming-service*
+### Project ref: [b6-naming-service](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b6-naming-service)
 - **<ins>Purpose / Feature</ins>**
   - It's an application that contains information about all micro services including the name of the service, port, and IP address. 
   - Each microservice has to register itself with the Eureka Server.
@@ -553,7 +561,7 @@
 ---
 
 ## 6. Eureka Naming server client configuration
-### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
+### Project ref: [b3-currency-exchange-service](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b3-currency-exchange-service) & [b5-currency-conversion-service-openfeign](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign)
 - **<ins>Purpose / Feature</ins>**
   - Register's the micro-service to Name server.
 - **<ins>Steps</ins>**
@@ -586,7 +594,7 @@
 > Note: If `Eureka client` dependency is present in `POM.xml`, spring will automatically try to register this service to Naming server by looking for `Eureka Server` on it's default `Eureka port - 8761`.
 ---
 ## 7. Client side Load Balancing microservices
-### Project ref: *b3-currency-exchange-service* & *b5-currency-conversion-service-openfeign*
+### Project ref: [b3-currency-exchange-service](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b3-currency-exchange-service) & [b5-currency-conversion-service-openfeign](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b5-currency-conversion-service-openfeign)
 - **<ins>Purpose / Feature</ins>**
   - Balance the traffic to the services dynamically by checking the current running instances.
 - **<ins>Steps</ins>**
@@ -684,7 +692,7 @@
 ---
 
 ## 8. API Gateway
-### Project ref: *b7-api-gateway*
+### Project ref: [b7-api-gateway](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b7-api-gateway)
 - **<ins>Purpose / Feature</ins>**
   - All requests will be routed via API Gateway.
   - This gives us flexibility to implement all common features at one place.
@@ -764,7 +772,7 @@
 ---
 
 ## 9. Routes with spring cloud gateway
-### Project ref: *b8-api-gateway-routes*
+### Project ref: [b8-api-gateway-routes](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b8-api-gateway-routes)
 - **<ins>Purpose / Feature</ins>**
   - API Gateway `Routers` and `Filters` provides the option to intercept and process the requests.
   - It provides methods/APIs to match request on any attribute - `method, header, cookie, path, host etc.`.
@@ -898,7 +906,7 @@
 ---
 
 ## 10. API Gateway : Global filter
-### Project ref: *b8-api-gateway-routes*
+### Project ref: [b8-api-gateway-routes](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b8-api-gateway-routes)
 - **<ins>Purpose / Feature</ins>**
   - Contract for interception-style, chained processing of gateway requests that may be used to implement cross-cutting, application-agnostic requirements such as security, timeouts, and others
   - Only applies to matched gateway routes. Copied from framework WebFilter.
@@ -947,7 +955,7 @@
 ---
 
 ## 11. Using Resilience4j - retry
-### Project ref: *b9-curcuit-breacker*
+### Project ref: [b9-curcuit-breacker](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker)
 - **<ins>Purpose / Feature</ins>**
   - `Resilience4j` is a replacement of `netflix-hystrix` for circuit breaker framework.
   - Resilience4j is a lightweight fault tolerance library designed for functional programming.
@@ -1109,7 +1117,7 @@
 
 
 ## 12. Using Resilience4j - circuit breaker
-### Project ref: *b9-curcuit-breacker*
+### Project ref: [b9-curcuit-breacker](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker)
 - **<ins>Purpose / Feature</ins>**
   - **Note:** This project is extention to `Using Resilience4j - retry`. So all settings will remain same except for that instead of ***@Retry** annotation we'll use ***@CircuitBreaker*** annotation.
   - If there are continious failure identified for a microservice, then after certain attemts, circuit breaker stop processing the API and send the response directly from `fallbackMethod`.
@@ -1236,7 +1244,7 @@
 ---
 
 ## 13. Using Resilience4j - API advance configuration
-### Project ref: *b9-curcuit-breacker*
+### Project ref: [b9-curcuit-breacker](https://github.com/SRVivek1/springboot-microservices-2024/tree/main/b9-curcuit-breacker)
 - **<ins>Purpose / Feature</ins>**
   - **Note:** Advance API configuration.
   - **Aspect order:** The Resilience4j Aspects order is the following:
